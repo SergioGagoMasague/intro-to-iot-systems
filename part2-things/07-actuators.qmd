@@ -1,0 +1,5 @@
+# Actuators and the Observe–Decide–Act Loop {#sec-ch07}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C07, C07_02 · Activity 4.
+:::

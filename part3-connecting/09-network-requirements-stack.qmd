@@ -1,0 +1,5 @@
+# IoT Network Requirements and the Protocol Stack {#sec-ch09}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C09, C10.
+:::

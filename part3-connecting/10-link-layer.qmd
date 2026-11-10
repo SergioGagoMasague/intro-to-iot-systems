@@ -1,0 +1,5 @@
+# The Link Layer: Short and Long Range {#sec-ch10}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C11_01–03 · Activity 6.
+:::

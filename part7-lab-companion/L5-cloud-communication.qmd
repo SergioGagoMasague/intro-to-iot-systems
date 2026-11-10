@@ -1,0 +1,5 @@
+# Lab 5: Cloud Communication {#sec-lab-l5}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 5 handout.
+:::

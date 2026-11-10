@@ -1,0 +1,5 @@
+# Lab 6: Harden Your Device {#sec-lab-l6}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 6 handout.
+:::

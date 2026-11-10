@@ -1,0 +1,5 @@
+# The Internet Layer: 6LoWPAN and RPL {#sec-ch11}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C12.
+:::

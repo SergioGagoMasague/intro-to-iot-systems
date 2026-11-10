@@ -1,0 +1,89 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Introduction to IoT Systems"
+  subtitle: "Building connected devices from the breadboard up"
+  author: "Sergio Gago-Masagué"
+  date: last-modified
+  date-format: "MMMM YYYY"
+  repo-url: https://github.com/OWNER/intro-to-iot-systems   # TODO: set once the repository exists
+  repo-actions: [edit, issue]
+  license: "CC BY 4.0"
+  search: true
+  page-footer:
+    left: "© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT"
+    right: "IoT@UCI"
+  chapters:
+    - index.qmd
+    - how-to-use.qmd
+    - part: "Part I — Foundations"
+      chapters:
+        - part1-foundations/01-what-is-iot.qmd
+        - part1-foundations/02-boards-and-kit.qmd
+        - part1-foundations/03-programming-the-device.qmd
+        - part1-foundations/04-embedded-systems-os.qmd
+    - part: "Part II — The Things"
+      chapters:
+        - part2-things/05-serial-communication.qmd
+        - part2-things/06-sensors.qmd
+        - part2-things/07-actuators.qmd
+    - part: "Part III — Connecting Things"
+      chapters:
+        - part3-connecting/08-communication-models.qmd
+        - part3-connecting/09-network-requirements-stack.qmd
+        - part3-connecting/10-link-layer.qmd
+        - part3-connecting/11-internet-layer.qmd
+        - part3-connecting/12-application-protocols.qmd
+        - part3-connecting/13-interoperability-standards.qmd
+    - part: "Part IV — Trustworthy IoT"
+      chapters:
+        - part4-trustworthy/14-security-privacy.qmd
+        - part4-trustworthy/15-device-identity.qmd
+        - part4-trustworthy/16-ota-lifecycle.qmd
+        - part4-trustworthy/17-compliance.qmd
+    - part: "Part V — Intelligence at the Edge"
+      chapters:
+        - part5-edge-intelligence/18-ai-on-iot.qmd
+        - part5-edge-intelligence/19-where-iot-is-heading.qmd
+    - part: "Part VI — Building an IoT System"
+      chapters:
+        - part6-building/20-idea-to-vertical-slice.qmd
+        - part6-building/21-testing-in-the-field.qmd
+        - part6-building/22-reviewing-systems.qmd
+    - part: "Part VII — Lab Companion"
+      chapters:
+        - part7-lab-companion/L0-bench-safety-soldering.qmd
+        - part7-lab-companion/L1-build-the-kit.qmd
+        - part7-lab-companion/L2-traffic-controller.qmd
+        - part7-lab-companion/L3-serial-communication.qmd
+        - part7-lab-companion/L4-ble-step-counter.qmd
+        - part7-lab-companion/L5-cloud-communication.qmd
+        - part7-lab-companion/L6-harden-your-device.qmd
+  appendices:
+    - appendices/A-kit-reference.qmd
+    - appendices/B-toolchain.qmd
+    - appendices/C-troubleshooting.qmd
+    - appendices/D-glossary.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: [cosmo, theme.scss]
+      dark: [darkly, theme.scss]
+    code-copy: true
+    code-overflow: wrap
+    number-depth: 2
+    toc-depth: 3
+    callout-appearance: default
+  typst:
+    papersize: us-letter
+    toc: true
+    section-numbering: "1.1"
+
+execute:
+  enabled: false

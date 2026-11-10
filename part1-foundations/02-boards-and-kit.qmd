@@ -1,0 +1,5 @@
+# Development Boards and the IoT Kit {#sec-ch02}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C02 · Activity 1.
+:::

@@ -1,0 +1,5 @@
+# Sensors {#sec-ch06}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C06.
+:::

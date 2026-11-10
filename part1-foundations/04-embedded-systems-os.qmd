@@ -1,0 +1,5 @@
+# Embedded Systems and Operating Systems {#sec-ch04}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C04.
+:::

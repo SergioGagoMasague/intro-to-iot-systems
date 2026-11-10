@@ -1,0 +1,5 @@
+# Lab 0: Bench Safety and Soldering {#sec-lab-l0}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: S01.
+:::

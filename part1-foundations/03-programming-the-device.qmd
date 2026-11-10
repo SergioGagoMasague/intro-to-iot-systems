@@ -1,0 +1,5 @@
+# Programming the Device {#sec-ch03}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C03_1, C03_2 · Activity 2.
+:::

@@ -1,0 +1,5 @@
+# Lab 2: Traffic Controller {#sec-lab-l2}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 2 handout.
+:::

@@ -1,0 +1,5 @@
+# Application Protocols: HTTP, CoAP, MQTT and More {#sec-ch12}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C13_01–05 · Activity 7.
+:::

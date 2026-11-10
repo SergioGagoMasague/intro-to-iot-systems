@@ -1,0 +1,43 @@
+# Chapter Title {#sec-chNN}
+
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. …
+2. …
+3. …
+:::
+
+## Why it matters
+
+A real system, product or failure story that shows why this topic matters.
+
+## Concepts
+
+### First concept
+
+…
+
+::: {.callout-tip title="Try it on your kit"}
+A short exercise (10–20 minutes) on the kit. Link to the matching lecture activity or lab: see @sec-lab-lN.
+:::
+
+## Design trade-offs
+
+When to choose what, usually as a comparison table.
+
+## Common pitfalls
+
+- …
+
+::: {.callout-note title="Advanced track" collapse="true"}
+Optional deeper material: standards, engineering practice, design reviews.
+:::
+
+## Check your understanding
+
+1. …
+
+## Further reading
+
+- …

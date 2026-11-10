@@ -1,0 +1,5 @@
+# Lab 1: Build the Kit in Stages {#sec-lab-l1}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 1 handout.
+:::

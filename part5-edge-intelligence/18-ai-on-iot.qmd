@@ -1,0 +1,5 @@
+# AI on IoT and Edge ML {#sec-ch18}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C15.
+:::

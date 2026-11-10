@@ -1,0 +1,5 @@
+# What Is the Internet of Things? {#sec-ch01}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: C01.
+:::

@@ -1,0 +1,22 @@
+# Using This Book with the IoT@UCI Kit {.unnumbered}
+
+Most chapters include a **Try it on your kit** box. These exercises assume the IoT@UCI team kit: an ESP32 DevKit V1 on two 830-point breadboards, with a set of sensors, actuators, a display, a secure element and a LoRa radio.
+
+## What is in the kit
+
+| Part | Role | Bus | Used from |
+|---|---|---|---|
+| ESP32 DevKit V1 | Microcontroller with Wi-Fi and Bluetooth | — | @sec-ch02 |
+| LEDs, push buttons, potentiometer, buzzer | Basic I/O | GPIO / ADC / PWM | @sec-ch03 |
+| 128×64 OLED display (SSD1306) | Text and graphics output | SPI | @sec-ch05 |
+| BMP280 | Temperature and pressure sensor | I²C | @sec-ch05 |
+| MPU-6050 | Accelerometer and gyroscope | I²C | @sec-ch05 |
+| ATECC608A | Secure element (device identity, signatures) | I²C | @sec-ch05, @sec-ch15 |
+| Servo motor | Actuator on its own 5 V rail | PWM | @sec-ch07 |
+| RFM95W (SX1276) | LoRa radio | SPI | @sec-ch10 |
+
+The kit is built in stages, so that each part is wired just before the chapter that first needs it. The full build is described in @sec-lab-l1, and the complete pin map is in @sec-app-a.
+
+## Safety
+
+Always unplug the USB cable before changing any wiring. Never connect the servo's 5 V rail to the 3.3 V rail. Read @sec-lab-l0 before you solder.

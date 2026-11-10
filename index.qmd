@@ -1,0 +1,32 @@
+# Preface {.unnumbered}
+
+This book teaches the Internet of Things the way IoT systems are actually built: one wire, one bus, one protocol layer at a time, on hardware you assemble yourself.
+
+It was written for a ten-week, hands-on course in IoT software and systems. Every concept is paired with something you can run on a small ESP32 kit, so that the ideas in each chapter turn into working circuits, packets and devices before the week is over.
+
+## Who this book is for
+
+The book assumes you can program in C or C++ and have met basic computer organization and networking ideas. It does not assume any electronics background. Chapters that need circuit knowledge build it as they go, and the Lab Companion walks through soldering and wiring from first principles.
+
+## How the book is organized
+
+The book has two layers.
+
+- **The core text** (Parts I–VI) covers ideas that change slowly: how devices talk to sensors, how IoT networks are layered, how to make devices trustworthy, and how to build and test a complete system.
+- **The Lab Companion** (Part VII) covers the specific kit, pin assignments, starter code and lab procedures. It is updated every term as hardware and libraries change.
+
+Each core chapter follows the same pattern: learning objectives, a motivating example, the concepts, a short exercise on your kit, design trade-offs, common pitfalls, review questions, and further reading.
+
+## Two tracks
+
+Every chapter has a core path that all readers should follow. Some chapters also contain **Advanced track** sections, marked with a distinct callout. These go deeper into standards, design reviews and engineering practice. They are optional on a first reading.
+
+## Conventions
+
+- Code that runs on the kit is written for the Arduino framework on the ESP32, built with PlatformIO.
+- Course helper functions use the `iot` prefix (for example `iotStartSerial()`), and pin assignments live in `iot_pins.h` under the `IoTPins::` namespace.
+- I²C addresses are written as 7-bit hexadecimal values, such as `0x68`.
+
+## License and contributions
+
+The text and figures are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Code is licensed under the MIT License. Corrections and suggestions are welcome as issues or pull requests in the book's repository.

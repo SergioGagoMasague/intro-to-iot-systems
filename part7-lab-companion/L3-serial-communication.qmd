@@ -1,0 +1,5 @@
+# Lab 3: Serial Communication {#sec-lab-l3}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 3 handout.
+:::

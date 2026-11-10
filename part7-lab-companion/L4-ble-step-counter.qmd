@@ -1,0 +1,5 @@
+# Lab 4: BLE Step Counter {#sec-lab-l4}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.** Will be drafted from: Lab 4 handout.
+:::

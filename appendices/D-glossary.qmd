@@ -1,0 +1,5 @@
+# Glossary {#sec-app-d}
+
+::: {.callout-note appearance="minimal"}
+**Not yet written.**
+:::
