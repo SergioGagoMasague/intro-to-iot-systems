@@ -99,6 +99,50 @@ The honest conclusion is that blockchain helps in a narrow set of cases: multi-p
 4. Describe the additional steps needed to turn this into continuous deployment to a fleet of kits, safely.
 :::
 
+## In depth (optional) {#sec-ch19-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Can a device run on harvested energy?
+
+A recurring vision for the future of IoT is the battery-free device. Whether it works is an energy-balance question.
+
+**The balance.** Over a long period, the energy harvested must at least equal the energy used:
+
+$$
+\bar P_\text{harvest} \ge \bar P_\text{device} = D\,P_\text{active} + (1 - D)\,P_\text{sleep}.
+$$
+
+A storage element (a supercapacitor or small rechargeable cell) covers the gap between moments of plenty and moments of need, but it cannot fix a negative average.
+
+**What sources offer.** Orders of magnitude, which vary widely with conditions:
+
+| Source | Typical harvested power density |
+|---|---|
+| Outdoor sunlight on a small solar cell | ~10 mW/cm² |
+| Indoor office lighting on a solar cell | ~10–100 µW/cm² |
+| Body heat (thermoelectric, small ΔT) | ~10–50 µW/cm² |
+| Vibration (machinery) | ~10–100 µW/cm³ |
+| Ambient radio signals | ~0.1–1 µW/cm² near transmitters, far less elsewhere |
+
+: Approximate harvesting power densities (orders of magnitude).
+
+**An example.** An indoor sensor with a 10 cm² solar cell harvesting 20 µW/cm² gets 200 µW on average while the lights are on, say 10 hours a day: a daily average of about 83 µW. A BLE beacon that sleeps at 3 µW (≈10 µW with its regulator) and spends 30 µJ per advertising event can afford
+
+$$
+\frac{(83 - 10)\ \mu\text{W}}{30\ \mu\text{J}} \approx 2.4\ \text{events per second},
+$$
+
+comfortably above one advertisement per second. A Wi-Fi device that spends tens of millijoules per connection could afford roughly one report every few minutes, and only if its sleep current is in the microamperes. The radio, again, decides what is possible.
+
+**Why the trend helps.** For decades, the energy needed per computation fell by roughly half every year and a half to two and a half years (an observation often called Koomey's law). Radios and sensors improve more slowly, but each halving moves another class of application into the range of harvested energy.
+
+**Exercise.** Using the table, what solar-cell area would a device that averages 1 mW need indoors? Outdoors? What does that suggest about where battery-free Wi-Fi devices make sense?
+
+Sources for this section: [@koomey_2011].
+
 ## Design trade-offs
 
 | Decision | Considerations |

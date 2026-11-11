@@ -1,0 +1,61 @@
+# Activity 4: The Observe–Decide–Act Loop {#sec-act-4 .unnumbered}
+
+**Time:** about 45 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 3 (servo on its 5 V rail) · **Chapters:** @sec-ch06 and @sec-ch07
+
+## Goal
+
+Make the servo follow the potentiometer. Every 100 ms the program will:
+
+- **Observe:** read the potentiometer with the ADC;
+- **Decide:** map the reading to a servo pulse width and convert it to a PWM duty value;
+- **Act:** output the PWM signal that moves the servo.
+
+## Before you start
+
+Check the Stage 3 wiring ([Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)): servo signal on GPIO 13, red wire on the **5 V rail** from VIN, brown or black on GND, and the 470 µF capacitor across the rail with its stripe to GND. **Do not power the servo from 3V3**: its current spikes reset the ESP32.
+
+## TODOs
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Make the potentiometer pin an input | `pinMode(IoTPins::POT_ADC, INPUT)` |
+| 2 | Set up a 50 Hz, 16-bit PWM channel on the servo pin | `ledcSetup(SERVO_CH, 50, 16)` and `ledcAttachPin(...)`; the starter uses channel 2 because `tone()` uses channel 0 |
+| 3 | Observe: read the ADC | `analogRead()` returns 0–4095 |
+| 4 | Decide: map to 600–2400 µs, then to a duty value | `map()`, then the provided `usToDuty()` |
+| 5 | Act: write the duty value | `ledcWrite(SERVO_CH, duty)` |
+
+: Activity 4 TODOs.
+
+::: {.callout-note title="The duty arithmetic"}
+At 50 Hz one period is 20 ms. With 16-bit resolution the period is divided into $2^{16} = 65\,536$ counts, so a pulse of $t$ microseconds needs a duty of
+$$\text{duty} = \frac{t}{20\,000\ \mu\text{s}} \times 65\,536 .$$
+A centred servo (1500 µs) is therefore about 4915 counts.
+:::
+
+## Expected result
+
+```text
+Pot  328 ->  744 us -> duty 2437
+Pot 2048 -> 1500 us -> duty 4915
+Pot 4095 -> 2400 us -> duty 7864
+```
+
+The OLED shows the reading, the pulse width and the approximate angle, and the servo follows the knob.
+
+## Extension (optional)
+
+Add a **dead band**: only write a new duty when the pulse width differs from the last one sent by more than 20 µs. Does the servo stop buzzing when you let go of the knob? Why would a battery-powered product want this?
+
+## Troubleshooting
+
+- **Servo does not move:** signal on GPIO 13; servo ground shared with the ESP32; `ledcAttachPin()` in `setup()`.
+- **Board resets ("Brownout detector was triggered"):** the servo is on 3V3 or the capacitor is missing.
+- **Servo buzzes at the ends:** it is pushing against its end stops; narrow the range to about 700–2300 µs.
+- **`ledcSetup` does not compile:** the project needs Arduino core 2.x (`espressif32@6.9.0`); core 3.x renamed these functions.
+
+## Questions
+
+1. Which lines of your code are Observe, which Decide, and which Act?
+2. What duty value gives a 1.5 ms pulse? Why does the servo never use most of the 0–65 535 range?
+3. What would change if the loop ran once per second instead of every 100 ms?
+4. Why is the servo powered from the 5 V rail with a capacitor instead of the 3V3 pin?

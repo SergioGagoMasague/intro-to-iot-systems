@@ -119,6 +119,40 @@ The response is evidence of engineering maturity, and is often worth as much as 
 4. When you receive your own report, write a response that triages every finding and documents your fixes.
 :::
 
+## In depth (optional) {#sec-ch22-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### How many defects are left?
+
+A review finds some defects. The question a team really wants answered is how many it did *not* find.
+
+**Independent reviewers find more.** If each reviewer independently finds a given defect with probability $p$, then $k$ reviewers find it with probability
+
+$$
+P_\text{found} = 1 - (1-p)^k .
+$$
+
+With $p = 0.4$, one reviewer finds 40% of defects, two find 64%, three 78%. Each extra reviewer adds less; and in practice reviewers are not independent (they share blind spots), so real gains are smaller. Checklists and different review roles (one reviewer per STRIDE category, for instance) make reviewers less alike.
+
+**Estimating what remains: capture–recapture.** Ecologists estimate a population by catching animals, marking them, and seeing how many marked ones are caught again. The same idea estimates the number of defects. If reviewer A finds $n_A$ defects, reviewer B finds $n_B$, and $m$ of them are the same, then an estimate of the total number of defects is
+
+$$
+\hat N = \frac{n_A\,n_B}{m} .
+$$
+
+If A finds 12 issues in a peer team's device, B finds 10, and 6 are common, $\hat N = 120/6 = 20$. Together they found $12 + 10 - 6 = 16$, so about 4 are probably still there. A small overlap is a warning: it means the reviewers are sampling a large population of defects.
+
+The estimate assumes both reviewers look at the same scope and that every defect is equally easy to find; easy defects are found by both, so it tends to underestimate. It is still far better than assuming the count of found defects is the count of defects.
+
+**Severity, not just count.** Scoring systems such as CVSS combine how a weakness is exploited (network or physical access, complexity, privileges needed) with its impact on confidentiality, integrity and availability. Whatever the scale, rank findings so that the team fixes the few that matter before the many that do not.
+
+**Exercise.** Two reviewers of the same repository report 8 and 5 findings with 1 in common. Estimate the total. What would you tell the team about the review's coverage?
+
+Sources for this section: [@eick_capture_recapture_1992; @owasp_istg].
+
 ## Design trade-offs
 
 | Decision | Considerations |

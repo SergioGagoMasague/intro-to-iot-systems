@@ -1,0 +1,49 @@
+# Activity 8: Signed Messages and STRIDE {#sec-act-8 .unnumbered}
+
+**Time:** about 20 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 2 with a **pre-provisioned** ATECC608A · **Chapters:** @sec-ch14 and @sec-ch15
+
+## Goal
+
+Protect a sensor message with a digital signature made by the kit's **ATECC608A** secure element, whose private key never leaves the chip. Then show two things: changing a signed message makes verification fail (**tampering**), and resending an old, valid message is only caught by a **freshness** check (**replay**). Finally, map what you saw to **STRIDE**.
+
+::: {.callout-important}
+The code only *uses* the chip. It never configures or locks it and never reads private keys. If the chip reports that it is not provisioned, stop and ask the teaching staff.
+:::
+
+## TODOs
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Convert the ADC reading to 0–100 % | `map()` |
+| 2 | Build the message | Exactly `DEVICE=<chip serial>;SEQ=<seq>;SENSOR=<percent>`; the serial is `cryptoContext.serialNumber` |
+| 3 | Sign it in hardware | `IoTCrypto::signMessage(packet.message, packet.signature)`, a 64-byte ECDSA P-256 signature from key slot 0 |
+| 4 | Verify the authentic message | `IoTCrypto::verifyMessage(message, signature, cryptoContext.publicKey)` |
+| 5 | Tamper test | Verify the **modified** message with the **original** signature; do not re-sign |
+| 6 | Replay test | (A) the old message still verifies; (B) accept it only if `sequence > lastAcceptedSequence` |
+
+: Activity 8 TODOs.
+
+## Running it
+
+Turn the knob, press **Button 1** to create, sign and verify a message. Press **Button 2** once for the tamper test, and again for the replay test.
+
+| Test | Expected OLED |
+|---|---|
+| Authentic | `AUTHENTIC MESSAGE` · `Signature: VALID` |
+| Tamper | `TAMPER DETECTED` · `Signature: INVALID` |
+| Replay | `REPLAY DETECTED` · `Signature: VALID` · `Freshness: REJECT` |
+
+: Expected results.
+
+The replay row is the key lesson: a valid signature proves the message is authentic and unmodified, but only the sequence check shows it is new.
+
+## Extension (optional)
+
+Reset the board and press Button 1. The sequence number starts over. Would a receiver that remembered the last accepted sequence now reject every new message? Propose one way a real device keeps freshness working across reboots (@sec-ch15).
+
+## Questions
+
+1. Which STRIDE category does the tamper test demonstrate, and which part of your code defends against it?
+2. A signature does not hide the sensor value. Which STRIDE category is still open, and what would close it?
+3. Why does a valid signature not stop a replay? Besides a sequence number, name another way to prove freshness.
+4. What does keeping the private key inside the ATECC608A protect against, compared with storing it in the ESP32's flash?

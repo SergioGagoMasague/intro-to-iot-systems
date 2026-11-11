@@ -172,6 +172,46 @@ More capable edge hardware runs much larger models. Camera boards such as the ES
 5. Optional: train a small neural network on the same data, quantize it to int8, and run it with LiteRT for Microcontrollers. Compare accuracy, size and latency with the tree.
 :::
 
+## In depth (optional) {#sec-ch18-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Fitting a model into a microcontroller
+
+**Sampling first.** To capture motion up to frequency $f_\text{max}$, the Nyquist criterion requires sampling at $f_s > 2 f_\text{max}$. Human walking has most of its energy below about 3 Hz, and arm gestures below about 10–15 Hz, so 50 Hz accelerometer sampling is ample; sampling slower lets faster movements alias into false low-frequency patterns.
+
+**Features from raw axes.** The acceleration magnitude
+
+$$
+|a| = \sqrt{a_x^2 + a_y^2 + a_z^2}
+$$
+
+does not depend on how the device is oriented, which makes it a robust input for step counting. Over a window of $W$ samples, simple features such as the mean, standard deviation and number of threshold crossings summarize the motion into a few numbers a small model can use.
+
+**Counting the work.** A fully connected layer with $n_\text{in}$ inputs and $n_\text{out}$ outputs performs $n_\text{in} \times n_\text{out}$ multiply-accumulate operations (MACs) and stores the same number of weights. A 2-D convolution producing an $H \times W \times C_\text{out}$ output with $K \times K$ kernels over $C_\text{in}$ input channels performs
+
+$$
+\text{MACs} = H\,W\,C_\text{out}\,K^2\,C_\text{in} .
+$$
+
+A gesture model with layers 300→32→16→4 needs $9600 + 512 + 64 \approx 10\,200$ MACs and as many weights. At a few cycles per MAC on a 240 MHz core, inference takes well under a millisecond.
+
+**Quantization.** Storing weights as 8-bit integers instead of 32-bit floats cuts memory four times and allows faster integer arithmetic. The common affine scheme maps a real value $x$ to an integer $q$ with a scale $s$ and zero point $z$:
+
+$$
+q = \operatorname{round}\left(\frac{x}{s}\right) + z, \qquad x \approx s\,(q - z),
+$$
+
+with $s = (x_\text{max} - x_\text{min})/255$ for int8. The rounding error is at most $s/2$ per value; accuracy usually drops by around a percentage point or less if the model was trained or calibrated with quantization in mind, and can drop much more if it was not.
+
+**Energy per inference.** Energy is power times time: a core at 30 mA and 3.3 V running a 1 ms inference uses about 0.1 mJ. Sending the raw 300-sample window over Wi-Fi instead (hundreds of bytes plus connection overhead) costs far more. That ratio, compute is cheap and radio is expensive, is the main argument for edge intelligence.
+
+**Exercise.** Your model has 25 000 float32 weights. How much flash does it need before and after int8 quantization? Would it fit alongside a 1.2 MB application in one 1.9 MB OTA partition?
+
+Sources for this section: [@jacob_quantization_2018; @warden_tinyml].
+
 ## Design trade-offs
 
 | Decision | Considerations |

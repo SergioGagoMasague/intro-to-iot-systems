@@ -1,0 +1,83 @@
+# Activity 2: Buttons, Debouncing and Interrupts {#sec-act-2 .unnumbered}
+
+**Time:** about 15 minutes · **Format:** individual · **Hardware:** none, the Wokwi ESP32 simulator · **Chapter:** @sec-ch03
+
+## Goal
+
+Count button presses with an **interrupt service routine (ISR)** instead of polling, and add a software **debounce** so that one press counts once. Wokwi's pushbutton imitates the contact bounce of a real button, so you will see the problem before you fix it.
+
+After this activity you should be able to:
+
+- wire a pushbutton with `INPUT_PULLUP`;
+- register an ISR with `attachInterrupt()` and explain what an ISR is for;
+- implement a time-based debounce;
+- explain why variables shared with an ISR are `volatile`.
+
+## Build the circuit
+
+Add one **pushbutton**: one side to **D27** (GPIO 27), the other to **GND**. No resistor is needed: the internal pull-up holds the pin HIGH until the button pulls it LOW. In the simulator, click and hold the button to press it.
+
+## Starter code
+
+```cpp
+#include <Arduino.h>
+
+const int BUTTON_PIN = 27;
+
+volatile unsigned long pressCount = 0;      // changed inside the ISR
+volatile unsigned long lastInterruptMs = 0;
+unsigned long lastPrinted = 0;
+
+void IRAM_ATTR onButtonPress() {
+  // TODO 1: ignore presses within 150 ms of the last accepted one
+  // TODO 2: increment pressCount
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Button interrupts");
+  // TODO 3: configure BUTTON_PIN as an input with the internal pull-up
+  // TODO 4: attach onButtonPress to BUTTON_PIN on the FALLING edge
+}
+
+void loop() {
+  if (pressCount != lastPrinted) {
+    lastPrinted = pressCount;
+    // TODO 5: print the current press count
+  }
+}
+```
+
+## Hints
+
+| TODO | Hint |
+|---|---|
+| 1 | Read `millis()`; accept the press only if more than 150 ms have passed since `lastInterruptMs`, and then update `lastInterruptMs`. |
+| 2 | Increment inside the accepted branch only. |
+| 3 | `pinMode()` with `INPUT_PULLUP`. |
+| 4 | `attachInterrupt(digitalPinToInterrupt(pin), handler, FALLING)`. |
+| 5 | `Serial.print()` then `Serial.println()`. |
+
+Keep the ISR short: never call `Serial` or `delay()` inside it (@sec-ch04).
+
+## Expected result
+
+Each press prints one new line, such as `Button count: 3`.
+
+## Extension (optional)
+
+Set the debounce window to 0 ms and press several times: how often does one press count more than once? Then add an LED (with a 220 Ω resistor) that toggles on every valid press.
+
+## Troubleshooting
+
+- **Count jumps by several per press:** the debounce check is missing or the window is too small.
+- **Count never changes:** check the wiring and `INPUT_PULLUP`.
+- **Counts on release:** use `FALLING`, not `RISING`.
+- **Simulation crashes when pressing:** something slow is inside the ISR.
+
+## Questions
+
+1. What is an interrupt, and why is it useful compared with checking the button in `loop()`?
+2. What problem does debouncing solve? What did you see with a 0 ms window?
+3. Why does `INPUT_PULLUP` let you wire the button without an external resistor?
+4. Why is the falling edge used here?

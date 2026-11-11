@@ -245,7 +245,51 @@ This exercise corresponds to the MQTT lecture activity and to [Lab 5](/part7-lab
 3. Register a last will. Unplug your kit and observe what other subscribers see.
 4. Publish your LED state as a retained message. Restart the desktop client: what does it see immediately?
 5. **Pick the QoS**: for each message type (telemetry, an emergency alarm, a "dispense medication" command, a firmware-available notice), choose QoS 0, 1 or 2 and justify your choice. What would duplicates or losses cost in each case?
+
+A guided, step-by-step version for a lecture session is [Activity 7](/part8-activities/A7-mqtt-qos.qmd).
 :::
+
+## In depth (optional) {#sec-ch12-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Reliability and overhead, quantified
+
+**Header sizes.** For a small reading, the application header is a large share of the message:
+
+| Protocol | Fixed header | Plus |
+|---|---|---|
+| MQTT PUBLISH | 2 bytes | 2-byte topic length + topic; 2-byte packet ID at QoS 1–2 |
+| CoAP | 4 bytes | Token (0–8) and options, often 10–20 bytes in all |
+| HTTP/1.1 | Text request line | Text headers, typically 100–300 bytes |
+
+: Application-layer header sizes.
+
+A 4-byte reading published at QoS 0 to topic `iot/t07/temp` (12 characters) is $2 + 2 + 12 + 4 = 20$ bytes of MQTT, against roughly 200 bytes of HTTP. Short topic names matter.
+
+**What QoS 1 buys.** Suppose each MQTT packet is lost with probability $p$ (after TCP gives up, or across a broker restart). A QoS 1 exchange succeeds when both the PUBLISH and the PUBACK arrive, with probability $s = (1-p)^2$. With up to $r$ attempts, the message is delivered unless every attempt fails:
+
+$$
+P_\text{lost} = (1 - s)^r ,\qquad E[\text{attempts}] \approx \frac{1}{s}.
+$$
+
+If $p = 10\%$, $s = 0.81$; three attempts leave $0.19^3 \approx 0.7\%$ lost, at an average cost of about 1.23 exchanges. But a PUBACK that is lost *after* the PUBLISH arrived causes a resend the receiver already has: duplicates occur with probability up to $p(1-p)$ per exchange, which is why QoS 1 receivers must be idempotent (or deduplicate by packet ID). QoS 2 removes the duplicates with a four-packet exchange: twice the messages, and state at both ends.
+
+**CoAP's retransmission schedule.** Confirmable CoAP messages are resent with exponential back-off. RFC 7252's defaults are an initial timeout chosen randomly between `ACK_TIMEOUT` = 2 s and $1.5\times$ that, doubled after each try, for up to `MAX_RETRANSMIT` = 4 retries. The longest time from first transmission to last retransmission is the `MAX_TRANSMIT_SPAN`:
+
+$$
+T_\text{span} = T_0 \left(2^{R} - 1\right) F = 2\ \text{s} \times 15 \times 1.5 = 45\ \text{s},
+$$
+
+where $T_0$ is `ACK_TIMEOUT`, $R$ is `MAX_RETRANSMIT` and $F$ is `ACK_RANDOM_FACTOR`.
+
+A sender that hears nothing for 45 s plus the time it waits for the last reply knows the message almost certainly failed. Randomizing the timeout prevents a room of devices from retrying in lockstep.
+
+**Exercise.** A telemetry stream sends one reading per second at QoS 0 over a link that loses 2% of packets. How many readings are lost per day? Would QoS 1 be worth it if each reading replaces the previous one on the dashboard?
+
+Sources for this section: [@mqtt5; @rfc7252].
 
 ## Design trade-offs
 

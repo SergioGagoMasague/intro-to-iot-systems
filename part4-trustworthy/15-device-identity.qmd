@@ -164,6 +164,49 @@ A strong device identity enables much more than logging in:
 4. Design a challenge–response protocol in which the course server verifies that a message really came from your kit's secure element. Which parts must be secret, and where does each live?
 :::
 
+## In depth (optional) {#sec-ch15-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Inside an ECDSA signature
+
+The ATECC608A signs with **ECDSA over the NIST P-256 curve**. The arithmetic is worth seeing once, because it explains both why the scheme is secure and how it fails.
+
+**The setting.** Points $(x, y)$ satisfying $y^2 = x^3 - 3x + b \pmod p$, for a fixed 256-bit prime $p$ and constant $b$, form a group under a geometric "addition" rule. A fixed **generator** point $G$ has a large prime order $n$: adding $G$ to itself $n$ times returns to the identity. Computing $Q = dG$ (adding $G$ to itself $d$ times, done efficiently by doubling and adding) is fast; recovering $d$ from $Q$ is the **elliptic-curve discrete logarithm problem**, believed to take about $2^{128}$ operations for P-256.
+
+- **Private key:** a random integer $d$ with $1 \le d < n$, generated inside the chip.
+- **Public key:** the point $Q = dG$ (64 bytes: $x$ and $y$).
+
+**Signing** a message $m$, with $z$ = the leftmost 256 bits of $\text{SHA-256}(m)$:
+
+1. Choose a fresh secret random $k$ in $[1, n-1]$.
+2. Compute $(x_1, y_1) = kG$ and $r = x_1 \bmod n$.
+3. Compute $s = k^{-1}(z + r\,d) \bmod n$.
+4. The signature is $(r, s)$: two 32-byte integers, the 64 bytes in Activity 8.
+
+**Verifying** with the public key $Q$:
+
+1. Compute $w = s^{-1} \bmod n$, $u_1 = z w \bmod n$, $u_2 = r w \bmod n$.
+2. Compute $(x_2, y_2) = u_1 G + u_2 Q$, and accept if $x_2 \equiv r \pmod n$.
+
+It works because $u_1 G + u_2 Q = w(z + r d)\,G = w\,s\,k\,G = kG$.
+
+**Why the nonce must never repeat.** If two signatures $(r, s_1)$ and $(r, s_2)$ on hashes $z_1 \ne z_2$ use the same $k$ (visible because $r$ is equal), subtracting the two signing equations gives
+
+$$
+k = \frac{z_1 - z_2}{s_1 - s_2} \bmod n, \qquad d = \frac{s_1 k - z_1}{r} \bmod n .
+$$
+
+Two signatures reveal the private key. Even a slightly biased $k$ leaks it, given enough signatures. Generating $k$ inside a secure element with a hardware random-number generator, or deterministically from the key and message (RFC 6979), removes this failure mode.
+
+**Why a signature proves so little about time.** Nothing in $(r, s)$ depends on *when* it was made. A valid signature proves who signed which bytes; freshness must be inside the signed bytes (a counter, timestamp or challenge), as Activity 8 shows.
+
+**Exercise.** Verification needs two scalar multiplications, signing one. On a microcontroller where a P-256 scalar multiplication takes 50 ms in software, how many signatures per second can a gateway verify? What changes if the gateway uses a secure element that verifies in 60 ms?
+
+Sources for this section: [@fips186_5; @rfc6979; @microchip_atecc608a].
+
 ## Design trade-offs
 
 | Decision | Considerations |

@@ -23,7 +23,7 @@ Every IoT system that grows beyond a single vendor meets the same problem. Two d
 
 **Interoperability** is the ability of a system or device to exchange information with another, and to **understand and use** the information exchanged. The second half is the hard part.
 
-The Levels of Conceptual Interoperability Model, adopted in IoT by organizations such as the Industrial Internet Consortium, describes interoperability as a stack of levels. Each depends on the ones below:
+The Levels of Conceptual Interoperability Model [@tolk_lcim], adopted in IoT by organizations such as the Industrial Internet Consortium, describes interoperability as a stack of levels. Each depends on the ones below:
 
 | Level | Question | Concerned with | Examples |
 |---|---|---|---|
@@ -42,7 +42,7 @@ In healthcare, for example, standards such as **HL7** (and its modern form, FHIR
 
 Machine-to-machine (M2M) systems have existed for decades: remote meter reading, fleet tracking, alarm panels. They were typically built as **vertical silos**: one application, one type of device, one proprietary communication stack, tightly coupled end to end. A smart-metering system and a street-lighting system in the same city shared nothing, even when they used the same cellular network.
 
-This fragmentation slowed the market. Every new application required building a new stack from the devices up. The response was to **invert the pipes**: replace vertical silos with **horizontal** layers that many applications share. Devices connect through a common network (IP plus mobile infrastructure), and applications use a common **application services layer** that provides the functions every IoT application needs.
+This fragmentation slowed the market. Every new application required building a new stack from the devices up. The response, in the phrase used by ETSI and by Rayes and Salam [@rayes_salam_iot], was to **invert the pipes**: replace vertical silos with **horizontal** layers that many applications share. Devices connect through a common network (IP plus mobile infrastructure), and applications use a common **application services layer** that provides the functions every IoT application needs.
 
 ### The application services layer
 
@@ -135,6 +135,38 @@ Matter is a good example of the "standards" route: devices interoperate because 
 4. Which Matter clusters would your kit implement if it were a Matter device? Which kit features have no standard cluster?
 :::
 
+## In depth (optional) {#sec-ch13-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Why common models scale, and what encodings cost
+
+**The translation problem.** If $N$ systems each speak their own data model and every pair must interoperate, you need a translator for each ordered pair: $N(N-1)$ translators, or $N(N-1)/2$ if each is bidirectional. Ten systems need 45 bidirectional translators. If they all map to one shared model, you need only $N$ mappings (to and from the common model): 10 instead of 45. The gap grows quadratically, which is the economic argument for standards such as Matter's data model, OPC UA information models, or W3C Thing Descriptions.
+
+The argument has a cost: each mapping to a common model can lose information that the model does not represent. Two translations (A → common → B) can lose more than one direct translation. Good common models therefore include extension points.
+
+**Encoding size.** The same reading, `{"t":23.5,"h":41}`, is 17 bytes as compact JSON. In **CBOR** (RFC 8949), a binary encoding with the same data model as JSON, it is 10 bytes:
+
+| Bytes | Meaning |
+|---|---|
+| `A2` | map with 2 pairs |
+| `61 74` | text string of length 1: "t" |
+| `F9 4D E0` | half-precision float 23.5 |
+| `61 68` | text string "h" |
+| `18 29` | unsigned integer 41 |
+
+: The reading in CBOR.
+
+The value 23.5 fits a 16-bit half-precision float exactly: $23.5 = 1.46875 \times 2^4$, so the sign is 0, the biased exponent is $4 + 15 = 19 = 10011_2$, and the 10-bit fraction is $0.46875 \times 1024 = 480 = 0111100000_2$, giving `0 10011 0111100000` = `0x4DE0`. With integer keys instead of text keys (as in many IoT profiles), the message shrinks to 8 bytes.
+
+Smaller is not free: binary encodings need a decoder to be read by a person, and every party must agree on the key numbering. That agreement is exactly what a shared data model provides.
+
+**Exercise.** Encode `{"t":-4,"h":100}` in CBOR by hand. (Negative integers use major type 1 and encode $-1-n$; integers 24–255 need one extra byte.) How many bytes is it, and how many in JSON?
+
+Sources for this section: [@rfc8949; @w3c_wot_td].
+
 ## Design trade-offs
 
 | Decision | Considerations |
@@ -171,6 +203,7 @@ Matter is a good example of the "standards" route: devices interoperate because 
 
 ## Further reading
 
+- A. Rayes and S. Salam [@rayes_salam_iot], on interoperability and standardization of the application services layer.
 - W3C, *Web of Things (WoT) Thing Description 1.1* [@w3c_wot_td].
 - oneM2M, *Technical Specifications* [@onem2m].
 - Connectivity Standards Alliance, *Matter specification* [@matter_spec].

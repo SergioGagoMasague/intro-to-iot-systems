@@ -25,7 +25,7 @@ An **actuator** converts a control signal, usually a small electrical signal or 
 
 ### The Observe–Decide–Act loop
 
-IoT actuation follows a simple cycle, the **Observe–Decide–Act** (ODA) loop (@fig-oda):
+IoT actuation follows a simple cycle, the **Observe–Decide–Act** (ODA) loop described by Rayes and Salam [@rayes_salam_iot] (@fig-oda):
 
 ![The Observe–Decide–Act loop. The physical effect of each action changes what the device observes next.](../images/oda-loop.svg){#fig-oda width="80%"}
 
@@ -174,7 +174,43 @@ This exercise corresponds to the Observe–Decide–Act lecture activity and use
 3. **Act**: move the servo, and show the angle on the OLED.
 4. Add a rule: if the angle exceeds 150°, sound the buzzer and light LED 1. Add hysteresis so the alarm does not chatter near the threshold.
 5. Unplug the potentiometer's wiper wire (with the USB cable disconnected first, then reconnect power). What does the servo do? Design a plausibility check and a fail-safe position for this case.
+
+A guided, step-by-step version for a lecture session is [Activity 4](/part8-activities/A4-oda-loop.qmd).
 :::
+
+## In depth (optional) {#sec-ch07-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### PWM, inductors and capacitors
+
+**What PWM delivers.** A PWM signal switching between 0 and $V_{DD}$ with duty cycle $D$ has an average value $\bar V = D\,V_{DD}$. Loads that respond slowly compared with the period (an LED seen by an eye, a motor with inertia, a heater) respond to the average. A servo is different: it reads the *width* of each pulse as a position command, not the average.
+
+**Resolution versus frequency.** The ESP32's LEDC peripheral counts a source clock (80 MHz by default). With $b$ bits of resolution, the counter wraps every $2^b$ clock ticks, so
+
+$$
+f_\text{PWM,max} = \frac{f_\text{clk}}{2^b}.
+$$
+
+At 16 bits that is $80\times10^6 / 65\,536 \approx 1.2$ kHz, comfortably above a servo's 50 Hz. A 20 kHz motor drive (above the range of hearing) leaves only $\log_2(80\times10^6/20\times10^3) \approx 12$ bits.
+
+**Why motors need flyback diodes.** A motor or relay coil is an inductor, whose voltage is $V = L\,di/dt$. Switching off 200 mA through 10 mH in 1 µs would demand $10^{-2} \times 0.2/10^{-6} = 2000$ V; in practice the voltage spikes until something breaks down, often the transistor. A diode across the coil gives the current a path to decay slowly instead.
+
+**Sizing a reservoir capacitor.** When the servo starts moving, it draws a current pulse faster than the USB supply and its cable can respond. A capacitor across the rail supplies that pulse. If it must supply current $I$ for time $\Delta t$ while the rail sags by at most $\Delta V$,
+
+$$
+C \ge \frac{I\,\Delta t}{\Delta V}.
+$$
+
+A 0.5 A step that the supply takes 0.5 ms to catch up with, allowing 0.5 V of sag, needs $0.5 \times 0.5\times10^{-3}/0.5 = 500\ \mu$F, the order of the kit's 470 µF. A stalled servo draws its high current for much longer; no practical capacitor covers that, which is why the servo has its own 5 V rail.
+
+**Hysteresis.** An alarm that turns on above 150° and off below 150° chatters when noise straddles the threshold. Use two thresholds, on above $\theta_\text{on}$ and off below $\theta_\text{off} < \theta_\text{on}$. The gap should exceed the peak-to-peak noise; with ±2° of noise, a 5° gap is enough.
+
+**Exercise.** Your PWM drives an LED at 1 kHz with 10-bit resolution. What is the smallest change in average current you can make, if full brightness is 6 mA? Why might the LED still look non-linear across the range?
+
+Sources for this section: [@espressif_esp32_trm; @astrom_murray_feedback].
 
 ## Design trade-offs
 
@@ -214,5 +250,6 @@ This exercise corresponds to the Observe–Decide–Act lecture activity and use
 
 ## Further reading
 
+- A. Rayes and S. Salam [@rayes_salam_iot], on the ODA loop and the classification of actuators.
 - K. J. Åström and R. M. Murray, *Feedback Systems* [@astrom_murray_feedback], a free textbook on control.
 - Adafruit, *Adafruit GFX Graphics Library* guide [@adafruit_gfx], for drawing text and graphics on small displays.

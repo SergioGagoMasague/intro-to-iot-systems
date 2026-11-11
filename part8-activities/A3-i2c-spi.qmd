@@ -1,0 +1,60 @@
+# Activity 3: Scan the I²C Bus, Report on SPI {#sec-act-3 .unnumbered}
+
+**Time:** about 45 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 1 (ESP32 and OLED) and at least one Stage 2 I²C device · **Chapter:** @sec-ch05
+
+## Goal
+
+Find every device on the kit's shared I²C bus by its address, name it, and show the result on the OLED, which is on the SPI bus. One program, two buses.
+
+After this activity you should be able to:
+
+- explain how several devices share two I²C wires using addresses;
+- initialize the I²C and SPI buses on the ESP32;
+- scan a bus and interpret the addresses that answer;
+- compare I²C and SPI in wires, speed and addressing.
+
+If only some of your Stage 2 devices are wired, do the activity anyway: a scan that finds one device, or none, still shows the idea.
+
+## What the starter does
+
+The starter project contains a scan loop that, for each 7-bit address from 1 to 126, starts a transmission and checks whether any device acknowledges. You complete six TODOs:
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Initialize the I²C bus | `iotInitI2C()` |
+| 2 | Print each address that answers, in hexadecimal, with a leading zero below 0x10 | `Serial.print(addr, HEX)`; use `print`, not `println`, because the starter finishes the line |
+| 3 | In `identifyI2CDevice(addr)`, return a name for each known address | 0x60 ATECC608A, 0x68 MPU-6050, 0x76 or 0x77 BMP280 |
+| 4 | Run the scan and keep the count | Store the return value of `scanI2CBus()` |
+| 5 | Initialize SPI, then the display | `iotInitSPI()` before `iotInitDisplay()` |
+| 6 | Show the count and up to three names on the OLED | `iotDisplayLines(...)` |
+
+: Activity 3 TODOs.
+
+## Expected result
+
+```text
+Found I2C device at 0x60 -> ATECC608A secure element
+Found I2C device at 0x68 -> MPU-6050 motion sensor
+Found I2C device at 0x76 -> BMP280 pressure sensor
+Total I2C devices found: 3
+```
+
+The OLED shows the same count and names, which proves the SPI side works too.
+
+## Extension (optional)
+
+In `loop()`, show the live potentiometer value on the OLED and count how many full-screen updates you complete per second. Use the result to estimate the SPI throughput, and compare it with what the same 1 KB frame would take on I²C at 400 kHz (@sec-ch05-depth works through the arithmetic).
+
+## Troubleshooting
+
+- **0 devices found:** TODO 1 must run before the scan; check the four bus wires (3V3, GND, SDA 21, SCL 22).
+- **0x60 missing although wired:** the ATECC608A sleeps until woken and can miss a scan. Press EN to scan again.
+- **Addresses print as `0x8`:** add the leading-zero check.
+- **OLED blank:** SPI must start before the display; the module's "SDA" pin is SPI data and goes to GPIO 23, not 21.
+
+## Questions
+
+1. How can three devices share the same two I²C wires without their messages getting mixed up?
+2. What would happen if two devices on one bus had the same address? How do some sensors avoid this?
+3. Why does the OLED use SPI instead of I²C? What does SPI cost in exchange?
+4. Count the wires each bus uses in the kit. Which bus would you choose for a board with very few free pins, and why?

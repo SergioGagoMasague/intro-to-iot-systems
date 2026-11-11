@@ -17,6 +17,22 @@ Most chapters include a **Try it on your kit** box. These exercises assume the I
 
 The kit is built in stages, so that each part is wired just before the chapter that first needs it. The full build is described in [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd), and the complete pin map is in @sec-app-a.
 
+## How each chapter is organized
+
+Every chapter follows the same pattern, so you can choose how deep to go:
+
+| Element | What it is | Required? |
+|---|---|---|
+| **Concepts** | The core ideas, with diagrams | Yes |
+| **Try it on your kit** | Short exercises on the kit | Recommended |
+| **In depth (optional)** | The math, physics and technical detail behind the chapter: formulas, worked examples and an exercise | No: clearly marked and skippable |
+| **Advanced track** | Extra tasks for graduate students and those who want more | No |
+| **Check your understanding** | Review questions | Recommended |
+
+: Chapter elements.
+
+Part VII (the Lab Companion) and Part VIII (the Lecture Activities) turn the chapters into step-by-step handouts.
+
 ## Safety
 
 Always unplug the USB cable before changing any wiring. Never connect the servo's 5 V rail to the 3.3 V rail. Read [Lab 0](/part7-lab-companion/L0-bench-safety-soldering.qmd) before you solder.

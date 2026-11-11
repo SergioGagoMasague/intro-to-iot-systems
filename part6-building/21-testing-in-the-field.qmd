@@ -149,6 +149,46 @@ A live demo is a small field test under pressure. Reduce the risk:
 5. Write one page on what failed, why, and what you changed.
 :::
 
+## In depth (optional) {#sec-ch21-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### How much testing is enough?
+
+Field tests produce numbers such as "no failures in 72 hours" or "997 of 1000 packets delivered". Statistics tells you how much those numbers actually prove.
+
+**Zero failures is not zero failure rate.** If a test of $n$ independent trials sees no failures, the 95% upper confidence bound on the failure probability is approximately
+
+$$
+p_\text{upper} \approx \frac{3}{n} \qquad \text{(the "rule of three")},
+$$
+
+because $(1 - p)^n = 0.05$ gives $p \approx -\ln(0.05)/n \approx 3/n$. 1000 successful packets show, with 95% confidence, a loss rate below 0.3%, not a loss rate of zero.
+
+**Mean time between failures from a short test.** For failures that occur at a constant rate, a test of total duration $T$ with no failures supports, at confidence $C$,
+
+$$
+\text{MTBF} \ge \frac{T}{-\ln(1 - C)} .
+$$
+
+A 72-hour run with no failures shows MTBF ≥ 72/3.0 ≈ 24 hours at 95% confidence. To claim a month, you would need about three months of failure-free device-hours, which is why teams test many devices in parallel: 30 kits for 72 hours give 2160 device-hours.
+
+**Estimating a rate with an interval.** For $x$ successes in $n$ trials, the observed rate is $\hat p = x/n$, and a simple 95% interval is
+
+$$
+\hat p \pm 1.96\sqrt{\frac{\hat p (1 - \hat p)}{n}} .
+$$
+
+997 of 1000 gives 99.7% ± 0.34%. The approximation is poor near 0% and 100%, where the Wilson interval is better, but it shows the key point: to halve the uncertainty, you need four times the trials.
+
+**Comparing before and after.** If a fix raises delivery from 96% to 98%, is that real? With 200 packets each, the intervals (about ±2.7% and ±1.9%) overlap; with 2000 each they do not. Decide the sample size before the test, not after seeing the result.
+
+**Exercise.** Your team's device must deliver at least 99% of readings. How many consecutive successful readings, with no failures, would let you claim that with 95% confidence?
+
+Sources for this section: [@hanley_rule_of_three_1983].
+
 ## Design trade-offs
 
 | Decision | Considerations |

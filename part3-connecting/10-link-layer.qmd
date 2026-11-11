@@ -22,7 +22,7 @@ There is no single best link technology. A wireless earbud, a smart lock, a soil
 
 ### What IoT asks of the link layer
 
-Four groups of characteristics shape the choice of link technology:
+Four groups of characteristics shape the choice of link technology [@rayes_salam_iot]:
 
 - **Device characteristics.** How much energy the device has, and how much processing and memory it can spend on the radio stack. For many devices, communication costs more energy than everything else combined, so low-power radios are essential.
 - **Traffic characteristics.** Some devices send short, occasional bursts (a door sensor); others send continuous streams (a camera). Some applications tolerate loss and delay (weather monitoring); others need guaranteed, bounded latency (engine control). The same device can face different requirements in different applications.
@@ -235,7 +235,7 @@ Not every IoT link is wireless. Factories and vehicles use Ethernet extended wit
 - **scheduled and shaped forwarding** (for example IEEE 802.1Qbv and 802.1Qav), so that time-critical traffic gets guaranteed, bounded latency even on links shared with video or file transfers;
 - **stream reservation** and **redundant paths** (IEEE 802.1CB) for reliability.
 
-Targets in industrial automation are on the order of microseconds of latency within a machine cell and around 100 µs across a factory.
+Targets in industrial automation reported in the literature [@rayes_salam_iot] are on the order of microseconds of latency within a machine cell and around 100 µs across a factory.
 
 ### Choosing a link technology
 
@@ -263,7 +263,53 @@ This exercise corresponds to the LoRa lecture activity and uses Stage 4 of the k
 3. Change the spreading factor from 7 to 10 on both kits. How do range and time on air change? Measure time on air with `micros()` around `endPacket()`.
 4. Turn the beacon into an emergency beacon: pressing a button sends an alert that the other kit shows on its OLED and announces with the buzzer.
 5. Estimate battery life for a beacon that wakes from deep sleep once per minute, sends one SF7 packet and goes back to sleep.
+
+A guided, step-by-step version for a lecture session is [Activity 6](/part8-activities/A6-lora-beacon.qmd).
 :::
+
+## In depth (optional) {#sec-ch10-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Link budgets and time on air
+
+**Free-space path loss.** In free space, received power falls with the square of distance and with the square of frequency (for fixed-gain antennas). In decibels, with $d$ in metres and $f$ in hertz,
+
+$$
+\text{FSPL} = 20\log_{10} d + 20\log_{10} f - 147.55\ \text{dB}.
+$$
+
+At 915 MHz the loss over 1 km is $60 + 179.2 - 147.6 \approx 91.7$ dB; at 2.4 GHz it is about 8.4 dB more. Real environments lose more, and a **log-distance model** captures it with an exponent $n$ (2 in free space, roughly 2.7–3.5 in towns, 4–6 indoors through walls):
+
+$$
+PL(d) = PL(d_0) + 10\,n \log_{10}\frac{d}{d_0}.
+$$
+
+**The link budget.** A link works if
+
+$$
+P_\text{tx} + G_\text{tx} + G_\text{rx} - PL - L_\text{misc} \ge S_\text{rx},
+$$
+
+where $S_\text{rx}$ is the receiver sensitivity. For an SX1276 at 14 dBm with unity-gain antennas, sensitivity is roughly −123 dBm at SF7 and −137 dBm at SF12 (125 kHz). The difference between transmit power and sensitivity, the **maximum coupling loss**, is 137 dB at SF7 and 151 dB at SF12. Every 6 dB of extra budget doubles the free-space range; with $n = 3$, it multiplies range by $10^{6/30} \approx 1.6$.
+
+**LoRa time on air.** A chirp spread-spectrum symbol at spreading factor SF and bandwidth BW lasts $T_s = 2^{SF}/BW$. Semtech's formula for the number of payload symbols, for a payload of PL bytes, coding rate $4/(4+CR)$, CRC on ($\text{CRC} = 1$), explicit header ($IH = 0$) and low-data-rate optimization off ($DE = 0$), is
+
+$$
+n_\text{payload} = 8 + \max\left(\left\lceil \frac{8PL - 4SF + 28 + 16\,\text{CRC} - 20\,IH}{4\,(SF - 2DE)} \right\rceil (CR + 4),\ 0\right),
+$$
+
+and the preamble of $n_p$ symbols adds $(n_p + 4.25)\,T_s$.
+
+For Activity 6's 23-byte beacon at SF7, BW 125 kHz, CR = 1 (4/5) and an 8-symbol preamble: $T_s = 1.024$ ms; the fraction is $200/28 = 7.14$, rounded up to 8, times 5 gives 40, so $n_\text{payload} = 48$. Time on air is $(12.25 + 48) \times 1.024 \approx 62$ ms. At SF12, $T_s = 32.8$ ms, low-data-rate optimization becomes mandatory ($DE = 1$), and the same packet takes about 1.5 s: the range costs airtime, and airtime costs energy and channel capacity.
+
+**Duty-cycle arithmetic.** In Europe's 868 MHz bands many sub-bands limit each device to 1% of the time: 36 s per hour, or about 580 of these SF7 packets but only about 24 at SF12. North American rules for 902–928 MHz instead limit the *dwell time* on a channel (400 ms for many configurations), which an SF12 packet of this size already exceeds.
+
+**Exercise.** Two kits are 300 m apart in a town ($n = 3$, $PL(1\,\text{m}) = 31.7$ dB at 915 MHz). Is SF7 enough? What margin do you have?
+
+Sources for this section: [@friis_1946; @semtech_sx1276; @semtech_an1200_13].
 
 ## Design trade-offs
 
@@ -306,6 +352,7 @@ This exercise corresponds to the LoRa lecture activity and uses Stage 4 of the k
 
 ## Further reading
 
+- A. Rayes and S. Salam [@rayes_salam_iot], on link-layer requirements and technologies.
 - Espressif, *ESP-IDF Sleep Modes* documentation [@espressif_idf_sleep].
 - K. Townsend et al., *Getting Started with Bluetooth Low Energy* [@townsend_ble].
 - LoRa Alliance, *LoRaWAN Specification* [@lorawan_spec].

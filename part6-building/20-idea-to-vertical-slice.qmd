@@ -131,6 +131,40 @@ A team of three can easily lose a week to coordination problems. A few practices
 4. Record a short video of the slice working, and list the three things that surprised you while building it.
 :::
 
+## In depth (optional) {#sec-ch20-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Sizing and reliability of a whole system
+
+A vertical slice crosses several components: device, network, broker, database, dashboard. Two simple models let you reason about the whole chain before it exists.
+
+**Little's law.** In any stable system, the average number of items inside, $L$, equals the arrival rate $\lambda$ times the average time each spends inside, $W$:
+
+$$
+L = \lambda\,W .
+$$
+
+If 500 devices each publish once every 10 s, the broker receives $\lambda = 50$ messages per second. If the database writer takes $W = 40$ ms per message on average, about $L = 2$ messages are in the pipeline at any time. If a slow query raises $W$ to 400 ms, 20 messages queue up; if $W$ exceeds $1/\lambda$ per writer for long, the queue grows without bound. The law holds regardless of the arrival pattern, which makes it a quick sanity check for any queue in your design.
+
+**Peaks, not averages.** If every device reports on the minute, the arrival rate in that second is $N$, not $N/60$. Adding a random offset to each device's schedule spreads the load; this is called **jitter**, and it is one of the cheapest scalability fixes.
+
+**Reliability multiplies along a chain.** If a reading must pass through $k$ components in series, each available with probability $A_i$, the end-to-end availability is
+
+$$
+A_\text{chain} = \prod_{i=1}^{k} A_i .
+$$
+
+Five components at 99% each give $0.99^5 \approx 95\%$: more than a day of outage per month. Each component's availability can be estimated as $A = \text{MTBF}/(\text{MTBF} + \text{MTTR})$, mean time between failures over that plus mean time to repair.
+
+**Redundancy adds in parallel.** Two independent components in parallel, either of which suffices, fail only if both do: $A_\text{par} = 1 - (1 - A_1)(1 - A_2)$. Two 99% gateways give 99.99%. Buffering readings on the device until the network returns has a similar effect: it turns a network outage from data loss into delay.
+
+**Exercise.** Your slice is device (99.5%), Wi-Fi (98%), broker (99.9%), database (99.9%), dashboard (99%). What is the end-to-end availability? Which single change would help most?
+
+Sources for this section: [@little_1961; @nygard_release_it].
+
 ## Design trade-offs
 
 | Decision | Considerations |

@@ -1,0 +1,72 @@
+# Activity 5: A Classroom Poll over HTTP {#sec-act-5 .unnumbered}
+
+**Time:** about 35 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 1 and a classroom Wi-Fi network · **Chapter:** @sec-ch08
+
+## Goal
+
+Turn the ESP32 into an HTTP **client**. It joins the room's Wi-Fi network, reads the potentiometer as a percentage, and, when Button 1 is pressed, sends the team's answer to a poll **server** on the instructor's laptop. A dashboard at the front of the room shows every team's answer and the class average.
+
+Every layer of the TCP/IP model is at work:
+
+| Layer | In this activity |
+|---|---|
+| Application | HTTP: `GET` for the question, `POST` for the answer, and a status code back |
+| Transport | TCP connection to port 8080, reliable byte delivery |
+| Internet | IP routing to the server's private address on the room router |
+| Link | Wi-Fi (802.11) frames between the board and the router |
+
+: The layers in the poll.
+
+## Before you start
+
+No new wiring. The network name, password and server address are shown in the room. Use the class router, not the campus enterprise network, which blocks unregistered devices (@sec-app-b).
+
+## Steps and TODOs
+
+Set `WIFI_SSID`, `WIFI_PASSWORD`, `SERVER_BASE_URL` and your `TEAM_ID` in `include/secrets.h`, then complete:
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Configure the potentiometer and Button 1 | `INPUT` and `INPUT_PULLUP` |
+| 2 | Join Wi-Fi | Store the result of `iotConnectWiFi()` |
+| 3 | Read the knob as 0–100 % | `map()` then `constrain()` |
+| 4 | Open the request with a JSON content type | `http.begin(url)`; `http.addHeader("Content-Type", "application/json")` |
+| 5 | Send the answer | `http.POST(body)`, with a body such as `{"team":"T07","value":42}` |
+| 6 | Interpret the status code | 200 means accepted; anything else is a failure to report |
+
+: Activity 5 TODOs.
+
+## Expected result
+
+```text
+Connected. IP: 192.168.8.23
+GET /api/question -> 200
+POST http://192.168.8.10:8080/api/answer  {"team":"T07","value":64}
+Server replied: {"ok": true, "team": "T07", "value": 64, "replaced": false}
+Submission successful.
+```
+
+Pressing again replaces your team's answer: the server keeps one answer per team.
+
+## Status codes you may see
+
+| Code | Meaning here |
+|---|---|
+| 200 OK | Answer accepted |
+| 400 Bad Request | Body not valid JSON, value outside 0–100, or the default team ID |
+| 404 Not Found | Wrong path (for example a trailing slash in the base URL) |
+| 415 Unsupported Media Type | Missing `Content-Type` header |
+| Negative (e.g. −1) | **Not an HTTP response**: the board never reached the server |
+
+: Status codes in the poll.
+
+## Extension (optional)
+
+Measure the round-trip time: record `millis()` just before and after `http.POST()`. Submit several times. How much does it vary, and why? Which part of the time is TCP's handshake (@sec-ch12)?
+
+## Questions
+
+1. For each TCP/IP layer, name the part of your program or hardware that handles it.
+2. What status code did you get when it worked? What would a 400 tell you, and what does a negative code tell you?
+3. Why does the client, not the server, start the conversation in this design?
+4. What would have to change for the dashboard to push a new question to every board instead of each board asking?

@@ -49,7 +49,7 @@ Typically, the first 64 bits are a **network prefix** and the last 64 bits an **
 
 Many IoT deployments form **low-power and lossy networks** (LLNs): networks of hundreds or thousands of constrained devices (@sec-ch09) connected by links where packet loss is high and variable, such as 802.15.4, BLE or low-power Wi-Fi. LLNs appear in building automation (heating, lighting, access control and fire systems), connected homes, healthcare, environmental monitoring and urban networks such as smart grids.
 
-LLNs pose five challenges for the internet layer:
+LLNs pose five challenges for the internet layer [@rayes_salam_iot]:
 
 1. **Very little state.** Nodes have tiny memories, so routing protocols must keep as little per-node state as possible. A protocol that stores a full map of the network on every node will not fit.
 2. **Sleeping nodes.** Nodes save energy by sleeping for long periods, so from the network's point of view the topology changes constantly.
@@ -116,6 +116,41 @@ Although the kit cannot run 6LoWPAN, its Wi-Fi interface can run IPv6.
 3. Calculate how many bytes of application payload remain in one 802.15.4 frame (a) without compression and (b) with IPv6 and UDP headers compressed to 2 and 4 bytes respectively, assuming a 25-byte MAC header and 21 bytes of security.
 4. Sketch the DODAG that RPL would build for a building with sensors on three floors and a border router in the basement. Which nodes need to stay awake?
 :::
+
+## In depth (optional) {#sec-ch11-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Fragments, links and routes
+
+**Address space.** IPv6 addresses have 128 bits: $2^{128} \approx 3.4\times10^{38}$ addresses. A single /64 subnet, the standard size for one link, holds $2^{64}$ interface identifiers, as many as the entire IPv4 address space squared. Scarcity, and therefore NAT, disappears as a design constraint; reachability and firewalling become policy decisions instead.
+
+**Why 6LoWPAN must compress and fragment.** IPv6 requires every link to carry packets of at least 1280 bytes. An IEEE 802.15.4 frame carries at most 127 bytes; after the MAC header, security and checksum, roughly 80–100 bytes remain. Two consequences follow:
+
+1. **Compression.** The uncompressed IPv6 header (40 bytes) plus UDP (8) would eat half the frame. Header compression (IPHC) elides fields that can be derived from the link layer, such as addresses built from MAC addresses, and can shrink both to under 10 bytes.
+2. **Fragmentation.** A full 1280-byte packet becomes about 14 fragments.
+
+**Fragmentation multiplies loss.** If each frame is lost independently with probability $p$, a packet split into $k$ fragments arrives only if *all* fragments do:
+
+$$
+P_\text{deliver} = (1-p)^k.
+$$
+
+With $p = 5\%$, a single-frame packet arrives 95% of the time, but a 14-fragment packet only $0.95^{14} \approx 49\%$, and a lost fragment forces the whole packet to be resent. Hence the guidance to keep IoT application messages small enough for one frame.
+
+**Choosing routes by expected transmissions.** RPL routes along the parent that minimizes a cost; a common one is **ETX**, the expected number of transmissions to deliver a frame and receive its acknowledgment across a link:
+
+$$
+\text{ETX} = \frac{1}{d_f \, d_r},
+$$
+
+where $d_f$ and $d_r$ are the forward and reverse delivery ratios. A link with 90% delivery each way has ETX ≈ 1.23; one with 60% has ETX ≈ 2.78. ETX adds along a path, so two good hops (2.46) beat one poor hop (2.78): the shortest route by hop count is not always the cheapest.
+
+**Exercise.** A sensor is three hops from the border router, each with ETX 1.5, or two hops with ETX 1.2 and 2.0. Which path does RPL prefer under the ETX objective? What is the expected number of radio transmissions per delivered packet on each?
+
+Sources for this section: [@rfc6282; @rfc6550; @couto_etx_2003].
 
 ## Design trade-offs
 

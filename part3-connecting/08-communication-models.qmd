@@ -170,7 +170,44 @@ This exercise corresponds to the classroom-poll lecture activity. Your kit acts 
 2. Use the buttons to choose an answer and send it to the server with an HTTP POST. Show the server's response on the OLED.
 3. For one request, identify what each TCP/IP layer contributes: the link (Wi-Fi), internet (IP addresses), transport (ports) and application (HTTP method, path, body).
 4. Your kit has a private IP address. Explain how the server's reply finds its way back to it.
+
+A guided, step-by-step version for a lecture session is [Activity 5](/part8-activities/A5-http-poll.qmd).
 :::
+
+## In depth (optional) {#sec-ch08-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Overhead and delay, counted
+
+**How much of a message is payload?** Each layer adds its own header. Consider a 4-byte temperature reading sent in an HTTP POST over Wi-Fi with IPv4:
+
+| Layer | Bytes added (typical) |
+|---|---|
+| HTTP request line and headers | ≈ 150 |
+| TCP header | 20 (often 32 with options) |
+| IPv4 header | 20 |
+| 802.11 MAC header, LLC/SNAP, FCS | ≈ 36 |
+
+The payload is 4 of roughly 230 bytes, an efficiency $\eta = \text{payload}/\text{total}$ under 2%. Before it, TCP's three-way handshake exchanged three more packets, and the response and connection teardown add more. For a 4-byte reading, protocol choice dominates the energy bill: Chapter 12 compares MQTT and CoAP, which shrink the application header to a few bytes and avoid a new connection per reading.
+
+**Where the delay comes from.** The delay of one packet across one link is the sum of four parts:
+
+$$
+d = d_\text{proc} + d_\text{queue} + \underbrace{\frac{L}{R}}_{d_\text{trans}} + \underbrace{\frac{s}{v}}_{d_\text{prop}},
+$$
+
+where $L$ is the packet length in bits, $R$ the link rate, $s$ the distance and $v$ the signal speed (about $2\times10^8$ m/s in cable). A 230-byte frame at 1 Mb/s takes 1.8 ms to transmit; it travels 300 m of air in 1 µs. On short links, **transmission and queueing dominate**; across continents, propagation does (about 40 ms each way across the United States in fibre).
+
+**Round trips set the floor.** A new HTTPS request needs one round trip for TCP's handshake, one for TLS 1.3's, and one for the request itself: at least three round-trip times (RTT). With a 50 ms RTT to a cloud region, the minimum is 150 ms before the server even processes the reading. Keeping connections open, or using UDP-based protocols, removes most of it.
+
+**The bandwidth-delay product.** A sender can only keep a link busy if it has $R \times \text{RTT}$ bits in flight. At 10 Mb/s and 50 ms RTT that is 62.5 kB; a small device with a 4 kB TCP window gets at most $4096 \times 8 / 0.05 \approx 655$ kb/s, whatever the link speed.
+
+**Exercise.** In Activity 5's extension you measured the POST round-trip time. Using the formula above, estimate how much of it is Wi-Fi transmission time, and suggest where the rest comes from.
+
+Sources for this section: [@kurose_ross].
 
 ## Design trade-offs
 
@@ -209,5 +246,6 @@ This exercise corresponds to the classroom-poll lecture activity. Your kit acts 
 
 ## Further reading
 
+- A. Rayes and S. Salam [@rayes_salam_iot], chapter on the internet in IoT, whose sequence this chapter follows.
 - J. F. Kurose and K. W. Ross, *Computer Networking: A Top-Down Approach* [@kurose_ross], the standard introduction to internet protocols.
 - A. L. Russell, "OSI: The Internet that wasn't" [@russell_internet_wasnt], on how TCP/IP won.

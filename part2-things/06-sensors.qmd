@@ -37,7 +37,7 @@ Between the transducer and your code there is a **signal chain** (@fig-sensor-ch
 
 ### Smart sensors
 
-In the simplest sensors, such as a potentiometer or a thermistor, the microcontroller's own ADC does the conversion and your code does everything else. A **smart sensor** integrates the whole chain on one small chip, with its own ADC, a small processor and a digital interface. Smart sensors bring several advantages:
+In the simplest sensors, such as a potentiometer or a thermistor, the microcontroller's own ADC does the conversion and your code does everything else. A **smart sensor** [@rayes_salam_iot] integrates the whole chain on one small chip, with its own ADC, a small processor and a digital interface. Smart sensors bring several advantages:
 
 - **Self-calibration.** Factory calibration coefficients are stored in the chip, and the sensor or its driver applies them automatically.
 - **Communication.** The sensor reports over a digital bus, which is far less sensitive to noise than a small analog voltage on a long wire.
@@ -48,7 +48,7 @@ Both of the kit's environmental and motion sensors, the BMP280 and the MPU-6050,
 
 ### Classifying sensors
 
-Sensors can be grouped in several useful ways:
+Sensors can be grouped in several useful ways [@rayes_salam_iot]:
 
 | Dimension | Options | Example |
 |---|---|---|
@@ -180,7 +180,7 @@ void loop() {
 From the accelerometer alone, the device's tilt can be estimated whenever it is not otherwise accelerating, because gravity then points straight down:
 
 $$
-\text{pitch} = \operatorname{atan2}\!\left(-a_x,\ \sqrt{a_y^2 + a_z^2}\right),\qquad
+\text{pitch} = \operatorname{atan2}\left(-a_x,\ \sqrt{a_y^2 + a_z^2}\right),\qquad
 \text{roll} = \operatorname{atan2}(a_y,\ a_z)
 $$
 
@@ -234,6 +234,53 @@ This exercise uses Stage 2 of the kit build.
 5. Optional: implement the complementary filter and compare it with the accelerometer-only estimate while shaking the board.
 :::
 
+## In depth (optional) {#sec-ch06-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### From voltage to physics
+
+**Quantization.** An $N$-bit ADC with reference voltage $V_\text{ref}$ divides the input range into $2^N$ steps of one **least significant bit**, $\text{LSB} = V_\text{ref}/2^N$. For the ESP32's 12-bit ADC over roughly 3.3 V, one LSB is about 0.8 mV. Rounding to the nearest step adds an error spread uniformly over ±½ LSB, whose standard deviation is
+
+$$
+\sigma_q = \frac{\text{LSB}}{\sqrt{12}},
+$$
+
+which gives the ideal signal-to-quantization-noise ratio $\text{SQNR} \approx 6.02N + 1.76$ dB (74 dB for 12 bits). Real converters add their own noise and non-linearity; the ESP32's ADC behaves more like a 9- or 10-bit converter, its **effective number of bits** (ENOB).
+
+**Averaging.** Averaging $M$ independent readings reduces random noise by $\sqrt{M}$: 16 samples give a factor of 4, two extra effective bits. It does not remove systematic errors such as offset or non-linearity; those need calibration.
+
+**The potentiometer is a voltage divider.** With the wiper at fraction $x$ of the track, $V_\text{out} = x\,V_{DD}$ regardless of the total resistance, as long as the ADC draws negligible current. A 10 kΩ potentiometer has a worst-case source resistance of 2.5 kΩ (at mid-travel), low enough for the ADC to sample accurately.
+
+**Pressure to altitude.** In the standard atmosphere, pressure falls with height. A widely used approximation for the lower atmosphere is
+
+$$
+h = 44\,330 \left[ 1 - \left(\frac{p}{p_0}\right)^{1/5.255} \right]\ \text{m},
+$$
+
+where $p_0$ is the pressure at sea level (1013.25 hPa by default). Near sea level, pressure falls about 12 Pa per metre, so the BMP280's resolution of a few pascals corresponds to tens of centimetres. Weather changes $p_0$ by several hectopascals a day, however, so absolute altitude needs a local reference, while *changes* in altitude (a floor climbed) are measured well.
+
+**Tilt from an accelerometer.** At rest, an accelerometer measures only gravity. With the MPU-6050 at ±2 g, 16 384 counts represent 1 g. Pitch and roll follow from the gravity vector's components:
+
+$$
+\theta_\text{pitch} = \operatorname{atan2}\left(-a_x,\ \sqrt{a_y^2 + a_z^2}\right), \qquad
+\phi_\text{roll} = \operatorname{atan2}(a_y,\ a_z).
+$$
+
+**Fusing gyro and accelerometer.** The accelerometer's angle is correct on average but noisy; the gyroscope's integrated rate is smooth but drifts. A **complementary filter** combines them:
+
+$$
+\theta_k = \alpha\left(\theta_{k-1} + \omega_k\,\Delta t\right) + (1-\alpha)\,\theta_{\text{acc},k},
+$$
+
+with $\alpha$ close to 1 (for example 0.98 at 100 Hz). It is a high-pass filter on the gyroscope and a low-pass filter on the accelerometer, with a crossover time constant $\tau = \alpha\,\Delta t/(1-\alpha) \approx 0.5$ s.
+
+**Exercise.** You average 64 ADC readings of a still potentiometer whose single readings have a standard deviation of 8 LSB. What standard deviation do you expect for the average, and how many effective bits did you gain?
+
+Sources for this section: [@bosch_bmp280; @invensense_mpu6050; @fraden_sensors].
+
 ## Design trade-offs
 
 | Decision | Considerations |
@@ -276,4 +323,5 @@ This exercise uses Stage 2 of the kit build.
 
 - Bosch Sensortec, *BMP280 datasheet* [@bosch_bmp280].
 - InvenSense, *MPU-6000/MPU-6050 Product Specification* and *Register Map* [@invensense_mpu6050].
+- A. Rayes and S. Salam [@rayes_salam_iot], chapter on sensors and actuators, which this chapter's classification follows.
 - J. Fraden, *Handbook of Modern Sensors* [@fraden_sensors], a comprehensive reference on sensing principles.

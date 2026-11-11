@@ -1,35 +1,87 @@
 # Kit Reference {#sec-app-a}
 
 ::: {.callout-note appearance="simple"}
-This appendix describes the current version of the IoT@UCI kit. If your term's kit or starter code differs, **the starter's `iot_pins.h` is authoritative**.
+This appendix describes the IoT@UCI kit as built in Fall 2026, in enough detail for another course to build compatible kits. If your term's kit or starter code differs, **the starter's `iot_pins.h` is authoritative**. Photos of a finished kit will be added in a later release; the illustrations below show the layout.
 :::
+
+## What the finished kit looks like
+
+![The team kit, top view. The ESP32 bridges the two breadboards at the bottom; I/O parts are on the left board, bus-connected modules on the right, and a printed holder at the top carries the servo and the radio.](../images/kit-layout.svg){#fig-kit-layout width="70%"}
+
+The layout follows a few deliberate rules:
+
+- **Two 830-point breadboards**, joined along their long edges, give every module its own rows and leave space for project additions.
+- **The ESP32 straddles the seam** between the boards, at the end nearest the edge of the desk, so the USB cable does not cross the circuit.
+- **Left board, top to bottom**: the 5 V servo rail and its capacitor, three LEDs, the potentiometer, two buttons and the buzzer. These are the parts students touch.
+- **Right board, top to bottom**: ATECC608A, OLED, MPU-6050, BMP280. All four sit on shared buses, so their header pins line up with the bus wiring.
+- **The holder** at the top keeps the servo and radio from pulling on their wires.
 
 ## Bill of materials
 
-Each team of two or three students shares one kit.
+Each kit is shared by a team of two or three students. Part numbers are the ones used in Fall 2026; equivalent parts work if they match the noted specifications.
 
-| Qty | Part | Purpose | Bus | Chapter |
-|---|---|---|---|---|
-| 1 | ESP32 DevKit V1 (ESP32-WROOM-32), USB | Microcontroller with Wi-Fi and Bluetooth | — | @sec-ch02 |
-| 1 | USB cable (data-capable) | Power, upload, Serial Monitor | UART | @sec-ch05 |
-| 2 | 830-point solderless breadboards | Circuit construction | — | @sec-ch02 |
-| — | Jumper wire (assorted colors) | Connections | — | [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd) |
-| 3 | LEDs: red, yellow, green | Indicators | GPIO | @sec-ch03 |
-| 3 | 220 Ω resistors | LED current limiting | — | @sec-ch02 |
-| 2 | Push buttons | Input | GPIO | @sec-ch03 |
-| 1 | 10 kΩ potentiometer | Analog input | ADC | @sec-ch03 |
-| 1 | Passive piezo buzzer | Sound | PWM | @sec-ch07 |
-| 1 | 128 × 64 OLED, SSD1306, 7-pin SPI | Display | SPI | @sec-ch07 |
-| 1 | BMP280 breakout | Temperature and pressure | I²C | @sec-ch06 |
-| 1 | MPU-6050 (GY-521) breakout | Accelerometer and gyroscope | I²C | @sec-ch06 |
-| 1 | ATECC608A breakout | Secure element | I²C | @sec-ch15 |
-| 1 | Hobby servo (SG90 class) | Actuator | PWM | @sec-ch07 |
-| 1 | 470 µF, 16 V electrolytic capacitor | Servo supply buffer | — | @sec-ch07 |
-| 1 | RFM95W (SX1276) LoRa radio, 915 MHz, with spring antenna | Long-range radio | SPI | @sec-ch10 |
-| — | Header pins | For soldering to breakouts | — | [Lab 0](/part7-lab-companion/L0-bench-safety-soldering.qmd) |
-| 1 | Holder (3D-printed tray) | Holds servo and, in some kits, the radio | — | [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd) |
+| Qty | Part | Specification that matters | Fall 2026 source / part no. |
+|---|---|---|---|
+| 1 | ESP32 DevKit V1 (ESP32-WROOM-32), 30-pin, USB-C | 30-pin pinout shown in @fig-stage1 | AITRIP 4-pack, Amazon B0GBVDJLSF |
+| 1 | USB-C to USB-C cable, 1 m | **Data** cable, not charge-only | SMAYS 10-pack, Amazon B0CC5J8GB7 |
+| 2 | 830-point solderless breadboard | Split power rails are common; check | ELEGOO 3-pack, Amazon B01EV6LJ7G |
+| 1 pack | Jumper wires (male–male) and 22 AWG solid-core wire | Solid core for flat wiring | ELEGOO 120-pack B01EV70C78; Adafruit #1311 |
+| 3 | LEDs: red, yellow, green, 5 mm | | Assorted 600-pack, Amazon B0FL1T4ZHT |
+| 3 | 220 Ω resistors, ¼ W | | Resistor assortment, Amazon B0F4P352BB |
+| 2 | 6 × 6 mm tactile push buttons | 4-pin, fits across the center channel | DAOKI 100-pack, Amazon B01CGMP9GY |
+| 1 | 10 kΩ linear potentiometer, breadboard-friendly | 0.1 in (2.54 mm) pin pitch | Adafruit #4133 (or #562) |
+| 1 | Passive piezo buzzer | **Passive** (needs a tone), ≈12 mm | Adafruit #160 (PS1240) |
+| 1 | 0.96 in 128 × 64 OLED, SSD1306, **7-pin SPI** | Pins GND, VDD, SCK, SDA, RES, DC, CS | UMLIFE 6-pack, Amazon B08SJW4J4P |
+| 1 | BMP280 breakout, 3.3 V | 6-pin with CSB and SDO broken out | Amazon B0B38CBXG1 |
+| 1 | MPU-6050 (GY-521) breakout | AD0 and INT broken out | HiLetgo 3-pack, Amazon B00LP25V1A |
+| 1 | ATECC608A breakout | I²C, address 0x60 | SparkFun DEV-18077 (DigiKey) |
+| 1 | SG90-class micro servo, 180° | 4.8–6 V, three-wire | Miuzei 10-pack, Amazon B072V529YD |
+| 1 | 470 µF, 16 V electrolytic capacitor | ≥ 10 V rating | Nichicon UHE1C471MPD6 (DigiKey) |
+| 1 | LoRa radio, 915 MHz (North America) | SX1276-based; small 16 × 16 mm module fits the holder | Adafruit RFM95W #3072, or bare RFM95W-915S2 |
+| 1 | 915 MHz spring antenna (or 78 mm of 22 AWG wire) | Quarter-wave at 915 MHz | Adafruit #4269 |
+| — | Header pins (male), 40-pin strips | Cut to length | Amazon B0774VBJ3J |
+| 1 | Printed holder (tray) | See below | Printed in PLA or PETG |
 
-: Kit contents. {#tbl-bom}
+: Kit bill of materials. {#tbl-bom}
+
+In Fall 2026 the parts for one new kit cost roughly **$55–60** at pack prices, excluding the printed holder, tax and shipping; the radio and the secure element account for about $23 of that.
+
+::: {.callout-tip title="Why a quarter-wave antenna is 78 mm"}
+A simple wire antenna works best at a quarter of the wavelength. At 915 MHz the wavelength is $\lambda = c / f = 3\times10^8 / 9.15\times10^8 \approx 0.328$ m, so $\lambda/4 \approx 82$ mm. A real wire is made slightly shorter (about 95%) because the signal travels a little slower along a conductor than in free space, which gives the familiar ≈78 mm.
+:::
+
+## The printed holder
+
+The holder is a single printed part that clips over the outer edges of the two breadboards and carries the servo and the radio, so that they do not pull on their wires.
+
+![Functional dimensions of the holder used in Fall 2026, measured from the printed part. They are given so that other courses can design a compatible holder.](../images/tray-dimensions.svg){#fig-tray width="95%"}
+
+Design notes for a compatible holder:
+
+| Feature | Value | Why |
+|---|---|---|
+| Body | 115 × 37.5 mm, 14.75 mm thick | Spans two 55 mm-wide breadboards plus clip walls |
+| End uprights | ≈ 4 mm wide, extending to 61.5 mm | Clip over the breadboards' outer edges |
+| Servo pocket | ≈ 25 × 24 mm, 12.8 mm deep | SG90 body (≈ 23 × 12 × 23 mm) lying on its side, with clearance |
+| Radio pocket | ≈ 17.3 × 16.3 mm, 7.5 mm deep | Bare 16 × 16 mm RFM95W module |
+| Antenna arm | ≈ 17 × 7.5 mm | Keeps the spring antenna away from the board |
+| Wire channel | Tapered, 5 mm deep | Routes the radio's wires down to the right breadboard |
+
+Larger breakout-style radios (such as the 29 × 25 mm RadioFruit board) do **not** fit the radio pocket; they sit on the right breadboard instead.
+
+Printing tips: PLA or PETG, 0.2 mm layers, 15–20% infill, no supports if printed pocket-side up. Print one, test-fit a servo, a radio and both breadboards, then print the rest. Allow 0.2–0.3 mm clearance per side on pockets, since printers vary.
+
+## Wiring by stage
+
+The kit is wired in four stages, each just before the chapter that first needs it ([Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)).
+
+![Stage 1: LEDs, buttons, potentiometer, buzzer and the SPI display.](../images/stage1-wiring.svg){#fig-stage1 width="100%"}
+
+![Stage 2: the shared I²C bus for the BMP280, MPU-6050 and ATECC608A.](../images/stage2-wiring.svg){#fig-stage2 width="100%"}
+
+![Stage 3: the servo and its separate 5 V rail.](../images/stage3-wiring.svg){#fig-stage3 width="100%"}
+
+![Stage 4: the LoRa radio on the SPI bus, sharing SCK and MOSI with the display.](../images/stage4-wiring.svg){#fig-stage4 width="100%"}
 
 ## Pin map
 

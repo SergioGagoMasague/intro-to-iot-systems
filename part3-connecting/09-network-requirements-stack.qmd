@@ -15,7 +15,7 @@ After this chapter you should be able to:
 
 The TCP/IP stack was designed for computers with plenty of memory, wired connections and a person waiting at a screen. It works well for laptops and phones, and for an ESP32 on campus Wi-Fi. But many IoT devices are much smaller: a battery-powered sensor with 10 KB of RAM, a radio that can send only a few hundred bytes per second, and a duty cycle of a fraction of a percent. Others sit in factories or vehicles, where a message that arrives a few milliseconds late is as bad as one that never arrives.
 
-This chapter sets out what IoT asks of a network, and introduces the layered protocol stack that the rest of Part III fills in.
+Following the analysis of Rayes and Salam [@rayes_salam_iot], this chapter sets out what IoT asks of a network, and introduces the layered protocol stack that the rest of Part III fills in.
 
 ## Concepts
 
@@ -99,6 +99,35 @@ Until now your Wi-Fi password has been compiled into the firmware in `secrets.h`
 4. Add a "factory reset": holding both buttons at power-up erases the stored credentials.
 :::
 
+## In depth (optional) {#sec-ch09-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### The limits every radio lives within
+
+**Shannon's capacity.** No modulation scheme, however clever, can carry more than
+
+$$
+C = B \log_2\left(1 + \frac{S}{N}\right)\ \text{bits per second}
+$$
+
+over a channel of bandwidth $B$ with signal-to-noise ratio $S/N$ (as a ratio, not in dB). The formula explains the families in this chapter:
+
+- A 20 MHz Wi-Fi channel at 25 dB SNR ($S/N \approx 316$) is capped at $20\times10^6 \log_2 317 \approx 166$ Mb/s. Wide channel, strong signal, high rate.
+- A 125 kHz LoRa channel at −10 dB SNR ($S/N = 0.1$) is capped at $125\times10^3 \log_2 1.1 \approx 17$ kb/s. LoRa trades almost all of that capacity away to decode signals *below* the noise floor, which is what gives it range.
+
+To get more bits, you can widen the channel (more spectrum, more noise collected, often a regulatory limit) or raise the SNR (more power, better antennas, shorter distance).
+
+**Noise floor.** Thermal noise in a bandwidth $B$ is $N = kTB$; at room temperature that is $-174\ \text{dBm/Hz} + 10\log_{10} B$. A 125 kHz channel has a floor of $-174 + 51 = -123$ dBm, a 20 MHz channel $-174 + 73 = -101$ dBm, before the receiver adds its own noise figure (typically 6 dB). Narrow channels hear weaker signals.
+
+**Energy per bit.** For battery devices the useful metric is not the bit rate but the energy spent per delivered bit, $E_b = P_\text{tx}/R$, plus the energy of waking up, joining and waiting. A radio at 100 mW and 1 Mb/s spends 100 nJ per bit; one at 50 mW and 5 kb/s spends 10 µJ per bit, 100 times more per bit, yet may still win for a 20-byte daily report because it needs no association, no IP stack and no keep-alive traffic.
+
+**Exercise.** A 1 MHz channel offers 10 dB of SNR. What is its Shannon capacity? How much SNR would you need to double it, and what does that say about adding power as a way to buy throughput?
+
+Sources for this section: [@shannon_1948].
+
 ## Design trade-offs
 
 | Requirement | Tension |
@@ -136,5 +165,6 @@ Until now your Wi-Fi password has been compiled into the firmware in `secrets.h`
 
 ## Further reading
 
+- A. Rayes and S. Salam [@rayes_salam_iot], chapters on IoT networking requirements and the layered IoT protocol stack, on which this chapter's structure is based.
 - C. Bormann, M. Ersue and A. Keranen, RFC 7228, *Terminology for Constrained-Node Networks* [@rfc7228].
 - M. Antonakakis et al., "Understanding the Mirai Botnet" [@antonakakis_mirai].

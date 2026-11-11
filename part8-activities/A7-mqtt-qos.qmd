@@ -1,0 +1,58 @@
+# Activity 7: MQTT Command Center and Picking the QoS {#sec-act-7 .unnumbered}
+
+**Time:** about 30 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 1 and a classroom Wi-Fi network with an MQTT broker · **Chapter:** @sec-ch12
+
+## Goal
+
+Connect the board to a classroom MQTT **broker**. It publishes potentiometer telemetry to a team topic and subscribes to a class-wide command topic, so that one message from the instructor changes every kit in the room. Then decide which QoS, retain and Last Will settings fit four real situations.
+
+| Term | Meaning |
+|---|---|
+| QoS 0 | At most once: no acknowledgment; may be lost |
+| QoS 1 | At least once: resent until acknowledged; may be duplicated |
+| QoS 2 | Exactly once: a four-step handshake, at extra cost |
+| Retained | The broker keeps the last message on a topic and gives it to new subscribers |
+| Last Will (LWT) | A message the broker publishes for a client that disconnects unexpectedly |
+
+: MQTT delivery options.
+
+## Part A: the command center
+
+Set the Wi-Fi values, `MQTT_HOST`, `MQTT_PORT` (1883) and `MQTT_TOPIC_BASE` in `include/secrets.h`, and your `TEAM_ID`.
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Point the client at the broker and register the callback | `mqttClient.setServer(...)`, `mqttClient.setCallback(onMqttMessage)` |
+| 2 | Subscribe to the command topic after connecting | Keep the Boolean result of `subscribe()` |
+| 3 | Publish telemetry on Button 1 | Topic `<base>/team/<TEAM_ID>/telemetry`; payload `TEAM=<team>;SEQ=<n>;SENSOR=<percent>` |
+| 4 | Act on commands | `ALERT` → `activateAlert()`; `NORMAL` → `restoreNormalMode()` (case-sensitive) |
+
+: Activity 7 TODOs.
+
+When the instructor publishes `ALERT`, every connected kit shows an alert and changes its LEDs; `NORMAL` restores them.
+
+## Part B: pick the QoS
+
+The starter's library publishes at QoS 0, so this part is a design exercise. For each situation choose a QoS level, decide whether the message is retained, and justify it in one sentence. Then choose **one** situation where a Last Will helps and write its topic and payload.
+
+1. A greenhouse sensor publishes temperature every 10 seconds to a live dashboard.
+2. A phone app sends an "unlock" command to a smart door lock.
+3. A smart electricity meter reports a daily billing reading that must be counted exactly once.
+4. A dashboard must show whether each device is online, including devices that just lost power.
+
+## Extension (optional)
+
+On Button 2, publish `HELLO from team <TEAM_ID>` to `<base>/team/<TEAM_ID>/chat`. Would other teams receive it? What would they need to subscribe to? Try a wildcard (`+` or `#`).
+
+## Troubleshooting
+
+- **Broker connection fails:** check the host, port and that the board is on the class network; note the state code printed.
+- **Your messages do not appear:** the topic base must match exactly.
+- **`ALERT` does nothing:** check the subscription result and the string comparison.
+
+## Questions
+
+1. Situations 1 and 2: which QoS and retain setting did you choose for each, and why?
+2. Situation 3: which QoS did you choose? Could QoS 1 work, and what would the receiver have to do?
+3. Situation 4: write the Last Will topic and payload, and say whether it should be retained.
+4. Why could the instructor alert every kit with one publish, without knowing how many were connected?

@@ -176,6 +176,38 @@ Use a spare board or the Wokwi simulator for steps that change eFuses; never bur
 5. Write a short plan (one page) for updating 500 deployed kits: rollout stages, metrics, halt criteria and rollback.
 :::
 
+## In depth (optional) {#sec-ch16-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### The numbers behind a safe rollout
+
+**How long does an update take to download?** Time is size divided by *effective* throughput:
+
+$$
+t = \frac{8\,S}{R_\text{eff}} .
+$$
+
+A 1.2 MB firmware image over Wi-Fi at an effective 2 Mb/s takes about 5 s. Over LoRa at SF7 the raw rate is about 5.5 kb/s, but a 1% duty-cycle limit leaves 55 b/s on average: $8 \times 1.2\times10^6 / 55 \approx 1.7\times10^5$ s, almost two days, before counting lost packets. Hence delta updates (send only the changed bytes), compression, and firmware-update-over-the-air schemes for LPWANs that multicast fragments with forward error correction.
+
+**Canary rollouts catch rare failures.** Suppose a new version bricks a fraction $p$ of devices in some unusual configuration. Updating a random canary group of $n$ devices first reveals the problem with probability
+
+$$
+P_\text{detect} = 1 - (1-p)^n .
+$$
+
+For $p = 1\%$ and $n = 300$, $P \approx 1 - e^{-3} \approx 95\%$. To catch a 0.1% failure with the same confidence you need about 3000 canaries. The rule of thumb $n \approx 3/p$ for 95% confidence comes from $e^{-np} \approx (1-p)^n = 0.05$.
+
+**Why A/B partitions matter.** If a power cut during an in-place update bricks the device with probability $q$ per update, and the fleet does $u$ updates per year, the expected number of bricked devices per year is $N u q$. For 100 000 devices, four updates a year and $q = 10^{-4}$, that is 40 truck rolls per year. A/B partitions (@fig-ota-ab) make $q$ effectively zero for power loss: the old image is untouched until the new one has booted and confirmed itself.
+
+**Flash wear.** NOR flash sectors survive on the order of $10^5$ erase cycles. A full image rewrite once a week uses 52 cycles a year, harmless. Logging a sensor reading to the same sector every second would exhaust it in about a day, which is why logs use wear-leveling file systems or rotate across many sectors.
+
+**Exercise.** Your fleet has 20 000 devices. You want 95% confidence of catching a defect affecting 0.5% of devices before more than 5% of the fleet is updated. Is that possible? How many stages would you use?
+
+Sources for this section: [@rfc9019; @espressif_idf_ota].
+
 ## Design trade-offs
 
 | Decision | Considerations |

@@ -1,0 +1,60 @@
+# Activity 6: A LoRa Emergency Beacon {#sec-act-6 .unnumbered}
+
+**Time:** about 30 minutes · **Format:** team of 2–3 with the kit · **Hardware:** kit Stage 4 (RFM95W radio with its antenna) · **Chapter:** @sec-ch10
+
+## Goal
+
+Send a short packet directly from radio to radio, with no Wi-Fi and no Internet. The beacon carries the team, a sequence number and a sensor reading; a receiver at the front of the room shows each packet with its **RSSI** and **SNR**.
+
+After this activity you should be able to:
+
+- initialize an SX1276-based radio on the SPI bus;
+- build a compact text payload for a low-data-rate link;
+- interpret RSSI and SNR;
+- explain where LoRa fits compared with Wi-Fi and BLE.
+
+::: {.callout-warning}
+Keep the antenna attached whenever the radio is powered. Do not change the frequency: every transmitter and the receiver must use the same one, and it must be legal in your region (915 MHz in North America).
+:::
+
+## TODOs
+
+Set your two-digit `TEAM_ID` first.
+
+| TODO | Task | Hint |
+|---|---|---|
+| 1 | Start the radio | `LoRa.begin(LORA_FREQUENCY_HZ)`; keep the Boolean result. The starter already sets the CS, RST and G0 pins. |
+| 2 | Read the knob as 0–100 % | `map()` then `constrain()` |
+| 3 | Build the packet | Exactly `TEAM=<team>;SEQ=<seq>;SENSOR=<percent>`, e.g. `TEAM=07;SEQ=3;SENSOR=62` |
+| 4 | Transmit | `LoRa.beginPacket()`, `LoRa.print(packet)`, `LoRa.endPacket()`; success when it returns 1 |
+
+: Activity 6 TODOs.
+
+## Expected result
+
+```text
+Packet: TEAM=07;SEQ=1;SENSOR=62
+Payload size: 23 bytes
+Transmission: SUCCESS
+```
+
+## Class signal test
+
+Transmit once with the kit in its normal orientation (round A), then rotate it about 90° without moving and transmit again (round B). Record RSSI and SNR for both. RSSI closer to 0 dBm is stronger: −65 dBm is stronger than −90 dBm.
+
+## Extension (optional)
+
+Use the time-on-air formula in the chapter's in-depth section (@sec-ch10-depth) to estimate how long your 23-byte packet occupies the channel at the starter's spreading factor. How many such packets per hour fit within a 1% duty cycle?
+
+## Troubleshooting
+
+- **Radio fails to start:** check the antenna and Stage 4 wiring, power-cycle and upload again.
+- **Packet does not appear at the receiver:** wait for other teams, transmit once more, and check that the team ID is not `00`.
+- **Different RSSI each time:** expected. Orientation, people, furniture and multipath all change it.
+
+## Questions
+
+1. Which orientation gave the stronger signal, and what is one plausible reason?
+2. Why is the payload a short text string rather than JSON with long field names?
+3. Your packet reached the receiver with no router and no Internet. What did you give up compared with Wi-Fi?
+4. Give one IoT application for which LoRa is a better choice than BLE, and one for which it is worse.

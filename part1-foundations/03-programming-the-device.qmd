@@ -236,7 +236,43 @@ This exercise corresponds to the second lecture activity and runs in Wokwi or on
 3. Rewrite the counter with an interrupt. Does it count bounces? Fix it by ignoring edges that arrive within 30 ms of the previous one.
 4. Make the red LED blink every 500 ms and the green LED every 700 ms using `millis()`, while the button still toggles the yellow LED instantly.
 5. Read the potentiometer and use it to set the green LED's brightness with PWM.
+
+A guided, step-by-step version for a lecture session is [Activity 2](/part8-activities/A2-buttons-interrupts.qmd).
 :::
+
+## In depth (optional) {#sec-ch03-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Bounce, time and wrap-around
+
+**Why buttons bounce.** A pushbutton is two springy metal contacts. When they close, they collide, separate and collide again several times before settling, typically for 1–10 ms. A pin sampled every microsecond sees each collision as a separate edge.
+
+**Hardware debouncing with an RC filter.** A resistor $R$ and capacitor $C$ smooth the signal. When the button opens, the pull-up charges the capacitor:
+
+$$
+V(t) = V_{DD}\left(1 - e^{-t/RC}\right).
+$$
+
+The pin reads HIGH once $V$ crosses its input threshold $V_{IH}$, at time $t = -RC \ln\left(1 - V_{IH}/V_{DD}\right)$. With $R = 10$ kΩ, $C = 1$ µF ($RC = 10$ ms) and $V_{IH} = 0.75\,V_{DD}$, that is $10 \ln 4 \approx 14$ ms: long enough to ride out the bounce. A slow edge can make an ordinary input chatter as it crosses the threshold, which is why hardware debouncers often add a Schmitt-trigger input with two thresholds.
+
+**Software debouncing** replaces the capacitor with a time window: accept an edge only if more than $t_d$ has passed since the last accepted one. The window must be longer than the worst bounce and shorter than the fastest intentional double press (about 100 ms for a person).
+
+**Timer arithmetic.** `millis()` counts milliseconds in an unsigned 32-bit integer, so it wraps to zero after $2^{32}$ ms $\approx 49.7$ days. The idiom
+
+```cpp
+if (now - last >= interval) { ... }
+```
+
+still works across the wrap, because unsigned subtraction is arithmetic modulo $2^{32}$: if `last` is just before the wrap and `now` just after, `now - last` is still the small, correct difference. The tempting alternative `if (now >= last + interval)` fails for the interval around the wrap. A device meant to run for months must get this right.
+
+**Hardware timers.** The ESP32's general-purpose timers count a clock (80 MHz by default) through a prescaler $P$. One tick lasts $P / 80\ \text{MHz}$; with $P = 80$, one tick is 1 µs, and an alarm after $N$ ticks fires every $N$ µs. This is how `micros()` and periodic timer interrupts are built.
+
+**Exercise.** A wearable samples a button every 5 ms and declares a press when it has seen *k* consecutive LOW samples. What is the smallest *k* that rejects bounces of up to 8 ms? What is the longest delay the user can notice?
+
+Sources for this section: [@espressif_esp32_trm].
 
 ## Design trade-offs
 

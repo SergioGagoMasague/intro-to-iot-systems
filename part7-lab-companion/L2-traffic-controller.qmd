@@ -4,6 +4,10 @@
 Pin numbers reflect the current kit. If your term's handout differs, **it wins**.
 :::
 
+::: {.callout-note appearance="minimal"}
+This lab is adapted from an earlier traffic-light lab handout by Biswadip Maity and Sergio Gago-Masagué.
+:::
+
 ## Goals
 
 - Design and implement a **finite-state machine** on a microcontroller.

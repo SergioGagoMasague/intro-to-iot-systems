@@ -1,0 +1,43 @@
+# About the Activities {#sec-activities .unnumbered}
+
+The eight activities in this part are short, hands-on exercises designed for a lecture session. Each one takes 15 to 45 minutes and turns one idea from a chapter into something that runs on a board.
+
+| # | Activity | Chapter | Hardware |
+|---|---|---|---|
+| 1 | [Blink and basic circuits](/part8-activities/A1-blink.qmd) | @sec-ch02 | Simulator (Wokwi) |
+| 2 | [Buttons, debouncing and interrupts](/part8-activities/A2-buttons-interrupts.qmd) | @sec-ch03 | Simulator (Wokwi) |
+| 3 | [Scan the I²C bus, report on SPI](/part8-activities/A3-i2c-spi.qmd) | @sec-ch05 | Kit, Stages 1–2 |
+| 4 | [The Observe–Decide–Act loop](/part8-activities/A4-oda-loop.qmd) | @sec-ch07 | Kit, Stage 3 |
+| 5 | [A classroom poll over HTTP](/part8-activities/A5-http-poll.qmd) | @sec-ch08 | Kit, Stage 1 + Wi-Fi |
+| 6 | [A LoRa emergency beacon](/part8-activities/A6-lora-beacon.qmd) | @sec-ch10 | Kit, Stage 4 |
+| 7 | [MQTT command center and picking the QoS](/part8-activities/A7-mqtt-qos.qmd) | @sec-ch12 | Kit + Wi-Fi |
+| 8 | [Signed messages and STRIDE](/part8-activities/A8-signed-messages.qmd) | @sec-ch14 | Kit, Stage 2 |
+
+: The lecture activities. {#tbl-activities}
+
+## How each activity works
+
+- **Starter code with TODOs.** Each kit activity starts from a small PlatformIO project in which the interesting lines are left as numbered TODOs. The handout gives a hint for each one. The activities in this book describe the TODOs; the starter projects are distributed by the course and will be published alongside the book.
+- **Required part and extension.** The TODOs are the required part. The *Extension* at the end is optional, for teams that finish early.
+- **Roles.** Kit activities work best in teams of two or three with rotating roles: a *Driver* at the keyboard and board, a *Navigator* who reads the handout and hints aloud, and a *Recorder* who keeps notes for the questions.
+- **Questions.** Each activity ends with four short questions. They are meant to be answered in a sentence or two, and they check understanding rather than code.
+- **Grading.** In IoT@UCI, activities are graded on participation, not correctness. Solutions are not published.
+
+## Helpers used by the starter projects
+
+The starter projects share a small support library, so that activity code stays short:
+
+| Helper | What it does |
+|---|---|
+| `IoTPins::…` | Pin names from `iot_pins.h` (@sec-app-a) |
+| `iotInitI2C()` | Starts the I²C bus on SDA 21 / SCL 22 |
+| `iotInitSPI()` | Starts the SPI bus on SCK 18 / MOSI 23 / MISO 19 |
+| `iotInitDisplay()` | Initializes the OLED; returns `true` on success |
+| `iotDisplayLines(a, b, c, d)` | Writes up to four lines to the OLED |
+| `iotConnectWiFi()` | Joins the network in `secrets.h`; returns `true` on success |
+
+: Support helpers used in the activities. {#tbl-activity-helpers}
+
+::: {.callout-note title="For instructors" collapse="true"}
+The network activities (5 and 7) need a 2.4 GHz WPA2-Personal network that every board can join, such as a travel router (@sec-app-e), and a server or broker on the instructor's laptop. Activity 6 needs one receiving radio at the front of the room. Activity 8 needs ATECC608A chips that were provisioned **before** the term: students must never configure or lock the chips themselves.
+:::

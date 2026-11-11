@@ -30,3 +30,18 @@ Every chapter has a core path that all readers should follow. Some chapters also
 ## License and contributions
 
 The text and figures are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Code is licensed under the MIT License. Corrections and suggestions are welcome as issues or pull requests in the book's repository.
+
+## Sources and originality
+
+The text, figures and code in this book were written for it. Where the book follows an existing framework, taxonomy or teaching sequence, it says so in the text and cites the source. In particular:
+
+- The overall sequence of Parts I–IV, and several frameworks used in them (the IoT reference framework, the classification of sensors and actuators, the Observe–Decide–Act loop, IoT networking requirements, the layered IoT protocol stack and the three-domain view of IoT security), follow Rayes and Salam's *Internet of Things from Hype to Reality* [@rayes_salam_iot] and its security chapter by Dabbagh and Rayes [@dabbagh_rayes_security]. These are used as frameworks with attribution; no text or figures are reproduced from them.
+- Facts, figures and standards are cited to their primary sources: datasheets, RFCs, specifications and official regulatory texts.
+- Code examples are original, or minimal uses of public library APIs written in the style of their documentation.
+- Product names and trademarks belong to their owners and are used only to identify products.
+
+If you believe any passage is insufficiently attributed, please open an issue in the book's repository; it will be corrected promptly.
+
+## Acknowledgments
+
+Several of the labs grew out of earlier lab handouts written with **Biswadip Maity**. The Fall 2026 offering of the course, on which the Lab Companion and the lecture activities are based, was supported by teaching assistants **Hamidreza Alikhani Koshkak**, **Nitish Nagesh**, **Jay Chen** and **Leming**, and earlier activity materials were developed with **Manuel Segura**. Thanks also to the students of the course, whose questions and feedback shaped every chapter.

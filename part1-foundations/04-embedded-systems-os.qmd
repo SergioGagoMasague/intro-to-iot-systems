@@ -162,6 +162,44 @@ An RTOS earns its place when a device has several activities with different timi
 4. Replace the button-counter ISR from @sec-ch03 with the queue pattern above.
 :::
 
+## In depth (optional) {#sec-ch04-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Will every task meet its deadline?
+
+A real-time operating system schedules tasks by priority. For periodic tasks, there is a classic way to check, before running anything, that every task will finish before its next period starts.
+
+Describe each task $i$ by its worst-case execution time $C_i$ and its period $T_i$ (its deadline is the end of the period). Its **utilization** is $U_i = C_i / T_i$, the fraction of the CPU it needs.
+
+**Necessary condition.** The total utilization must not exceed 1: $U = \sum_i C_i / T_i \le 1$.
+
+**A sufficient test for fixed priorities.** With **rate-monotonic** priorities (shorter period, higher priority), Liu and Layland showed that $n$ independent periodic tasks always meet their deadlines if
+
+$$
+U \le n\left(2^{1/n} - 1\right).
+$$
+
+The bound is 1.0 for one task, 0.828 for two, 0.780 for three, and approaches $\ln 2 \approx 0.693$ as $n$ grows.
+
+**Example.** A kit runs three tasks: read the IMU every 10 ms (1 ms of work), update the OLED every 100 ms (25 ms), and publish to MQTT every 1000 ms (60 ms). Then $U = 0.10 + 0.25 + 0.06 = 0.41 \le 0.780$: schedulable.
+
+**Response-time analysis** gives an exact answer when the bound fails. The worst-case response time $R_i$ of task $i$ is the smallest solution of
+
+$$
+R_i = C_i + \sum_{j \in hp(i)} \left\lceil \frac{R_i}{T_j} \right\rceil C_j,
+$$
+
+where $hp(i)$ are the tasks with higher priority. Solve it by iteration from $R_i = C_i$. For the OLED task: $R = 25 + \lceil 25/10 \rceil \cdot 1 = 28$, then $25 + \lceil 28/10\rceil \cdot 1 = 28$: converged, well under 100 ms.
+
+**What breaks the model.** Real tasks share resources. If a low-priority task holds a mutex that a high-priority task needs, while a medium-priority task runs, the high-priority task waits indefinitely: **priority inversion**. FreeRTOS mutexes use priority inheritance to bound it; binary semaphores do not. Interrupts, Wi-Fi stack activity on the other core, and flash writes also steal time that a simple $C_i$ does not show, so leave margin.
+
+**Exercise.** Add a fourth task that reads the BMP280 every 50 ms for 5 ms. Is the set still guaranteed schedulable by the utilization bound? If not, apply response-time analysis to the lowest-priority task.
+
+Sources for this section: [@liu_layland_1973; @barry_freertos].
+
 ## Design trade-offs
 
 | Architecture | Strengths | Weaknesses | Typical use |

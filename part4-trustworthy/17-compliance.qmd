@@ -137,6 +137,40 @@ This exercise corresponds to the compliance discussion in lecture.
 4. Write a one-paragraph "security support statement" for your product, stating how long it will receive security updates and how people can report vulnerabilities.
 :::
 
+## In depth (optional) {#sec-ch17-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Decibels, power limits and duty cycles
+
+Radio rules are written in units that are easy to misread, and a factor of 10 is easy to miss.
+
+**Decibels relative to a milliwatt.** Power in dBm is
+
+$$
+P_\text{dBm} = 10 \log_{10}\frac{P}{1\ \text{mW}} ,
+$$
+
+so 1 mW = 0 dBm, 25 mW ≈ 14 dBm, 100 mW = 20 dBm and 1 W = 30 dBm. Each 3 dB doubles the power; each 10 dB multiplies it by ten. Gains and losses then simply add.
+
+**EIRP and ERP.** Limits usually apply to the power that leaves the antenna in its strongest direction, not to the transmitter's output. **EIRP** (equivalent isotropically radiated power) is transmitter power plus antenna gain in dBi, minus cable loss. **ERP** uses a half-wave dipole as the reference instead of an ideal isotropic antenna, and a dipole has 2.15 dBi of gain:
+
+$$
+\text{EIRP} = \text{ERP} + 2.15\ \text{dB}.
+$$
+
+A rule of "25 mW ERP" is therefore 14 dBm ERP, or about 16.15 dBm EIRP. Swapping the kit's spring antenna for a 6 dBi directional antenna adds 6 dB of EIRP without touching the radio, and can turn a compliant device into a non-compliant one.
+
+**Duty cycle.** Where a band limits transmit time to a fraction $\delta$, a device may transmit $3600\,\delta$ seconds per hour; at 1%, 36 s. Chapter 10's time-on-air formula converts that into packets per hour. Compliance is per device, so a firmware bug that retries forever is a regulatory problem as well as a battery problem.
+
+**Certification is about the whole product.** A pre-certified radio module simplifies compliance only if it is used within the conditions of its grant: the listed antennas, power settings and host constraints. Changing any of them can require new testing.
+
+**Exercise.** A module transmits at 20 dBm into a cable with 1.5 dB loss and a 3 dBi antenna. What is its EIRP in dBm and in milliwatts? What is its ERP?
+
+Sources for this section: [@etsi_en303645].
+
 ## Design trade-offs
 
 | Decision | Considerations |

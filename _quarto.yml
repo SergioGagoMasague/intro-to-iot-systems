@@ -61,11 +61,23 @@ book:
         - part7-lab-companion/L4-ble-step-counter.qmd
         - part7-lab-companion/L5-cloud-communication.qmd
         - part7-lab-companion/L6-harden-your-device.qmd
+    - part: "Part VIII — Lecture Activities"
+      chapters:
+        - part8-activities/A0-about.qmd
+        - part8-activities/A1-blink.qmd
+        - part8-activities/A2-buttons-interrupts.qmd
+        - part8-activities/A3-i2c-spi.qmd
+        - part8-activities/A4-oda-loop.qmd
+        - part8-activities/A5-http-poll.qmd
+        - part8-activities/A6-lora-beacon.qmd
+        - part8-activities/A7-mqtt-qos.qmd
+        - part8-activities/A8-signed-messages.qmd
   appendices:
     - appendices/A-kit-reference.qmd
     - appendices/B-toolchain.qmd
     - appendices/C-troubleshooting.qmd
     - appendices/D-glossary.qmd
+    - appendices/E-teaching-lab.qmd
     - references.qmd
 
 bibliography: references.bib

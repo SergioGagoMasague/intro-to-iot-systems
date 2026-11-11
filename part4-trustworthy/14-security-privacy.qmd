@@ -40,7 +40,7 @@ Security and privacy are not features to add at the end. They shape every layer 
 
 ### Security requirements
 
-A secure IoT system must provide:
+Following Dabbagh and Rayes [@dabbagh_rayes_security], a secure IoT system must provide:
 
 - **Confidentiality**: only the intended parties can understand exchanged messages.
 - **Integrity**: messages cannot be altered without detection.
@@ -71,7 +71,7 @@ A simple process: draw the system's data flows (devices, gateways, brokers, clou
 
 ### A three-domain view of IoT security
 
-It helps to divide an IoT system into three domains, each with its own attacks:
+It helps to divide an IoT system into three domains, each with its own attacks. The taxonomy below follows Dabbagh and Rayes [@dabbagh_rayes_security]:
 
 - the **cloud domain**, which performs heavy computation and storage;
 - the **fog domain** (the edge), which aggregates, preprocesses and stores data close to the devices (@sec-ch18);
@@ -203,7 +203,43 @@ This exercise corresponds to the security lecture activity.
 3. Add the HMAC scheme above to the command topic. Show that a command with a modified payload is rejected, and that replaying a captured valid command is also rejected.
 4. Reboot the receiving kit and replay an old command. Does it succeed? Fix the problem.
 5. Which STRIDE threats does your HMAC scheme *not* address?
+
+A guided, step-by-step version for a lecture session is [Activity 8](/part8-activities/A8-signed-messages.qmd).
 :::
+
+## In depth (optional) {#sec-ch14-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### How strong is strong enough?
+
+**Brute force and key length.** A secret chosen uniformly from $2^k$ possibilities takes, on average, $2^{k-1}$ guesses to find. An attacker testing $10^{12}$ keys per second needs about $2^{55}/10^{12} \approx 10$ hours for a 56-bit key and $2^{127}/10^{12} \approx 5\times10^{18}$ years for a 128-bit key. The difference is not 2.3 times but $2^{72}$ times. Hence 128 bits as the modern floor for symmetric keys.
+
+**Human-chosen secrets are much weaker.** A 6-digit PIN has $10^6 \approx 2^{20}$ values; an 8-character password of lowercase letters $26^8 \approx 2^{37.6}$. Default passwords shared by a whole product line have, effectively, zero bits. Rate limiting and lockout help online, but not against an attacker who has captured a hash and guesses offline.
+
+**Truncated authentication tags.** A message authentication code (such as HMAC-SHA-256) is often truncated to save bytes on constrained links. An attacker who forges a message without the key succeeds with probability $2^{-t}$ per attempt for a $t$-bit tag. A 32-bit tag gives one success in about 4 billion attempts: acceptable on a LoRa link limited to a few hundred messages per hour, unacceptable on a fast network that allows millions of attempts.
+
+**Nonces and the birthday bound.** Many encryption modes need a **nonce** that never repeats under the same key. If nonces are chosen randomly from $2^b$ values, the probability that $n$ messages contain at least one repeat is approximately
+
+$$
+P_\text{collision} \approx 1 - e^{-n^2/2^{b+1}} \approx \frac{n^2}{2^{b+1}} .
+$$
+
+With 96-bit random nonces (the AES-GCM standard size), $n = 2^{32}$ messages give $P \approx 2^{-33}$: safe. With a 32-bit random nonce, collisions become likely after about $2^{16} = 65\,536$ messages, a few days of a sensor reporting every few seconds. A counter avoids collisions entirely, provided it survives reboots (see Activity 8's extension).
+
+**Risk as likelihood times impact.** Threat modeling often scores each threat as
+
+$$
+\text{risk} = \text{likelihood} \times \text{impact},
+$$
+
+on simple 1–5 scales. The product is crude, but it forces two separate judgments and makes the ranking discussable. A cheap attack with small impact (reading one room's temperature) can rank above an expensive attack with large impact (extracting a key from silicon), and that ranking is a design decision, not a fact.
+
+**Exercise.** A command channel uses HMAC tags truncated to 24 bits and accepts up to 10 commands per second. How long would an attacker need, on average, to get one forged command accepted? What would you change?
+
+Sources for this section: [@shostack_threat_modeling].
 
 ## Design trade-offs
 
@@ -246,6 +282,7 @@ This exercise corresponds to the security lecture activity.
 
 ## Further reading
 
+- M. Dabbagh and A. Rayes, "Internet of Things Security and Privacy" [@dabbagh_rayes_security], the source of the three-domain attack taxonomy used in this chapter.
 - OWASP, *IoT Top 10* [@owasp_iot_top10], a list of the most common IoT security weaknesses.
 - V. Hassija et al., "A survey on IoT security: application areas, security threats, and solution architectures" [@hassija_survey].
 - A. Shostack, *Threat Modeling: Designing for Security* [@shostack_threat_modeling].

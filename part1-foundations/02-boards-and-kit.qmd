@@ -152,7 +152,43 @@ This exercise corresponds to the first lecture activity and can be done in the W
 3. Reverse the LED. What happens, and why does nothing break?
 4. Move the LED to GPIO 34 and try again. Explain the result using @tbl-esp32-pins.
 5. Change the program so the LED blinks "SOS" in Morse code. What did changing the behavior cost you, compared with a 555 timer circuit?
+
+A guided, step-by-step version for a lecture session is [Activity 1](/part8-activities/A1-blink.qmd).
 :::
+
+## In depth (optional) {#sec-ch02-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Currents, resistors and heat on the kit
+
+**Sizing an LED resistor.** A lit LED holds a roughly constant forward voltage $V_f$ across itself. The resistor takes the rest of the supply, so by Ohm's law
+
+$$
+I = \frac{V_\text{GPIO} - V_f}{R}.
+$$
+
+With a 3.3 V pin, a red LED ($V_f \approx 2.0$ V) and 220 Ω, $I = 1.3 / 220 \approx 5.9$ mA: bright enough to see, well within a pin's limits. A green or blue LED ($V_f$ from about 2.2 to 3.0 V) draws less, and appears dimmer, with the same resistor. The resistor dissipates $P = I^2 R \approx 7.7$ mW, far below its ¼ W rating.
+
+Without the resistor, the only thing limiting current is the pin driver's own output resistance (tens of ohms) and the LED's small dynamic resistance: the current can exceed the pin's rating, and the pin or the LED can be damaged. The simulator in Activity 1 does not model this.
+
+**Pin limits add up.** The ESP32 lets you set each pin's drive strength; at the default setting a pin sources roughly 20 mA, and the absolute maximum is around 40 mA. What matters as much is the *total* drawn through the chip's power pins. Use pins to signal, not to power things: anything over a few milliamperes deserves a transistor.
+
+**Pull-up resistors.** With `INPUT_PULLUP`, an internal resistor of roughly 45 kΩ connects the pin to 3.3 V. When the button closes, the current is $3.3 / 45\,000 \approx 73\ \mu$A: negligible for an LED-sized budget, but not for a coin-cell device that holds a button down for hours.
+
+**The regulator gets warm.** The DevKit's linear regulator drops USB's 5 V to 3.3 V and turns the difference into heat:
+
+$$
+P_\text{reg} = (V_\text{in} - V_\text{out})\, I_\text{load}.
+$$
+
+During Wi-Fi bursts of 250 mA, $P = 1.7 \times 0.25 \approx 0.43$ W. A small regulator package rises in temperature by its thermal resistance $\theta_{JA}$ times that power; at a typical 90 °C/W, about 38 °C above ambient. It works, but leaves little margin, which is one reason not to hang extra loads on 3V3.
+
+**Exercise.** You want an LED current of 10 mA from a 3.3 V pin with a green LED of $V_f = 2.2$ V. Which standard resistor value would you choose, and what current do you actually get?
+
+Sources for this section: [@espressif_esp32_datasheet].
 
 ## Design trade-offs
 

@@ -299,7 +299,47 @@ This exercise uses the kit wiring from Stage 2 of [Lab 1](/part7-lab-companion/L
 3. Restore the wire and run the WHO_AM_I example. Confirm that it prints 0x68.
 4. Set the Serial Monitor to 9600 baud while the code still uses 115200. Describe what you see, and explain it using @fig-uart-frame.
 5. Write a line of your choice to the OLED. Which bus carried it, and which chip-select pin went low?
+
+A guided, step-by-step version for a lecture session is [Activity 3](/part8-activities/A3-i2c-spi.qmd).
 :::
+
+## In depth (optional) {#sec-ch05-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Bit budgets and bus electrics
+
+**UART efficiency.** An 8N1 frame sends 10 bits (start, 8 data, stop) for every byte, so the useful byte rate is $\text{baud}/10$: 11 520 bytes per second at 115 200 baud.
+
+**How much baud-rate error is tolerable?** The receiver synchronizes on the start bit's falling edge and samples each bit in its middle. If the two clocks differ by a fraction $\varepsilon$, the sampling point drifts by $\varepsilon$ bit-times per bit. By the stop bit, about 9.5 bit-times after the edge, the drift must stay under half a bit:
+
+$$
+9.5\,\varepsilon < 0.5 \quad\Rightarrow\quad \varepsilon < 5.3\%.
+$$
+
+That is the *combined* error of both ends, before any allowance for slow edges or noise, so designers aim for about 2% on each side. It explains why a 9600-baud monitor on a 115 200-baud stream produces garbage rather than a slowed-down message.
+
+**I²C pull-up resistors.** I²C lines are open-drain: devices only pull them low, and a pull-up resistor $R_p$ pulls them high through the bus capacitance $C_b$ (wires plus pins). The rise is an RC charge, and the standard measures it from 30% to 70% of $V_{DD}$:
+
+$$
+t_r = t_{70\%} - t_{30\%} = R_pC_b\left(\ln\frac{1}{0.3} - \ln\frac{1}{0.7}\right) = R_pC_b \ln\frac{7}{3} \approx 0.847\,R_p C_b .
+$$
+
+Fast mode (400 kHz) allows $t_r \le 300$ ns, so $R_p \le 300\ \text{ns} / (0.847\, C_b)$; for $C_b = 100$ pF, $R_p \le 3.5$ kΩ. The resistor also cannot be too small, or a device cannot pull the line low enough: with a 3 mA sink and a 0.4 V low level, $R_p \ge (3.3 - 0.4)/0.003 \approx 970$ Ω. Breakout boards each add their own pull-ups (often 4.7 kΩ or 10 kΩ), and they combine in parallel, so three modules on one bus already give 1.6–3.3 kΩ.
+
+**Transfer time on each bus.** An I²C byte takes 9 clock cycles (8 data bits plus acknowledge), so a 1024-byte display frame at 400 kHz takes at least
+
+$$
+\frac{1024 \times 9}{400\,000} \approx 23\ \text{ms},
+$$
+
+capping the refresh rate near 40 frames per second before any other work. On SPI at 8 MHz, with no acknowledge bit, the same frame takes $1024 \times 8 / 8\,000\,000 \approx 1$ ms. That factor of twenty is why the kit's display uses SPI.
+
+**Exercise.** The MPU-6050 delivers 14 bytes per sample (accelerometer, temperature, gyroscope). At 400 kHz, counting the address and register bytes, what is the highest sample rate the bus could sustain? What does that leave for the BMP280?
+
+Sources for this section: [@nxp_i2c_um10204; @espressif_esp32_trm].
 
 ## Design trade-offs
 

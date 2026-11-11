@@ -1,0 +1,54 @@
+# Setting Up a Teaching Lab {#sec-app-e}
+
+This appendix is for instructors and lab managers who want to run the course, or a course like it. It describes what a room needs so that every team can build, solder, program and test its kit safely. Quantities assume a section of about 30 students working in teams of two or three, with up to 10 people soldering at once.
+
+## The room
+
+| Need | Recommendation | Why |
+|---|---|---|
+| **Layout** | A dedicated soldering bench along one wall; separate tables for pair work with laptops; an instrument shelf; lockable storage; a visible safety station | Keeps hot irons away from laptops, paper and foot traffic |
+| **Power** | Hard-wired or properly rated outlets at each bench; no daisy-chained power strips; cords routed off the floor | Every station draws power at once, and crossing cords are a trip and burn hazard |
+| **Ventilation** | A fume extractor at each soldering station, and confirmation from your environmental health and safety office that room ventilation is adequate | Rosin flux fumes are a respiratory irritant |
+| **Surfaces** | Heat-resistant, wipeable bench tops or silicone mats at the soldering bench | Solder spatter and dropped irons |
+| **Seating** | Fixed, wipeable stools at the soldering bench | Fabric chairs on casters collect spatter, build static, and roll over cords |
+| **Lighting** | Task lighting at the soldering bench | Small pads and fine pitch need good light |
+| **Network** | A 2.4 GHz WPA2-Personal network able to handle about 30 devices, or a dedicated travel router | Enterprise and captive-portal networks block small devices (@sec-app-b) |
+| **Safety station** | First-aid kit including burn dressings, fire extinguisher, eyewash if required, posted soldering procedure and emergency contacts | Required by most institutions; makes the rules visible |
+
+: Room requirements. {#tbl-room}
+
+## Shared equipment (per 10 soldering stations)
+
+| Qty | Item | Notes (Fall 2026 choice) |
+|---|---|---|
+| 10 | Temperature-controlled soldering stations with stands | 60 W, with spare tips, helping hands and a solder sucker (YIHUA 926 III) |
+| 10 | Fume extractors | One per station |
+| 10 | Silicone work mats | Heat-resistant, ≈ 34 × 23 cm |
+| 30+ | Safety glasses | One per person soldering, plus spares |
+| 2 | Spools of lead-free solder, 0.8 mm, rosin core | SAC305 |
+| 5 | Flux pens | No-clean |
+| 10 | Desoldering braid | One spool per station |
+| 6 | Sets of 22 AWG solid-core wire, six colors | For the cut-and-strip activity and flat breadboard wiring |
+| 12 | Automatic wire strippers | Covering 22 AWG |
+| 15 | Flush cutters | One per station plus spares |
+| 5 | Digital multimeters | With continuity beeper |
+| 12 | USB-C inline power meters | For measuring board current; most cannot resolve deep-sleep currents |
+| 1 | Travel router | A private 2.4 GHz network for demos |
+| 2 | Burn first-aid kits | Supplementing the room's general kit |
+| 1 | Small-parts organizer | Spare LEDs, resistors, buttons and headers |
+
+: Shared equipment. {#tbl-lab-equipment}
+
+In Fall 2026 this shared equipment cost about **$1,900** for 10 stations, and kit parts for 36 new kits about **$2,000**.
+
+## Before the first lab
+
+- **Kits**: count, label and test every kit; flash a kit-check sketch; pre-solder or pre-provision anything students should not do themselves (for example, locking secure elements).
+- **Network**: test that 30 boards can join the room network and reach your broker or server at the same time.
+- **Safety briefing**: present the soldering procedure, show the safety station and require safety glasses.
+- **Staffing**: plan at least one teaching assistant per 10 students during soldering.
+- **Kit policy**: decide whether kits are returned at the end of the term or can be bought, and how damaged parts are replaced.
+
+## Running costs
+
+Budget each term for consumables (solder, flux, wire, resistors and LEDs), replacement parts (an ESP32 or a sensor per few kits is typical), and spare tips for the soldering stations.

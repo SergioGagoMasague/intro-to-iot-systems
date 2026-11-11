@@ -1,0 +1,80 @@
+# Activity 1: Blink and Basic Circuits {#sec-act-1 .unnumbered}
+
+**Time:** about 15 minutes · **Format:** individual · **Hardware:** none, the free [Wokwi](https://wokwi.com) ESP32 simulator in a web browser · **Chapter:** @sec-ch02
+
+## Goal
+
+Build the simplest useful embedded circuit, an LED with a current-limiting resistor, and make it blink from software. The code runs unchanged on a real ESP32 later.
+
+After this activity you should be able to:
+
+- build an LED circuit with a series resistor;
+- configure a GPIO pin as an output and drive it HIGH and LOW;
+- control timing with `delay()`;
+- run and debug ESP32 code in a simulator.
+
+## Set up the simulator
+
+1. Open wokwi.com (an optional free account lets you save and share projects).
+2. Start a new **ESP32** project from the **Arduino** template. The editor is on the left, the simulated board on the right.
+3. Add parts with the **+** button; make a wire by clicking one pin and then another; click a part to change its settings.
+4. Press **▶ Start** to run. Serial output appears below the board.
+
+## Build the circuit
+
+Add one **LED** and one **resistor** (set it to **220 Ω**), and wire:
+
+- ESP32 pin **D26** (GPIO 26) → resistor;
+- resistor → LED **anode** (A, the longer leg);
+- LED **cathode** (C) → **GND**.
+
+## Starter code
+
+```cpp
+#include <Arduino.h>
+
+const int LED_PIN = 26;   // GPIO wired to the resistor and LED
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Blink LED");
+  // TODO 1: configure LED_PIN as an output
+}
+
+void loop() {
+  // TODO 2: turn the LED on
+  // TODO 3: wait 500 ms
+  // TODO 4: turn the LED off
+  // TODO 5: wait 500 ms
+}
+```
+
+## Hints
+
+| TODO | Hint |
+|---|---|
+| 1 | A pin must be made an output once, in `setup()`, with `pinMode()`. |
+| 2, 4 | `digitalWrite()` drives the pin to 3.3 V (`HIGH`) or 0 V (`LOW`). |
+| 3, 5 | `delay()` takes milliseconds. |
+
+## Expected result
+
+The LED is on for about half a second, off for about half a second, and repeats; the Serial Monitor shows the title line once.
+
+## Extension (optional)
+
+Add a second LED with its own 220 Ω resistor on GPIO 27 and make the two LEDs alternate, or blink SOS (three short, three long, three short). The simulator may light an LED wired without a resistor: what would happen on a real board? (@sec-ch07 has the arithmetic.)
+
+## Troubleshooting
+
+- **LED never lights:** the anode must face the GPIO pin, the cathode GND.
+- **Nothing happens:** the circuit must be on the same pin as `LED_PIN`.
+- **Compile error:** read the first error line; a missing semicolon is the usual cause.
+- **LED stays on or off:** check that both delays are present and that TODO 1 is inside `setup()`.
+
+## Questions
+
+1. Why does the circuit need a resistor in series with the LED?
+2. Why must a GPIO pin be configured with `pinMode()` before it is used?
+3. What would you observe if both `delay()` calls were removed? Why?
+4. What would you change to make the LED blink twice as fast?

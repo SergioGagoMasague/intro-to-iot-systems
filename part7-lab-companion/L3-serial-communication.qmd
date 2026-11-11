@@ -4,6 +4,10 @@
 Pin numbers and parts reflect the current kit. If your term's handout differs, **it wins**.
 :::
 
+::: {.callout-note appearance="minimal"}
+This lab is adapted from an earlier serial-communication lab handout by Biswadip Maity and Sergio Gago-Masagué.
+:::
+
 ## Goals
 
 - Read a sensor over I²C at the register level, using its datasheet.

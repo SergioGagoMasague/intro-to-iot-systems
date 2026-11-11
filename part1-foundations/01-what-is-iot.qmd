@@ -27,7 +27,7 @@ There is no single official definition of the Internet of Things, but most defin
 - **Software**, to process and interpret the data;
 - **Connectivity**, so that data and commands can travel between devices, people and services.
 
-Putting these together:
+Putting these together, in a formulation close to that of Rayes and Salam [@rayes_salam_iot]:
 
 > The **Internet of Things** is the network of physical objects that are embedded with sensors, software and network connectivity, have a unique identity, and can collect and exchange data and act on the physical world.
 
@@ -50,7 +50,7 @@ These are not competing technologies. They are different lenses on the same idea
 
 ### From the Internet of People to the Internet of Things
 
-The internet has gone through several phases, each of which digitized something new:
+The internet has gone through several phases, each of which digitized something new [@evans_ioe_2011; @rayes_salam_iot]:
 
 1. **Connectivity** digitized *access to information*: email, the web, search.
 2. **The networked economy** digitized *business*: e-commerce, online banking, supply chains.
@@ -73,7 +73,7 @@ The third category grows fastest and is the hardest to get right, because no per
 
 ### A reference architecture
 
-Real IoT systems are built from many products made by different vendors. A **reference architecture** gives you a common vocabulary for where each part belongs. A widely used model has four levels (@fig-iot-architecture):
+Real IoT systems are built from many products made by different vendors. A **reference architecture** gives you a common vocabulary for where each part belongs. A widely used model, adapted here from Rayes and Salam [@rayes_salam_iot], has four levels (@fig-iot-architecture):
 
 ![A four-level IoT reference architecture. Data generally flows upward; commands flow downward.](../images/iot-reference-architecture.svg){#fig-iot-architecture width="95%"}
 
@@ -118,6 +118,34 @@ Look at the kit tour in *Using This Book with the IoT@UCI Kit*.
 3. Name one application-level product you use daily that sits on top of a device-level thing. What are its sensors, identifiers, software and connectivity?
 :::
 
+## In depth (optional) {#sec-ch01-depth}
+
+::: {.callout-note appearance="simple" icon=false}
+**Optional, in-depth explanation.** This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.
+:::
+
+### Back-of-the-envelope engineering
+
+Most early IoT design questions are answered with two quick estimates: **how long will the battery last**, and **how much data will the fleet produce**. Both are simple averages, and both are worth doing before writing any code.
+
+**Average current.** A device that is active for $t_a$ seconds in every period $T$ has a duty cycle $D = t_a / T$. Its average current is
+
+$$
+I_\text{avg} = D \, I_\text{active} + (1 - D)\, I_\text{sleep}.
+$$
+
+For a sensor that wakes for 0.5 s every 10 minutes, draws 80 mA while awake (Wi-Fi on) and 10 µA asleep: $D = 0.5/600 \approx 8.3\times10^{-4}$, so $I_\text{avg} \approx 67\ \mu\text{A} + 10\ \mu\text{A} \approx 77\ \mu\text{A}$. Notice that the 10 µA sleep current is already 13% of the total: at low duty cycles, **sleep current dominates**.
+
+**Lifetime.** A battery of capacity $Q$ (in mAh) lasts roughly $Q / I_\text{avg}$ hours. A 225 mAh coin cell would give $225 / 0.077 \approx 2900$ h, about four months, on paper.
+
+**The physics the average hides.** A battery is not an ideal voltage source; it has an internal resistance $R_\text{int}$. The terminal voltage under load is $V = V_\text{oc} - I R_\text{int}$. A coin cell's internal resistance is typically 10–30 Ω and rises as it discharges, so an 80 mA pulse drops $0.08 \times 15 = 1.2$ V: the 3 V cell sags to 1.8 V and the microcontroller resets. The average said four months; the peak says the design does not work at all. This is why Wi-Fi devices use AA or lithium-ion cells, and why coin-cell devices use BLE or LoRa, whose transmit current is far lower, often with a capacitor to supply the pulse.
+
+**Fleet data volume.** If $N$ devices each send $b$ bytes every $T$ seconds, the fleet produces $N b / T$ bytes per second. One million smart meters sending 100 bytes every 15 minutes produce $10^6 \times 100 / 900 \approx 111$ kB/s on average, or about 9.6 GB per day before protocol overhead (@sec-ch08 shows the overhead can be many times the payload). The rate is modest; the challenge is the *number of connections* and the *bursts* when every meter reports at the same moment.
+
+**Exercise.** Repeat the lifetime estimate for a device that reports every minute instead of every 10 minutes. Which term now dominates the average?
+
+Sources for this section: [@espressif_idf_sleep].
+
 ## Design trade-offs
 
 Every IoT design balances a small set of competing goals. It is worth naming them now, because they will reappear in every chapter:
@@ -158,4 +186,5 @@ There is no universally right answer. A good IoT engineer can state which goals 
 ## Further reading
 
 - IoT Analytics, *State of IoT 2025* [@iotanalytics_state_2025], for current device counts and connectivity trends.
+- A. Rayes and S. Salam, *Internet of Things from Hype to Reality* [@rayes_salam_iot], whose framing of IoT definitions and reference architecture this chapter follows.
 - ITU-T Recommendation Y.2060, *Overview of the Internet of Things* [@itu_y2060], the source of many reference-architecture terms.
