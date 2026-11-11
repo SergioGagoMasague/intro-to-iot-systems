@@ -1,5 +1,193 @@
 # Development Boards and the IoT Kit {#sec-ch02}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C02 · Activity 1.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Use voltage, current and Ohm's law to choose a current-limiting resistor for an LED.
+2. Build simple circuits on a solderless breadboard and explain how its strips are connected.
+3. Explain what a microcontroller is and why it replaced fixed-function circuits in most products.
+4. Identify the parts of a development board and what each one does.
+5. Describe the ESP32 and the DevKit V1 board used in the kit, including the pins you must avoid.
 :::
+
+## Why it matters
+
+Every IoT device starts as a circuit on a bench. Before you can write code that senses or acts, you need to know how electricity reaches a component, how much of it the component can take, and how a microcontroller board fits into the circuit. Most "my code doesn't work" problems in a first IoT course turn out to be circuit problems: an LED wired backwards, a missing ground, a component on the wrong breadboard row.
+
+This chapter builds the smallest useful circuit, makes it blink, and then explains the development board that will run all the code in the rest of the book.
+
+## Concepts
+
+### Voltage, current and resistance
+
+Three quantities describe what happens in a simple circuit:
+
+- **Voltage** (V, measured in volts) is the electrical "pressure" between two points. It is what pushes charge around a circuit. A USB port supplies 5 V; the ESP32's pins work at 3.3 V.
+- **Current** (I, measured in amperes or milliamperes, mA) is the rate at which charge flows. Components are damaged by too much current, not by voltage alone.
+- **Resistance** (R, measured in ohms, Ω) opposes current.
+
+They are related by **Ohm's law**:
+
+$$
+V = I \times R
+$$
+
+Current only flows around a **closed loop**: from the supply, through the components, and back to **ground** (GND), the reference point that all voltages are measured from. If any part of the loop is open, nothing happens.
+
+### Lighting an LED safely
+
+A light-emitting diode (LED) conducts in one direction only. Its longer leg, the **anode**, must face the positive supply; the shorter leg, the **cathode**, faces ground. Once it conducts, an LED holds a roughly fixed voltage across itself, called its **forward voltage** ($V_f$): about 2.0 V for a red LED, and around 3 V for blue or white ones.
+
+An LED has almost no resistance of its own once it conducts. Connect it straight across a supply and the current rises until something burns out. A **current-limiting resistor** in series sets the current:
+
+$$
+R = \frac{V_{supply} - V_f}{I_{LED}}
+$$
+
+For a red LED driven from a 3.3 V ESP32 pin, aiming for 10 mA:
+
+$$
+R = \frac{3.3\ \text{V} - 2.0\ \text{V}}{0.010\ \text{A}} = 130\ \Omega
+$$
+
+Resistors come in standard values, and it is always safe to round **up**. The kit uses 220 Ω, which gives about 6 mA: plenty for an indicator LED, and gentle on the microcontroller pin.
+
+### Breadboards
+
+A **solderless breadboard** lets you build and change circuits without soldering. Inside, metal clips connect groups of holes:
+
+- In the main area, each **row of five holes** is connected. The rows on either side of the central gap are *not* connected to each other. Chips and modules straddle this gap so that each pin gets its own row.
+- The long **power rails** along the edges run the length of the board. By convention, the red rail carries the supply voltage and the blue rail carries ground. On some boards the rails are split in the middle, so check before relying on them.
+
+The kit uses two 830-point breadboards side by side, with the ESP32 bridging the seam. The rails carry 3.3 V and GND, except for one short rail section reserved for the servo's 5 V supply (@sec-lab-l1).
+
+### From fixed circuits to microcontrollers
+
+Suppose you want the LED to blink once per second. One classic solution is a **555 timer**: a chip whose output switches on and off at a rate set by a resistor and a capacitor. It works, but changing the behavior means changing components. Making it blink twice and pause, or blink faster when a button is pressed, means designing a new circuit.
+
+A **microcontroller** replaces the fixed circuit with software. It is a small computer on a single chip, with a processor, memory and input/output pins. The same chip can blink an LED, read a sensor or run a network stack, depending on the program you load:
+
+```cpp
+void loop() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_PIN, LOW);
+  delay(1000);
+}
+```
+
+Microcontrollers are cheap (often well under a dollar for simple ones), so it is usually cheaper to use one than to design a custom circuit. This is a large part of why connected devices became affordable.
+
+### What a development board adds
+
+A bare microcontroller chip is hard to use on a bench: its pins are tiny, it needs a stable power supply, and loading a program onto it requires special hardware. A **development board** wraps the chip with everything needed to experiment:
+
+- **A power circuit**: a voltage regulator that turns 5 V from USB into the 3.3 V the chip needs.
+- **A programming interface**: usually a USB-to-UART bridge chip (@sec-ch05), so a laptop can upload programs and exchange text with the board.
+- **Basic I/O**: at least one LED and a reset button, often a second "boot" button.
+- **Header pins**: the chip's I/O pins brought out at breadboard-friendly spacing.
+
+### Arduino and the ESP family
+
+The **Arduino** project made microcontroller development accessible to people with no electronics background. It combined an inexpensive open-hardware board, the Arduino Uno based on an 8-bit AVR microcontroller, with a simple programming environment and a large library ecosystem. Its programming model (a `setup()` function and a `loop()` function, @sec-ch03) is still the most common entry point to embedded programming.
+
+The original Uno has no network connection. Adding Wi-Fi meant stacking an expansion board, called a **shield**, which added cost and size. The **ESP8266** and later the **ESP32**, both from Espressif Systems, changed this by putting a capable processor and a Wi-Fi radio on the same inexpensive chip. A chip that combines a microcontroller with radios and other advanced peripherals is often called a **system on a chip** (SoC).
+
+| | Arduino Uno (ATmega328P) | ESP32 (ESP32-WROOM-32 module) |
+|---|---|---|
+| CPU | 8-bit AVR, 16 MHz | 32-bit dual-core Xtensa LX6, up to 240 MHz |
+| RAM | 2 KB | 520 KB |
+| Program flash | 32 KB | 4 MB (external, on the module) |
+| Logic level | 5 V | 3.3 V |
+| Radios | None | Wi-Fi 802.11 b/g/n, Bluetooth Classic and BLE |
+| ADC | 10-bit, 6 inputs | 12-bit, up to 18 inputs |
+| Serial buses | 1 UART, 1 SPI, 1 I²C | 3 UART, 2 SPI, 2 I²C (freely remappable) |
+
+: The ESP32 compared with the classic Arduino Uno [@espressif_esp32_datasheet]. {#tbl-uno-vs-esp32}
+
+The ESP32 can still be programmed with the Arduino framework, so the simple programming model carries over unchanged.
+
+### The ESP32 DevKit V1
+
+The kit uses the **ESP32 DevKit V1**, a widely cloned board built around the ESP32-WROOM-32 module. Its parts are:
+
+- The **ESP32-WROOM-32 module** (the metal can), which contains the ESP32 chip, its flash memory, a crystal and a printed antenna. Keep the antenna end clear of metal and wires.
+- A **USB-to-UART bridge** (typically a CP2102 or CH340 chip) for uploading and for the Serial Monitor. If your laptop does not recognize the board, the bridge's driver is the usual culprit.
+- A **3.3 V regulator** fed from USB or from the VIN pin.
+- Two buttons: **EN** resets the chip; **BOOT** (GPIO 0) puts it into upload mode if automatic upload fails.
+- A power LED and, on most versions, a blue LED on GPIO 2.
+
+Not every pin is equally safe to use. These rules prevent most beginner problems:
+
+| Pins | Restriction |
+|---|---|
+| GPIO 6–11 | Connected to the module's flash memory. **Never use.** |
+| GPIO 34, 35, 36, 39 | **Input only**, with no internal pull-up or pull-down resistors. Good for analog input (the kit's potentiometer uses GPIO 34). |
+| GPIO 0, 2, 5, 12, 15 | **Strapping pins**, read at reset to choose the boot mode. Usable, but an external component holding them high or low can stop the board from booting or uploading. |
+| GPIO 1, 3 | UART0 TX and RX, used for uploading and the Serial Monitor. |
+| ADC2 pins | Cannot be used for analog input while Wi-Fi is active. Use ADC1 pins (GPIO 32–39) for analog sensors. |
+
+: ESP32 DevKit V1 pin restrictions [@espressif_esp32_datasheet]. {#tbl-esp32-pins}
+
+Each pin can safely source or sink only a few tens of milliamperes. Drive LEDs through resistors, and never power motors directly from a GPIO pin.
+
+### The IoT@UCI kit
+
+The kit gives each team one ESP32 and a set of parts that together exercise every topic in this book. It is built in stages, so that each part is wired just before the chapter that first needs it:
+
+| Stage | Parts | First used in |
+|---|---|---|
+| 1 | ESP32, power rails, three LEDs, two buttons, potentiometer, buzzer, OLED display | @sec-ch03, @sec-ch05 |
+| 2 | I²C sensors: BMP280, MPU-6050; ATECC608A secure element | @sec-ch05, @sec-ch06 |
+| 3 | Servo motor on its own 5 V rail, with a 470 µF capacitor | @sec-ch07 |
+| 4 | RFM95W LoRa radio | @sec-ch10 |
+
+The complete pin map is in @sec-app-a, and the build procedure is in @sec-lab-l1.
+
+::: {.callout-tip title="Try it on your kit: blink and basic circuits"}
+This exercise corresponds to the first lecture activity and can be done in the Wokwi simulator before you have hardware.
+
+1. Calculate the resistor needed to run a red LED at 8 mA from 3.3 V. Which standard value would you choose?
+2. Build an LED and resistor circuit on GPIO 2 and run the blink program above.
+3. Reverse the LED. What happens, and why does nothing break?
+4. Move the LED to GPIO 34 and try again. Explain the result using @tbl-esp32-pins.
+5. Change the program so the LED blinks "SOS" in Morse code. What did changing the behavior cost you, compared with a 555 timer circuit?
+:::
+
+## Design trade-offs
+
+| Choice | Consider |
+|---|---|
+| Development board vs. custom board | Development boards are ideal for prototypes and small runs. Products use a custom circuit board with only the parts they need, which lowers cost, size and power. |
+| Module vs. bare chip | A pre-certified radio module (like the WROOM-32) avoids designing and certifying an antenna circuit yourself. |
+| Arduino framework vs. vendor SDK (ESP-IDF) | Arduino is faster to learn and has many libraries. The vendor SDK gives full control of power modes, the RTOS and security features. |
+| 5 V vs. 3.3 V parts | Mixing them needs level shifting. Prefer 3.3 V parts with a 3.3 V microcontroller. |
+
+## Common pitfalls
+
+- **LED backwards.** It simply stays dark. Flip it.
+- **No resistor.** The LED may glow briefly and fail, and the GPIO pin can be damaged.
+- **Component in the wrong row.** Both legs of a resistor in the same five-hole row connect it to nothing.
+- **Split power rails.** Half the board has no power.
+- **Charge-only USB cables.** The board powers up but the computer never sees it. Use a data cable.
+- **Strapping pin held at the wrong level.** The board refuses to upload or boot. Disconnect the component on that pin and try again.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Reading a datasheet.** Find the ESP32-WROOM-32 datasheet and locate: the absolute maximum voltage on any I/O pin; the recommended operating voltage range; the current drawn during Wi-Fi transmission; and the current in deep sleep. Compare the transmit and deep-sleep figures. By what factor do they differ, and what does that imply for a battery-powered design?
+
+**Beyond the ESP32.** Newer Espressif chips use RISC-V cores (ESP32-C3, C6, H2) and add radios such as 802.15.4 for Thread and Zigbee. Other families popular in IoT include Nordic's nRF52 and nRF54 (Bluetooth Low Energy), Silicon Labs' EFR32 (multi-protocol) and the Raspberry Pi RP2040/RP2350 (no radio, but very low cost). Compare one of them with the ESP32 on power, radios and security features.
+:::
+
+## Check your understanding
+
+1. A green LED has a forward voltage of 2.2 V. What resistor would you use to run it at 5 mA from a 3.3 V pin?
+2. Why does a breadboard have a gap down the middle?
+3. What advantage does a microcontroller have over a 555 timer for blinking an LED? What does it cost?
+4. Name the four main parts a development board adds to a microcontroller chip.
+5. You connect a potentiometer to GPIO 4 and readings are fine until you enable Wi-Fi. What happened?
+6. Why should you never use GPIO 6–11 on the DevKit V1?
+
+## Further reading
+
+- Espressif, *ESP32 Series Datasheet* [@espressif_esp32_datasheet], for pin functions, electrical limits and power figures.
+- M. Margolis, *Arduino Cookbook* [@margolis_arduino_cookbook], for many small, tested circuit and code recipes.

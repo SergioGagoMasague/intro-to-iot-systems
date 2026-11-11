@@ -1,5 +1,204 @@
 # Embedded Systems and Operating Systems {#sec-ch04}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C04.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Describe the characteristics that distinguish embedded systems from general-purpose computers.
+2. Distinguish microprocessors, microcontrollers and systems on a chip.
+3. Explain hard and soft real-time requirements with examples.
+4. Compare three software architectures: the super-loop, foreground/background, and a real-time kernel.
+5. Create, schedule and synchronize FreeRTOS tasks on the ESP32.
+6. Decide when an IoT device needs an RTOS and when it does not.
 :::
+
+## Why it matters
+
+Your laptop runs hundreds of programs at once, can be restarted when something hangs, and has gigabytes of memory to spare. An IoT device may run one program for ten years in a place no one can reach, with a few hundred kilobytes of memory and a battery that must last the whole time. It may also have to react to an event within milliseconds, every time.
+
+Writing software for these conditions is different from writing desktop or web software. This chapter introduces the vocabulary of embedded systems and the two main ways to structure their software: a single loop, or a set of tasks managed by a real-time operating system.
+
+## Concepts
+
+### What makes a system "embedded"
+
+There is no precise definition of an embedded system, but embedded systems share a recognizable set of characteristics:
+
+- They do **one job**, or a small set of jobs, defined when they are built. The user does not install new programs.
+- They are **resource-constrained**: limited memory, processing power and energy, and a low cost per unit.
+- They **interact with the physical world** through sensors and actuators, and often have **real-time** constraints.
+- They run **unattended**, often for years, and may be physically inaccessible after deployment.
+
+Programmers moving from PCs to embedded systems should adjust a few habits:
+
+1. **Assume the device is unreachable.** Over-the-air updates help (@sec-ch16), but a device that crashes in a way that stops updates is lost.
+2. **Expect surprising inputs.** A sensor can fail and report nonsense, or a network can deliver a burst of messages at once. Plan for it.
+3. **Log well.** Faults may be impossible to reproduce on the bench, so error messages must carry enough context to diagnose them from a report.
+4. **Plan testing from the start.** Testing on real hardware is slow; design the code so that most of it can be tested without the hardware.
+5. **Read datasheets.** Embedded programmers write code that talks directly to hardware, and the datasheet is the specification.
+
+### Microprocessors, microcontrollers and SoCs
+
+These terms are often confused because the categories overlap:
+
+- A **microprocessor** (MPU) is a CPU on a chip. It needs external memory and peripherals to be useful. Desktop and laptop processors are microprocessors.
+- A **microcontroller** (MCU) puts a CPU, memory (flash for the program, RAM for data) and peripherals on one chip: GPIO, ADC, timers, UART, SPI and I²C controllers, and an interrupt controller.
+- A **system on a chip** (SoC) integrates a microcontroller or microprocessor with larger subsystems, such as radios, graphics or cryptographic accelerators. The ESP32 is an SoC: a dual-core microcontroller plus Wi-Fi and Bluetooth radios.
+
+Arm's processor families show the same split. **Cortex-M** cores are designed for microcontrollers. **Cortex-A** cores are application processors with a memory-management unit that can run Linux (the Raspberry Pi uses them). **Cortex-R** cores target hard real-time, safety-critical systems such as disk controllers and automotive braking.
+
+### Real-time systems
+
+A **real-time system** must respond to external events within a specified time. Being correct means producing the right answer *on time*; a right answer that arrives late is wrong.
+
+Real-time systems are classified by what happens when a deadline is missed:
+
+- In a **hard real-time** system, a missed deadline is a failure. An airbag that deploys 200 ms late, or a motor controller that misses its control period, has failed.
+- In a **soft real-time** system, a missed deadline degrades quality but the system still works. A video stream drops a frame; a thermostat updates its display a little late.
+
+"Real-time" does not mean "fast". The deadline might be microseconds or hours. What matters is that the response time is **bounded and predictable** (deterministic).
+
+### Architecture 1: the super-loop
+
+The simplest structure is the one you have used so far: a single infinite loop that does each job in turn.
+
+```cpp
+void loop() {
+  readSensors();
+  updateControl();
+  refreshDisplay();
+  sendTelemetry();
+}
+```
+
+Super-loops are small, easy to understand and need no operating system. Their weakness is that every job waits for every other job. If `sendTelemetry()` blocks for two seconds waiting for Wi-Fi, the control loop stops for two seconds too. Running jobs at different rates also gets awkward quickly, as you saw with the `millis()` scheduler in @sec-ch03.
+
+### Architecture 2: foreground/background
+
+A common improvement adds interrupts. The super-loop runs in the **background**, while interrupt service routines handle urgent events in the **foreground**. Most low-cost microcontroller products are built this way.
+
+The weakness moves rather than disappears. Urgent work must either be done inside the ISR, making the ISR long and delaying other interrupts, or deferred to the background loop, where it waits until the loop gets around to it.
+
+### Architecture 3: a real-time kernel
+
+A **real-time kernel** divides the program into independent **tasks** (also called threads), each with its own stack and a **priority**. A **scheduler** decides which task runs at any moment. In a **preemptive** kernel, a higher-priority task that becomes ready immediately interrupts a lower-priority one.
+
+The kernel also provides tools for tasks to cooperate safely:
+
+- **Delays** that put a task to sleep without wasting processor time;
+- **Queues** for passing messages between tasks, and from ISRs to tasks;
+- **Semaphores and mutexes** to signal events and protect shared resources, such as an I²C bus;
+- **Software timers** that run a function at a set interval.
+
+A **real-time operating system** (RTOS) is a real-time kernel plus higher-level services: file systems, network stacks, device drivers and so on.
+
+The kernel costs some memory and processor time. In return, you get more predictable timing, a program split into smaller and more manageable pieces, and priorities that can be changed in software.
+
+### FreeRTOS on the ESP32
+
+Many small RTOSes exist: FreeRTOS, Zephyr, RIOT, Apache Mynewt, Azure RTOS ThreadX (now Eclipse ThreadX), and commercial systems such as VxWorks. **FreeRTOS** is the most widely used. It is MIT-licensed, has been ported to dozens of processor families, and has been maintained by Amazon since 2017.
+
+The ESP32's software is built on FreeRTOS. Even a plain Arduino sketch runs on it: the framework starts a task called `loopTask` that calls `loop()` repeatedly, while Wi-Fi and Bluetooth run in their own tasks, mostly on the other core. You can create your own tasks alongside it:
+
+```cpp
+#include <Arduino.h>
+#include "iot_pins.h"
+
+void blinkTask(void* param) {
+  uint8_t pin = (uint8_t)(uintptr_t)param;
+  uint32_t periodMs = (pin == IoTPins::LED_1) ? 1000 : 1500;
+  pinMode(pin, OUTPUT);
+  for (;;) {                                   // a task never returns
+    digitalWrite(pin, !digitalRead(pin));
+    vTaskDelay(pdMS_TO_TICKS(periodMs));       // sleep; other tasks run
+  }
+}
+
+void setup() {
+  xTaskCreatePinnedToCore(blinkTask, "red",    2048, (void*)(uintptr_t)IoTPins::LED_1, 1, nullptr, 1);
+  xTaskCreatePinnedToCore(blinkTask, "yellow", 2048, (void*)(uintptr_t)IoTPins::LED_2, 1, nullptr, 1);
+}
+
+void loop() {
+  vTaskDelay(pdMS_TO_TICKS(1000));             // loop() is just another task
+}
+```
+
+The arguments to `xTaskCreatePinnedToCore()` are the task function, a name, the stack size in bytes, a parameter, the priority, an optional handle, and the core to run on.
+
+Queues are the safe way to pass data between tasks, or from an ISR to a task:
+
+```cpp
+QueueHandle_t buttonEvents = xQueueCreate(8, sizeof(uint32_t));
+
+void IRAM_ATTR onButton() {
+  uint32_t t = millis();
+  BaseType_t woken = pdFALSE;
+  xQueueSendFromISR(buttonEvents, &t, &woken);   // the ISR only posts an event
+  portYIELD_FROM_ISR(woken);
+}
+
+void handlerTask(void*) {
+  uint32_t t;
+  for (;;) {
+    if (xQueueReceive(buttonEvents, &t, portMAX_DELAY)) {  // sleeps until an event arrives
+      Serial.printf("Button at %lu ms\n", t);              // safe to print here
+    }
+  }
+}
+```
+
+This pattern keeps ISRs tiny, as @sec-ch03 recommended, while guaranteeing that every event is processed promptly by a task whose priority you control.
+
+### Do you need an RTOS?
+
+Not always. Many IoT devices are naturally **event-driven**: "sleep until something happens, handle it, go back to sleep". A foreground/background design with deep sleep may be simpler and use less energy. Some designs use only part of a kernel, such as a scheduler and queues.
+
+An RTOS earns its place when a device has several activities with different timing needs, such as a control loop, a user interface and a network connection, and when one slow activity must not stall the others.
+
+::: {.callout-tip title="Try it on your kit: one loop versus three tasks"}
+1. Using a super-loop with `delay()`, try to blink LED 1 every 1 s, LED 2 every 2 s and LED 3 every 1.5 s. Why is this awkward?
+2. Implement the same behavior with three FreeRTOS tasks. How many lines does each version take?
+3. Add a fourth task that simulates a slow network call with `vTaskDelay(pdMS_TO_TICKS(3000))`. Does the blinking change? What would happen in the super-loop version?
+4. Replace the button-counter ISR from @sec-ch03 with the queue pattern above.
+:::
+
+## Design trade-offs
+
+| Architecture | Strengths | Weaknesses | Typical use |
+|---|---|---|---|
+| Super-loop | Tiny, simple, easy to reason about | Every job waits for every other | Single-purpose, low-cost devices |
+| Foreground/background | Responsive to events, no kernel needed | Hard to balance ISR and loop work | Most simple products |
+| RTOS | Priorities, isolation, predictable timing | Memory per task, concurrency bugs | Devices with networking and control together |
+| Embedded Linux | Full OS, rich software ecosystem | Needs Cortex-A-class hardware and much more power | Gateways, cameras, smart displays |
+
+## Common pitfalls
+
+- **Stack overflow.** A task with too small a stack corrupts memory or crashes. Start with generous stacks and measure with `uxTaskGetStackHighWaterMark()`.
+- **Starving tasks.** A high-priority task that never blocks prevents all lower-priority tasks from running, and triggers the watchdog timer.
+- **Using `delay()` instead of yielding.** On the ESP32 `delay()` calls `vTaskDelay()`, but a busy-wait loop does not, and it starves other tasks.
+- **Unprotected shared resources.** Two tasks using the same I²C bus or `Serial` port at the same time interleave their messages. Protect them with a mutex.
+- **Priority inversion.** A low-priority task holding a mutex can block a high-priority task. Use mutexes (which support priority inheritance) rather than plain semaphores for shared resources.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Scheduling theory.** In rate-monotonic scheduling, tasks with shorter periods get higher priorities. Liu and Layland showed that $n$ periodic tasks are guaranteed to meet their deadlines under this policy if total processor utilization is at most $n(2^{1/n} - 1)$, which approaches about 69% for large $n$. Compute whether three tasks with execution times 1, 2 and 3 ms and periods 10, 20 and 40 ms are schedulable.
+
+**Watchdog timers.** A watchdog is a hardware timer that resets the processor unless software "feeds" it regularly. The ESP32's task watchdog fires when a task hogs a core. Design a watchdog strategy for a field device: what should be fed, by whom, and how do you avoid feeding it from a loop that is itself stuck?
+
+**Zephyr.** The Zephyr RTOS, hosted by the Linux Foundation, has become a common choice for new IoT products because it includes networking, Bluetooth, security and update support in one project. Compare its configuration model (Kconfig and devicetree) with the Arduino approach.
+:::
+
+## Check your understanding
+
+1. List four characteristics of embedded systems.
+2. Is the ESP32 a microprocessor, a microcontroller or an SoC? Justify your answer.
+3. Give one example each of a hard and a soft real-time requirement in an IoT product.
+4. Why does "real-time" not necessarily mean "fast"?
+5. What problem does a preemptive scheduler solve that a super-loop cannot?
+6. Why should an ISR post to a queue rather than print a message directly?
+7. Describe a device that does not need an RTOS, and explain why.
+
+## Further reading
+
+- R. Barry, *Mastering the FreeRTOS Real Time Kernel* [@barry_freertos], a free, practical guide to tasks, queues and synchronization.
+- Espressif, *ESP-IDF FreeRTOS documentation* [@espressif_idf_freertos], for the ESP32's dual-core extensions.
+- C. L. Liu and J. W. Layland, "Scheduling algorithms for multiprogramming in a hard-real-time environment" [@liu_layland_1973].

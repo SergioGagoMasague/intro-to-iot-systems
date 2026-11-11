@@ -1,5 +1,285 @@
 # Programming the Device {#sec-ch03}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C03_1, C03_2 · Activity 2.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Set up a PlatformIO project for the ESP32 using the Arduino framework.
+2. Read and write digital pins, and use pull-up and pull-down resistors correctly.
+3. Debounce a push button and explain why it is necessary.
+4. Choose between polling and interrupts, and write a safe interrupt service routine.
+5. Read analog voltages with the ADC, and produce analog-like outputs with the DAC and PWM.
+6. Write non-blocking code with `millis()` so that several things can happen "at once".
 :::
+
+## Why it matters
+
+A push button looks like the simplest input imaginable: pressed or not pressed. Yet a naïve button handler on a microcontroller will often count one press as three, miss presses entirely, or freeze the rest of the program while it waits. Getting the basics of input, output and timing right is what separates a demo that works once from a device that works every time.
+
+This chapter covers the programming model you will use for the rest of the book, and the handful of techniques that make simple I/O reliable.
+
+## Concepts
+
+### The toolchain
+
+Programming a microcontroller involves a **cross-compiler** (it runs on your laptop but produces code for the ESP32), libraries for the chip's hardware, and an uploader that writes the compiled program into the board's flash memory.
+
+The two most common environments are the **Arduino IDE** and **PlatformIO**. This book uses PlatformIO, an extension for VS Code, because it:
+
+- supports several *frameworks* for the same chip (Arduino and Espressif's own ESP-IDF);
+- manages library dependencies per project, with version numbers, in a single `platformio.ini` file;
+- integrates building, uploading, the Serial Monitor and debugging into one editor.
+
+A minimal kit project looks like this:
+
+```ini
+; platformio.ini
+[env:esp32dev]
+platform = espressif32@^6.9.0      ; pins the Arduino-ESP32 core (2.x series)
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+lib_deps =
+    adafruit/Adafruit SSD1306@^2.5.13
+```
+
+Pinning the platform version matters: different versions of the Arduino-ESP32 core have different APIs for some peripherals, and an unpinned project can stop compiling when a new version is released. Setup instructions are in @sec-app-b.
+
+### The Arduino programming model
+
+An Arduino program (a **sketch**) defines two functions:
+
+- `setup()` runs once after power-up or reset. Configure pins, start serial ports and initialize devices here.
+- `loop()` runs repeatedly, forever, until the board loses power.
+
+```cpp
+#include <Arduino.h>
+#include "iot_pins.h"            // IoTPins::LED_1 (red), LED_2 (yellow), LED_3 (green), BUTTON_1, ...
+
+void setup() {
+  pinMode(IoTPins::LED_1, OUTPUT);
+  pinMode(IoTPins::BUTTON_1, INPUT_PULLUP);
+}
+
+void loop() {
+  bool pressed = (digitalRead(IoTPins::BUTTON_1) == LOW);   // active low, see below
+  digitalWrite(IoTPins::LED_1, pressed ? HIGH : LOW);
+}
+```
+
+Behind the scenes the Arduino framework provides `main()`, calls `setup()` once, and then calls `loop()` in an endless loop. On the ESP32, that loop actually runs as a task under a real-time operating system (@sec-ch04), but for now you can think of it as a simple infinite loop.
+
+Arduino code is C++. Most sketches use a C-like subset, but classes, references and the standard library are all available. Because `int` is 16 bits on some boards and 32 bits on others, prefer the fixed-width types `uint8_t`, `int16_t`, `uint32_t` and so on whenever size matters.
+
+### Digital input and output
+
+A **digital** signal has two levels. On the ESP32, a pin reads `HIGH` (1) near 3.3 V and `LOW` (0) near 0 V.
+
+| Function | Purpose |
+|---|---|
+| `pinMode(pin, mode)` | Configure a pin as `OUTPUT`, `INPUT`, `INPUT_PULLUP` or `INPUT_PULLDOWN` |
+| `digitalWrite(pin, value)` | Drive an output pin `HIGH` or `LOW` |
+| `digitalRead(pin)` | Read an input pin as `HIGH` or `LOW` |
+
+### Pull-up and pull-down resistors
+
+A button connected between a pin and ground only defines the pin's level while it is pressed. When it is released, the pin is connected to nothing. It is **floating**, and it will pick up electrical noise and read random values.
+
+A **pull-up resistor** connects the pin weakly to 3.3 V, so it reads `HIGH` until the button pulls it firmly to ground. A **pull-down resistor** does the opposite. The ESP32 has internal pull-up and pull-down resistors (roughly 45 kΩ) on most pins, enabled with `INPUT_PULLUP` or `INPUT_PULLDOWN`.
+
+The kit's buttons are wired from GPIO 32 and 33 to ground and use `INPUT_PULLUP`. They are therefore **active low**: `digitalRead()` returns `LOW` when the button is pressed. Forgetting this inverts every button test.
+
+Remember that GPIO 34–39 have no internal pull resistors. A button on one of those pins needs an external resistor.
+
+### Debouncing
+
+Mechanical switch contacts bounce when they close or open. For a few milliseconds the pin rapidly flips between `HIGH` and `LOW` before settling. A microcontroller samples fast enough to see every bounce, so a single press can be counted many times.
+
+**Debouncing** filters out the bounces. The simplest software approach accepts a new state only once it has been stable for a short time, such as 20–50 ms:
+
+```cpp
+constexpr uint32_t DEBOUNCE_MS = 30;
+
+bool readButtonDebounced(uint8_t pin) {
+  static bool stableState = HIGH;     // last accepted state (released)
+  static bool lastReading = HIGH;
+  static uint32_t lastChange = 0;
+
+  bool reading = digitalRead(pin);
+  if (reading != lastReading) {       // something changed: restart the timer
+    lastChange = millis();
+    lastReading = reading;
+  }
+  if (millis() - lastChange >= DEBOUNCE_MS) {
+    stableState = reading;            // stable long enough: accept it
+  }
+  return stableState;
+}
+```
+
+Detecting double clicks, long presses and so on builds on the same idea. Well-tested libraries such as Button2 handle debouncing and click patterns for you, and are usually the right choice in a project.
+
+### Polling and interrupts
+
+The loop above **polls** the button: it checks the pin on every pass, even though the answer is almost always "no change". Polling is simple and adequate when the loop is fast and the event is slow.
+
+An **interrupt** lets the hardware notify the processor when a pin changes. The processor pauses whatever it was doing, runs a short function called an **interrupt service routine** (ISR), and then resumes. Every ESP32 GPIO pin can trigger an interrupt.
+
+```cpp
+volatile uint32_t pressCount = 0;     // shared with the ISR: must be volatile
+
+void IRAM_ATTR onButton() {           // keep the ISR in fast internal RAM
+  pressCount++;                       // do the minimum, then return
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(IoTPins::BUTTON_1, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(IoTPins::BUTTON_1), onButton, FALLING);
+}
+
+void loop() {
+  static uint32_t lastReported = 0;
+  uint32_t count = pressCount;        // copy once, then work with the copy
+  if (count != lastReported) {
+    Serial.printf("Presses: %lu\n", count);
+    lastReported = count;
+  }
+}
+```
+
+The trigger **mode** says which change causes the interrupt: `RISING`, `FALLING`, `CHANGE`, `LOW` or `HIGH`. Because the button is active low, a press is a `FALLING` edge.
+
+ISRs come with strict rules:
+
+- **Keep them short.** Set a flag, increment a counter or record a timestamp, and return. Do the real work in `loop()`.
+- **Do not block or print.** No `delay()`, no `Serial.print()`, no I²C or SPI transactions.
+- **Mark shared variables `volatile`**, so the compiler always reads them from memory instead of a stale copy in a register.
+- **Place the ISR in IRAM** with `IRAM_ATTR` on the ESP32, so it can run even while the flash memory is busy.
+
+Interrupts do not remove bouncing. The ISR above will count bounces as presses. A common fix is to record the time in the ISR and ignore edges that arrive within the debounce window of the previous one.
+
+### Analog input
+
+The physical world is mostly **analog**: temperature, light level and the position of a knob vary continuously. A computer can only store numbers, so an **analog-to-digital converter** (ADC) measures a voltage and **quantizes** it into one of a fixed number of steps.
+
+The number of steps is set by the converter's **resolution**. An $n$-bit ADC divides its input range into $2^n$ levels. The ESP32's ADCs are 12-bit by default, so `analogRead()` returns a value from 0 to 4095 over roughly 0 to 3.3 V, and each step is about 0.8 mV.
+
+```cpp
+int raw = analogRead(IoTPins::POT_ADC);                  // 0..4095
+float volts = raw * 3.3f / 4095.0f;                       // approximate
+int percent = map(raw, 0, 4095, 0, 100);                  // rescale
+```
+
+The ESP32 uses **successive-approximation** ADCs, which find the value bit by bit, like a binary search. Keep three practical limits in mind:
+
+- Only the **ADC1** pins (GPIO 32–39) work while Wi-Fi is on.
+- The ESP32's ADC is **not perfectly linear**, especially near 0 V and near the top of the range. For accurate measurements, use the calibrated `analogReadMilliVolts()` function, or an external ADC.
+- Readings are **noisy**. Averaging several samples is cheap and effective.
+
+### Analog output: DAC and PWM
+
+There are two ways to produce an output between "fully on" and "fully off".
+
+A **digital-to-analog converter** (DAC) produces a real intermediate voltage. The original ESP32 has two 8-bit DAC channels, on GPIO 25 and 26: `dacWrite(25, 128)` outputs about half of 3.3 V.
+
+**Pulse-width modulation** (PWM) is far more common. The pin switches rapidly between `HIGH` and `LOW`, and the fraction of time it spends `HIGH`, the **duty cycle**, sets the *average* power. An LED switched fast enough appears dimmer; a motor runs slower. A servo reads the width of each pulse as a position command (@sec-ch07).
+
+The ESP32 generates PWM with its **LEDC** peripheral, which has 16 channels with configurable frequency and resolution:
+
+```cpp
+// Arduino-ESP32 core 2.x API (the kit's pinned version)
+constexpr int LED_CHANNEL = 1, PWM_FREQ = 5000, PWM_BITS = 8;
+
+void setup() {
+  ledcSetup(LED_CHANNEL, PWM_FREQ, PWM_BITS);
+  ledcAttachPin(IoTPins::LED_3, LED_CHANNEL);
+}
+
+void loop() {
+  for (int duty = 0; duty <= 255; duty += 5) {   // fade in
+    ledcWrite(LED_CHANNEL, duty);
+    delay(20);
+  }
+}
+```
+
+Version 3.x of the Arduino-ESP32 core replaced `ledcSetup()` and `ledcAttachPin()` with a single `ledcAttach(pin, freq, bits)` and lets `ledcWrite()` take the pin directly. This is one reason the kit pins its platform version. Also note that `tone()` and the servo library both use LEDC channels; the kit's starter code assigns them separate channels so they do not interfere.
+
+### Time without blocking
+
+`delay(ms)` stops the program completely. While it waits, the loop cannot read buttons, refresh the display or answer network messages. A better pattern is to check how much time has passed and act only when it is due:
+
+```cpp
+void loop() {
+  static uint32_t lastRed = 0, lastYellow = 0;
+  uint32_t now = millis();
+
+  if (now - lastRed >= 1000) {           // every 1 s
+    lastRed = now;
+    digitalWrite(IoTPins::LED_1, !digitalRead(IoTPins::LED_1));
+  }
+  if (now - lastYellow >= 1500) {        // every 1.5 s
+    lastYellow = now;
+    digitalWrite(IoTPins::LED_2, !digitalRead(IoTPins::LED_2));
+  }
+  // ... the loop stays free to read inputs here
+}
+```
+
+`millis()` returns the milliseconds since start-up as a 32-bit unsigned number, which wraps around to zero after about 49.7 days. Writing the comparison as `now - last >= interval`, with unsigned arithmetic, gives the correct answer even across the wraparound. Writing it as `now >= last + interval` does not.
+
+::: {.callout-tip title="Try it on your kit: buttons and interrupts"}
+This exercise corresponds to the second lecture activity and runs in Wokwi or on Stage 1 of the kit.
+
+1. Count button presses by polling without any debouncing, and print the count. Press the button 20 times. What count do you get?
+2. Add the debounce function and repeat. What changed?
+3. Rewrite the counter with an interrupt. Does it count bounces? Fix it by ignoring edges that arrive within 30 ms of the previous one.
+4. Make the red LED blink every 500 ms and the green LED every 700 ms using `millis()`, while the button still toggles the yellow LED instantly.
+5. Read the potentiometer and use it to set the green LED's brightness with PWM.
+:::
+
+## Design trade-offs
+
+| Choice | Prefer it when |
+|---|---|
+| Polling | The loop is fast, the event is slow, and simplicity matters |
+| Interrupts | Events are short or rare, or the processor should sleep while waiting |
+| Internal pull-ups | Short wires and simple buttons |
+| External pull-ups (e.g. 10 kΩ) | Long wires, noisy environments, or input-only pins |
+| DAC | You need a true analog voltage (audio, a reference level) |
+| PWM | Dimming LEDs, controlling motor speed or driving servos |
+| `delay()` | Throwaway tests only |
+| `millis()` scheduling | Anything that must stay responsive |
+
+## Common pitfalls
+
+- **Floating inputs.** An input with no pull resistor reads random values.
+- **Forgetting active-low logic.** With `INPUT_PULLUP`, pressed is `LOW`.
+- **Long or blocking ISRs.** Printing, delaying or using I²C inside an ISR crashes the ESP32 or causes watchdog resets.
+- **Missing `volatile`.** The main loop never notices that the ISR changed a variable.
+- **Integer overflow and unsigned loops.** `for (uint8_t i = 255; i >= 0; i--)` never ends, because an unsigned value is always ≥ 0.
+- **ADC2 with Wi-Fi.** Analog readings fail silently once Wi-Fi starts.
+- **Unpinned platform versions.** Code that compiled last week fails after a core update.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Hardware debouncing.** A resistor and capacitor (an RC filter) on the button line, followed by a Schmitt-trigger input, removes bounce in hardware. Calculate an RC time constant that filters bounces of up to 5 ms, and discuss when hardware debouncing is worth the extra parts.
+
+**Atomic access.** Copying a 32-bit counter on the ESP32 is atomic, but a 64-bit value or a structure is not: an interrupt can arrive halfway through the copy. On the ESP32, protect such data with `portENTER_CRITICAL_ISR()` / `portEXIT_CRITICAL_ISR()` and a `portMUX_TYPE` spinlock, or pass events through a FreeRTOS queue (@sec-ch04).
+
+**Hardware timers.** For precise periodic work, the ESP32 has hardware timers whose interrupts fire at exact intervals regardless of what the main loop is doing. The `esp_timer` API offers microsecond-resolution software timers built on them.
+:::
+
+## Check your understanding
+
+1. What does a floating input read, and how do pull-up resistors fix it?
+2. A button on GPIO 32 uses `INPUT_PULLUP`. What does `digitalRead()` return while it is pressed?
+3. Why must a variable shared with an ISR be declared `volatile`?
+4. A 12-bit ADC with a 3.3 V range reads 2048. Approximately what voltage is on the pin?
+5. Explain how PWM makes an LED look half as bright without producing 1.65 V.
+6. Why does `now - last >= interval` keep working after `millis()` wraps around, while `now >= last + interval` does not?
+7. Find the bug: `for (uint8_t i = 255; i >= 0; i--) { dacWrite(25, i); }`.
+
+## Further reading
+
+- Espressif, *Arduino-ESP32 documentation* [@espressif_arduino_esp32], for GPIO, ADC, LEDC and interrupt APIs, including the 2.x-to-3.x migration guide.
+- PlatformIO documentation [@platformio_docs], for project configuration and library management.

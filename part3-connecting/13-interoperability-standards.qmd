@@ -1,5 +1,177 @@
 # Interoperability and Standards {#sec-ch13}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C13_06, C13_07.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Define interoperability and distinguish its technical, syntactic, semantic and organizational levels.
+2. Explain why early M2M systems formed vertical silos, and what "inverting the pipes" means.
+3. Describe the role of an application services layer, and compare middleware and standards as routes to interoperability.
+4. Summarize the main standards efforts: oneM2M, LwM2M, the W3C Web of Things, semantic models and domain standards.
+5. Explain how Matter achieves interoperability in the smart home.
+6. Describe your own device in a standard, machine-readable way.
 :::
+
+## Why it matters
+
+In UCI's SIMHome project, a smart-home testbed built with Southern California Edison, one of the hardest problems was not any single device. It was making sensors, actuators, networks and computers from different companies and research teams work together, when each used its own protocols (sometimes ad hoc), hardware, operating system (sometimes none at all) and data conventions.
+
+Every IoT system that grows beyond a single vendor meets the same problem. Two devices can share a network and an application protocol and still be unable to cooperate, because they disagree on what their messages mean. This chapter explains the levels at which devices must agree, and the standards that help them do so.
+
+## Concepts
+
+### What interoperability means
+
+**Interoperability** is the ability of a system or device to exchange information with another, and to **understand and use** the information exchanged. The second half is the hard part.
+
+The Levels of Conceptual Interoperability Model, adopted in IoT by organizations such as the Industrial Internet Consortium, describes interoperability as a stack of levels. Each depends on the ones below:
+
+| Level | Question | Concerned with | Examples |
+|---|---|---|---|
+| **Technical** | Can the bytes get there? | Hardware, operating systems, communication protocols and infrastructure | Both devices speak IPv6 over Thread; both support MQTT |
+| **Syntactic** | Can the receiver parse them? | Data formats and encodings | JSON, CBOR, XML, ASN.1, a fixed binary layout |
+| **Semantic** | Does the receiver understand them? | The meaning of the content: units, names, relationships | "temp" is air temperature in °C, measured in the living room |
+| **Organizational** | Do the organizations cooperate? | Business processes, agreements, policies across organizations, regions and cultures | A utility, a thermostat maker and a homeowner agree on a demand-response program |
+
+: Levels of interoperability. {#tbl-interop-levels}
+
+The protocols in the earlier chapters of Part III solve technical interoperability. Syntactic interoperability needs agreed formats. **Semantic interoperability** is the subject of most of this chapter: two devices may both send `{"temp": 21}`, yet one means degrees Celsius of the water in a boiler and the other means degrees Fahrenheit of a room, or a target rather than a measurement.
+
+In healthcare, for example, standards such as **HL7** (and its modern form, FHIR) define the meaning of clinical information exchanged between hospital systems, while the **ISO/IEEE 11073** family (X73) covers personal health devices across several layers of the stack, so that a blood-pressure cuff from one maker can report to a hub from another.
+
+### From silos to horizontal platforms
+
+Machine-to-machine (M2M) systems have existed for decades: remote meter reading, fleet tracking, alarm panels. They were typically built as **vertical silos**: one application, one type of device, one proprietary communication stack, tightly coupled end to end. A smart-metering system and a street-lighting system in the same city shared nothing, even when they used the same cellular network.
+
+This fragmentation slowed the market. Every new application required building a new stack from the devices up. The response was to **invert the pipes**: replace vertical silos with **horizontal** layers that many applications share. Devices connect through a common network (IP plus mobile infrastructure), and applications use a common **application services layer** that provides the functions every IoT application needs.
+
+### The application services layer
+
+The key gap, in this view, is an abstraction layer offering a common set of services, so that an application can work with potentially any device without knowing its internals in advance. The value of IoT is in the data, not in how it is transported or which hardware produced it.
+
+An application services layer typically provides:
+
+- **network-agnostic message routing**, synchronous and asynchronous;
+- a **subscribe/notify** model, with buffering so that devices are not overloaded with requests;
+- a **uniform data storage model** and resource naming;
+- a **uniform API** independent of programming language;
+- **registration and discovery** of devices and applications;
+- **group management**, to address many devices at once;
+- **security**: authentication, authorization and access control;
+- **device management**, such as configuration and firmware updates;
+- **location** information.
+
+There are two broad routes to this layer:
+
+- **Middleware**: software that sits between devices and applications and translates each device-specific language into a common internal model. Middleware works with existing devices but must be updated for every new device type.
+- **Standards**: devices and applications agree on common interfaces and data models in advance. Standards scale better but require industry agreement and take time.
+
+Real systems usually combine both.
+
+### Standards for the application services layer
+
+#### ETSI M2M and oneM2M
+
+In 2012 the European Telecommunications Standards Institute (ETSI) published a service-layer standard for M2M. Its central idea was a **Service Capabilities Layer** (SCL) present in devices, gateways and network servers, exposing common functions (registration, data transfer, identification, group management, security, device management and location) through a **RESTful** API in which all data, device information and access rights are represented as resources.
+
+Later in 2012, seven standards organizations from the US, Europe, Japan, China and Korea, including ETSI, launched **oneM2M** to develop a single global standard for the IoT service layer, and transferred their own overlapping work to it [@onem2m]. oneM2M defines a common service layer that can run over HTTP, CoAP, MQTT or WebSockets, and is used mainly in smart-city and telecom-operator platforms.
+
+#### LwM2M
+
+**Lightweight M2M** (LwM2M), from OMA SpecWorks, focuses on **device management** for constrained devices. It runs over CoAP (and also over MQTT and HTTP in recent versions) and defines a registry of standard **objects**: Device, Firmware Update, Connectivity Monitoring, Location, Temperature and many more, each with numbered resources. A server can update firmware or read battery level on any compliant device, regardless of maker.
+
+#### The W3C Web of Things
+
+Rather than replace existing protocols, the W3C **Web of Things** (WoT) describes them [@w3c_wot_td]. Its central artifact is the **Thing Description** (TD): a JSON-LD document that lists a device's **properties** (values that can be read or observed), **actions** (operations that can be invoked) and **events** (notifications), and for each one the protocol binding needed to use it (an HTTP URL, a CoAP resource, an MQTT topic):
+
+```json
+{
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "id": "urn:uuid:5f1b0c3e-iot-kit-07",
+  "title": "IoT@UCI kit 07",
+  "securityDefinitions": { "basic_sc": { "scheme": "basic" } },
+  "security": "basic_sc",
+  "properties": {
+    "temperature": {
+      "type": "number",
+      "unit": "degree Celsius",
+      "readOnly": true,
+      "observable": true,
+      "forms": [{ "href": "mqtts://broker.example.org/uci/iot/kit-07/temperature",
+                  "op": ["readproperty", "observeproperty"] }]
+    }
+  },
+  "actions": {
+    "beep": {
+      "input": { "type": "integer", "minimum": 50, "maximum": 2000, "description": "duration in ms" },
+      "forms": [{ "href": "mqtts://broker.example.org/uci/iot/kit-07/cmd" }]
+    }
+  }
+}
+```
+
+A generic client that understands Thing Descriptions can use any described device without device-specific code.
+
+#### Semantic models and ontologies
+
+Units, names and relationships can be pinned down further with shared **ontologies**: formal vocabularies that define concepts and how they relate. Examples include the W3C **SOSA/SSN** ontology for sensors and observations, **SAREF** (ETSI's Smart Applications REFerence ontology) for appliances and energy, and **Brick** and **Project Haystack** for buildings. Linking a TD's `temperature` property to `saref:Temperature` with a unit from a standard units vocabulary removes the ambiguity in `{"temp": 21}`.
+
+### Matter: interoperability in the smart home
+
+For years, smart-home buyers had to check whether a product worked with Amazon Alexa, Apple Home, Google Home or Samsung SmartThings. **Matter**, developed by the Connectivity Standards Alliance with those companies and hundreds of others, addresses all four levels of interoperability at once [@matter_spec]:
+
+- **Technical**: Matter runs over IPv6 on **Wi-Fi**, **Ethernet** or **Thread** (@sec-ch11), with BLE used for setup.
+- **Syntactic and semantic**: a single **data model**. A device has numbered **endpoints**; each endpoint implements standard **clusters** (On/Off, Level Control, Color Control, Door Lock, Thermostat, and so on); each cluster defines **attributes**, **commands** and **events** with precise meanings and units. A "dimmable light" is defined the same way by every maker.
+- **Security and onboarding**: every device carries a certificate chain proving it is a genuine, certified product; it is **commissioned** by scanning a QR code or entering a setup code; and all communication is encrypted.
+- **Organizational**: certification by the Alliance, and **multi-admin** support, which lets the same device be controlled by several ecosystems at once.
+
+Matter has grown steadily since its first release in 2022. Version 1.5 (late 2025) added cameras, and version 1.6 (mid-2026) added NFC-based commissioning and better support for sharing devices across ecosystems, along with a product-security specification. Thermostats, locks, lights, plugs, sensors, appliances and energy-management devices are all covered.
+
+Matter is a good example of the "standards" route: devices interoperate because they implement the same data model, not because a middleware translates for them. Its cost is that every device must implement the full stack and pass certification, which is why the ESP32 family is popular for Matter products: Espressif provides a certified SDK.
+
+::: {.callout-tip title="Try it on your kit: describe your device"}
+1. Write a Thing Description for your kit that exposes the potentiometer, the BMP280's temperature and pressure, and the LEDs, with the MQTT topics you used in @sec-ch12. Validate it with an online TD playground.
+2. Identify every piece of information in your TD that addresses semantic, rather than syntactic, interoperability.
+3. Exchange TDs with another team. Without looking at their code, write a short program on your laptop that reads their kit's temperature and turns on their LED. What was missing or ambiguous in their TD?
+4. Which Matter clusters would your kit implement if it were a Matter device? Which kit features have no standard cluster?
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Middleware vs. standards | Middleware integrates existing devices; standards scale but need agreement and certification |
+| Rich semantics vs. simplicity | Ontologies remove ambiguity but add complexity that small teams may not need |
+| Ecosystem standard (Matter) vs. open platform | A standard gives consumer reach; a custom platform gives freedom and differentiation |
+| Describing vs. replacing protocols | WoT describes existing devices; Matter and oneM2M ask devices to adopt a new stack |
+
+## Common pitfalls
+
+- **Assuming technical interoperability is enough.** Agreeing on MQTT does not mean agreeing on what a message means.
+- **Missing units and reference frames.** Always state units, coordinate frames and whether a value is a measurement or a set point.
+- **Ad hoc field names.** `temp`, `t`, `temperature_c` and `Temp` across one fleet make every consumer fragile.
+- **Undocumented payloads.** If the only specification is the firmware source, nobody else can integrate.
+- **Ignoring the organizational level.** Data sharing between organizations needs agreements on ownership, privacy and responsibility, not just formats.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Mapping between models.** Map your kit's Thing Description onto LwM2M objects (for example IPSO Temperature, object 3303) and onto Matter clusters. Which concepts map cleanly, which need extensions, and what is lost in each mapping?
+
+**Standards as strategy.** Interoperability standards are shaped by companies with commercial interests. Read about the history of Zigbee, Z-Wave, Thread and Matter, and write a short analysis of why earlier smart-home standards did not unify the market and what Matter did differently, organizationally as much as technically.
+:::
+
+## Check your understanding
+
+1. Define interoperability, and explain why "exchange" alone is not enough.
+2. Name the four levels of interoperability and give an IoT example of a failure at each.
+3. What is meant by vertical silos in M2M, and by "inverting the pipes"?
+4. List five functions an application services layer typically provides.
+5. Compare middleware and standards as ways to achieve interoperability.
+6. What three kinds of interaction does a W3C Thing Description describe?
+7. In Matter, what are endpoints and clusters?
+8. Why might a company choose not to adopt an interoperability standard?
+
+## Further reading
+
+- W3C, *Web of Things (WoT) Thing Description 1.1* [@w3c_wot_td].
+- oneM2M, *Technical Specifications* [@onem2m].
+- Connectivity Standards Alliance, *Matter specification* [@matter_spec].
+- F. Delmastro, "Pervasive communications in healthcare" [@delmastro_healthcare], on standards for health-device interoperability.
