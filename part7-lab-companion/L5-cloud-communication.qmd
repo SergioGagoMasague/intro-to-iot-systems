@@ -1,5 +1,69 @@
-# Lab 5: Cloud Communication {#sec-lab-l5}
+# Lab 5: Cloud Communication {#sec-lab-l5 .unnumbered}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Lab 5 handout.
+::: {.callout-note title="Lab Companion" appearance="simple"}
+Services, libraries and settings reflect the current term. If your term's handout differs, **it wins**.
 :::
+
+## Goals
+
+- Connect the kit to a cloud MQTT broker over TLS (@sec-ch12).
+- Design a topic hierarchy and message formats for telemetry, status and commands.
+- Build a dashboard and an alert that consume the data and send commands back.
+- Make the device survive network and broker outages.
+
+Uses: the whole kit, a laptop, and a free **HiveMQ Cloud** (serverless) cluster per team. The dashboard runs in **Node-RED** on a team laptop.
+
+This lab is also a natural point to build your project's **vertical slice** (@sec-ch20).
+
+## Part 1: the broker
+
+1. Create a free HiveMQ Cloud serverless cluster. Note its host name; the TLS port is **8883**.
+2. Create **separate credentials** for the kit and for the dashboard.
+3. Test the broker from your laptop with a desktop MQTT client: subscribe to `#`, publish a test message, and see it arrive.
+
+## Part 2: the device
+
+Design your topics before writing code, for example:
+
+| Topic | Direction | Payload | QoS | Retained |
+|---|---|---|---|---|
+| `iot/team-07/telemetry` | device → cloud | `{"seq":42,"t":21.4,"p":1009.8,"pot":1830}` | 0 | no |
+| `iot/team-07/status` | device → cloud | `online` / `offline` (last will) | 1 | yes |
+| `iot/team-07/cmd` | cloud → device | `{"led":1,"on":true}`, `{"beep":200}` | 1 | no |
+
+Then implement:
+
+1. Wi-Fi connection with automatic reconnection.
+2. MQTT over TLS with your device credentials, a **last will** on the status topic, and a retained `online` message after connecting (see the example in @sec-ch12).
+3. Telemetry every 5–10 seconds, with a **sequence number**.
+4. A command handler that parses JSON (ArduinoJson works well), validates the fields, and acts on the LEDs and buzzer. Make it **idempotent** (@sec-ch12): a duplicated command must not cause harm.
+5. Non-blocking reconnection with **exponential back-off**, so that sensing and the OLED keep working while the network or broker is down.
+
+In this lab the starter code may skip certificate verification with `setInsecure()` so that you can focus on MQTT. **That is not acceptable in a product**: anyone on the network path could impersonate the broker. You will fix it in [Lab 6](/part7-lab-companion/L6-harden-your-device.qmd).
+
+## Part 3: the dashboard and an alert
+
+1. In Node-RED, add an MQTT-in node subscribed to your telemetry topic (with the dashboard's credentials), parse the JSON, and show temperature and potentiometer value as gauges and a chart.
+2. Show the device status (online or offline).
+3. Add a button and a switch that publish commands to the kit.
+4. Add an **alert**: when the temperature crosses a threshold you choose (warm the BMP280 with your finger), show a notification on the dashboard and send a buzzer command to the kit. Use hysteresis so the alert does not chatter.
+
+## Part 4: failure testing
+
+1. Turn off Wi-Fi on your access point for one minute. What do the kit, the broker and the dashboard each show? Does the kit recover on its own?
+2. Unplug the kit. How long until the dashboard shows it offline? What determines that delay?
+3. Count lost telemetry messages over a 15-minute run using the sequence numbers.
+
+## What to show and submit
+
+- A live demonstration: telemetry on the dashboard, a dashboard command changing the kit, the alert, and recovery after a Wi-Fi outage.
+- Your code, your topic table, and an export of your Node-RED flow (with credentials removed).
+- Answers to the analysis questions.
+
+## Analysis questions
+
+1. Why does the device connect out to the broker instead of the dashboard connecting to the device?
+2. Which QoS did you choose for each topic, and why?
+3. What does the last-will message give you that a heartbeat alone does not?
+4. What is the risk of `setInsecure()`? Describe an attack it allows.
+5. How would your topic design change for 1 000 devices owned by different customers?

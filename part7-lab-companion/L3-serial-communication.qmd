@@ -1,4 +1,4 @@
-# Lab 3: Serial Communication {#sec-lab-l3}
+# Lab 3: Serial Communication {#sec-lab-l3 .unnumbered}
 
 ::: {.callout-note title="Lab Companion" appearance="simple"}
 Pin numbers and parts reflect the current kit. If your term's handout differs, **it wins**.
@@ -11,7 +11,7 @@ Pin numbers and parts reflect the current kit. If your term's handout differs, *
 - Exchange messages over UART.
 - Compare the three buses in practice (@sec-ch05).
 
-Uses: Stages 1 and 2 of the kit (@sec-lab-l1).
+Uses: Stages 1 and 2 of the kit ([Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)).
 
 ## Part 1: I²C, reading the BMP280 from its datasheet
 

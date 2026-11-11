@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 460" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="330.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">An RPL DODAG rooted at the border router</text>
+<line x1="220.6082237167196" y1="164.14752021790798" x2="307.8065283050712" y2="97.07190130379139" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="439.3917762832804" y1="164.14752021790798" x2="352.1934716949288" y2="97.07190130379139" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="135.2924641395512" y1="268.9728618081171" x2="183.5311924650987" y2="202.64461036048928" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="273.53581745331115" y1="269.87711022071363" x2="217.73065812720336" y2="201.670804377693" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="460.0" y1="264.0" x2="460.0" y2="208.0" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="183.75792876358497" y1="369.6974109544812" x2="137.49146133152388" y2="311.86432666440487" stroke="#6b7280" stroke-width="2" marker-end="url(#ar)" stroke-dasharray="5,5"/>
+<line x1="217.3930830221837" y1="370.6743521975737" x2="271.2689875145714" y2="310.81223609492065" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<line x1="380.76155809170547" y1="372.5105073560959" x2="310.71832205508645" y2="308.83483823189675" stroke="#6b7280" stroke-width="2" marker-end="url(#ar)" stroke-dasharray="5,5"/>
+<line x1="413.37688964111567" y1="367.70518393147387" x2="445.59411884802927" y2="314.00980191995126" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<circle cx="330" cy="80" r="25" fill="#2f5d8a" fill-opacity="0.15" stroke="#2f5d8a" stroke-width="2"/>
+<text x="330" y="85" text-anchor="middle" font-size="13" fill="#1A2420" font-weight="bold">Root</text>
+<text x="372" y="85" text-anchor="start" font-size="11" fill="#6b7280">rank 0</text>
+<circle cx="200" cy="180" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="200" y="185" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">A</text>
+<text x="242" y="185" text-anchor="start" font-size="11" fill="#6b7280">rank 1</text>
+<circle cx="460" cy="180" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="460" y="185" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">B</text>
+<text x="502" y="185" text-anchor="start" font-size="11" fill="#6b7280">rank 1</text>
+<circle cx="120" cy="290" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="120" y="295" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">C</text>
+<text x="162" y="295" text-anchor="start" font-size="11" fill="#6b7280">rank 2</text>
+<circle cx="290" cy="290" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="290" y="295" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">D</text>
+<text x="332" y="295" text-anchor="start" font-size="11" fill="#6b7280">rank 2</text>
+<circle cx="460" cy="290" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="460" y="295" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">E</text>
+<text x="502" y="295" text-anchor="start" font-size="11" fill="#6b7280">rank 2</text>
+<circle cx="200" cy="390" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="200" y="395" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">F</text>
+<text x="242" y="395" text-anchor="start" font-size="11" fill="#6b7280">rank 3</text>
+<circle cx="400" cy="390" r="25" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="2"/>
+<text x="400" y="395" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">G</text>
+<text x="442" y="395" text-anchor="start" font-size="11" fill="#6b7280">rank 3</text>
+<text x="330" y="440" text-anchor="middle" font-size="12" fill="#6b7280">Solid: preferred parent · dashed: backup parent</text>
+</svg>

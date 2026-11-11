@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 380" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="310.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">Traffic-light state machine</text>
+<ellipse cx="150" cy="110" rx="105" ry="42" fill="#9E3629" fill-opacity="0.13" stroke="#9E3629" stroke-width="2"/>
+<text x="150" y="108" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">RED</text>
+<text x="150" y="127" text-anchor="middle" font-size="10.5" fill="#1A2420">10 s · buzzer 250/250 ms</text>
+<ellipse cx="470" cy="110" rx="105" ry="42" fill="#8F5119" fill-opacity="0.13" stroke="#8F5119" stroke-width="2"/>
+<text x="470" y="108" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">RED-YELLOW</text>
+<text x="470" y="127" text-anchor="middle" font-size="10.5" fill="#1A2420">2 s</text>
+<ellipse cx="470" cy="300" rx="105" ry="42" fill="#1C6B49" fill-opacity="0.13" stroke="#1C6B49" stroke-width="2"/>
+<text x="470" y="298" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">GREEN</text>
+<text x="470" y="317" text-anchor="middle" font-size="10.5" fill="#1A2420">until button + 5 s · buzzer 500/1500 ms</text>
+<ellipse cx="150" cy="300" rx="105" ry="42" fill="#8F5119" fill-opacity="0.13" stroke="#8F5119" stroke-width="2"/>
+<text x="150" y="298" text-anchor="middle" font-size="15" fill="#1A2420" font-weight="bold">YELLOW</text>
+<text x="150" y="317" text-anchor="middle" font-size="10.5" fill="#1A2420">2 s</text>
+<line x1="258" y1="110" x2="362" y2="110" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<text x="310" y="98" text-anchor="middle" font-size="11" fill="#6b7280">timer</text>
+<line x1="470" y1="155" x2="470" y2="255" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<text x="500" y="205" text-anchor="start" font-size="11" fill="#6b7280">timer</text>
+<line x1="362" y1="300" x2="258" y2="300" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<text x="310" y="288" text-anchor="middle" font-size="11" fill="#6b7280">pressed and ≥ 5 s</text>
+<line x1="150" y1="255" x2="150" y2="155" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<text x="140" y="205" text-anchor="end" font-size="11" fill="#6b7280">timer</text>
+<line x1="30" y1="60" x2="70" y2="82" stroke="#6b7280" stroke-width="2" marker-end="url(#ar)"/>
+<text x="28" y="52" text-anchor="start" font-size="11" fill="#6b7280">start</text>
+</svg>

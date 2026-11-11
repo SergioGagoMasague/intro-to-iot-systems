@@ -1,4 +1,4 @@
-# Lab 2: Traffic Controller {#sec-lab-l2}
+# Lab 2: Traffic Controller {#sec-lab-l2 .unnumbered}
 
 ::: {.callout-note title="Lab Companion" appearance="simple"}
 Pin numbers reflect the current kit. If your term's handout differs, **it wins**.
@@ -10,7 +10,7 @@ Pin numbers reflect the current kit. If your term's handout differs, **it wins**
 - Use non-blocking timing with `millis()` so several behaviors run at once (@sec-ch03).
 - Think about safe default states and accessibility (@sec-ch07).
 
-Uses: Stage 1 of the kit (@sec-lab-l1): LED 1 red (GPIO 2), LED 2 yellow (GPIO 4), LED 3 green (GPIO 15), button 1 (GPIO 32), buzzer (GPIO 27).
+Uses: Stage 1 of the kit ([Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)): LED 1 red (GPIO 2), LED 2 yellow (GPIO 4), LED 3 green (GPIO 15), button 1 (GPIO 32), buzzer (GPIO 27).
 
 ## The problem
 
@@ -25,9 +25,9 @@ Build a simplified pedestrian traffic light for a road crossing:
 
 ## Design
 
-Model the light as a **state machine** with four states: `RED`, `RED_YELLOW`, `GREEN` and `YELLOW` (@fig-tl-fsm).
+Model the light as a **state machine** with four states: `RED`, `RED_YELLOW`, `GREEN` and `YELLOW`, as shown below.
 
-![Traffic-light state machine.](../images/traffic-light-fsm.svg){#fig-tl-fsm width="80%"}
+![](../images/traffic-light-fsm.svg){width="80%" fig-alt="Traffic-light state machine with four states: red, red-yellow, green and yellow"}
 
 Each state has:
 

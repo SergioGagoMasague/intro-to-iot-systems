@@ -1,5 +1,83 @@
-# Lab 6: Harden Your Device {#sec-lab-l6}
+# Lab 6: Harden Your Device {#sec-lab-l6 .unnumbered}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Lab 6 handout.
+::: {.callout-note title="Lab Companion" appearance="simple"}
+Procedures reflect the current term. If your term's handout differs, **it wins**.
 :::
+
+::: {.callout-warning title="Nothing irreversible on kit boards"}
+Kits are reused every term. **Do not burn eFuses, enable flash encryption or secure boot, or change the ATECC608A's configuration** on your kit. Those steps are demonstrated by the teaching staff on a dedicated board. Every step in this lab is reversible.
+:::
+
+## Goals
+
+- Apply the security practices from Part IV to your own device and system.
+- Remove credentials from source code and authenticate the broker properly.
+- Protect commands against tampering and replay.
+- Reduce the device's attack surface.
+- Understand, without burning anything, how the ESP32's eFuses protect production devices.
+
+Uses: your Lab 5 system.
+
+## Part 1: threat model
+
+Draw the data-flow diagram of your Lab 5 system with its trust boundaries, and apply **STRIDE** (@sec-ch14). List your top five threats with likelihood and impact. Keep this list: each part below should address one or more of them.
+
+## Part 2: verify the broker
+
+Replace `setInsecure()` with real certificate verification:
+
+1. Find the root CA certificate that issued your broker's certificate (your broker's documentation names it; for example, many services use Let's Encrypt's ISRG Root X1).
+2. Store it in the firmware as a PEM string and pass it to `setCACert()`.
+3. Make sure the device has the correct time (with `configTime()` and NTP) before connecting, since certificate validity depends on it.
+4. Show that connecting to a different host with the same code now **fails**.
+
+## Part 3: get secrets out of the source code
+
+1. Remove Wi-Fi and broker credentials from `secrets.h` in the firmware.
+2. Implement **serial provisioning**: at first boot (or when both buttons are held at start-up), the device asks for its credentials over the Serial Monitor and stores them in **NVS** (non-volatile storage) using the `Preferences` library. Normal boots read them from NVS.
+3. Check your repository's **history** for secrets that were ever committed (`git log -p | grep -i pass`), and rotate (change) any you find.
+
+NVS on this ESP32 is not encrypted unless flash encryption is enabled. Note in your report what an attacker with physical access could still read, and what a production device would do instead (@sec-ch16).
+
+## Part 4: authenticate commands
+
+Protect your command topic against spoofing, tampering and replay, using either:
+
+- an **HMAC** with a per-device shared key and a monotonically increasing counter (@sec-ch14), with the counter stored in NVS so that a reboot does not reset it; or
+- **ECDSA signatures** verified on the device, if your kit's ATECC608A has been provisioned with a key by the staff (read-only use; @sec-ch15).
+
+Show that a modified command and a replayed command are both rejected, and that a valid one is accepted.
+
+## Part 5: reduce the attack surface
+
+1. Add a `PRODUCTION` build flag that removes debug output containing secrets or internal state.
+2. Validate every field of every incoming message: types, ranges and lengths. Reject anything else.
+3. Rate-limit commands, so a flood cannot keep the buzzer on or the CPU busy.
+4. Use per-device broker credentials with permissions limited to your own topics, if your broker supports access control.
+
+## Part 6: eFuses, read-only
+
+Run the read-only summary command from the ESP-IDF tools, with the kit connected:
+
+```bash
+espefuse.py --port /dev/ttyUSB0 summary
+```
+
+(On Windows the port is `COM3` or similar; on macOS, `/dev/cu.usbserial-…` or `/dev/cu.SLAB_USBtoUART`.)
+
+Identify the eFuses for flash encryption, secure boot, JTAG and UART download mode. Are any of them set on your board? Then watch the staff demonstration of flash encryption on a dedicated board.
+
+## What to show and submit
+
+- A demonstration: provisioning over serial, a verified TLS connection, and rejection of tampered and replayed commands.
+- Your threat model, showing which threats each change addresses and which remain.
+- Your code (with no secrets in it or in its history).
+- Answers to the analysis questions.
+
+## Analysis questions
+
+1. Which of your top five threats did this lab address, and which remain? What would you do next?
+2. Why does certificate verification depend on the device knowing the correct time?
+3. What could an attacker with physical access to your kit still extract, and how would secure boot and flash encryption change that?
+4. Why must the replay counter survive a reboot?
+5. Explain, from your eFuse summary, why enabling these protections on a production device is irreversible, and why that is a feature rather than a flaw.

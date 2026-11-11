@@ -1,5 +1,116 @@
 # Kit Reference {#sec-app-a}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.**
+::: {.callout-note appearance="simple"}
+This appendix describes the current version of the IoT@UCI kit. If your term's kit or starter code differs, **the starter's `iot_pins.h` is authoritative**.
 :::
+
+## Bill of materials
+
+Each team of two or three students shares one kit.
+
+| Qty | Part | Purpose | Bus | Chapter |
+|---|---|---|---|---|
+| 1 | ESP32 DevKit V1 (ESP32-WROOM-32), USB | Microcontroller with Wi-Fi and Bluetooth | — | @sec-ch02 |
+| 1 | USB cable (data-capable) | Power, upload, Serial Monitor | UART | @sec-ch05 |
+| 2 | 830-point solderless breadboards | Circuit construction | — | @sec-ch02 |
+| — | Jumper wire (assorted colors) | Connections | — | [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd) |
+| 3 | LEDs: red, yellow, green | Indicators | GPIO | @sec-ch03 |
+| 3 | 220 Ω resistors | LED current limiting | — | @sec-ch02 |
+| 2 | Push buttons | Input | GPIO | @sec-ch03 |
+| 1 | 10 kΩ potentiometer | Analog input | ADC | @sec-ch03 |
+| 1 | Passive piezo buzzer | Sound | PWM | @sec-ch07 |
+| 1 | 128 × 64 OLED, SSD1306, 7-pin SPI | Display | SPI | @sec-ch07 |
+| 1 | BMP280 breakout | Temperature and pressure | I²C | @sec-ch06 |
+| 1 | MPU-6050 (GY-521) breakout | Accelerometer and gyroscope | I²C | @sec-ch06 |
+| 1 | ATECC608A breakout | Secure element | I²C | @sec-ch15 |
+| 1 | Hobby servo (SG90 class) | Actuator | PWM | @sec-ch07 |
+| 1 | 470 µF, 16 V electrolytic capacitor | Servo supply buffer | — | @sec-ch07 |
+| 1 | RFM95W (SX1276) LoRa radio, 915 MHz, with spring antenna | Long-range radio | SPI | @sec-ch10 |
+| — | Header pins | For soldering to breakouts | — | [Lab 0](/part7-lab-companion/L0-bench-safety-soldering.qmd) |
+| 1 | Holder (3D-printed tray) | Holds servo and, in some kits, the radio | — | [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd) |
+
+: Kit contents. {#tbl-bom}
+
+## Pin map
+
+| Function | GPIO | Notes |
+|---|---|---|
+| LED 1 (red) | 2 | Strapping pin; also the board's blue LED on many DevKits |
+| LED 2 (yellow) | 4 | |
+| LED 3 (green) | 15 | Strapping pin |
+| Button 1 | 32 | `INPUT_PULLUP`, active low |
+| Button 2 | 33 | `INPUT_PULLUP`, active low |
+| Potentiometer wiper | 34 | Input-only, ADC1 |
+| Buzzer | 27 | LEDC channel shared with `tone()` |
+| Servo signal | 13 | On its own LEDC channel; powered from the 5 V rail |
+| I²C SDA | 21 | BMP280 0x76, MPU-6050 0x68, ATECC608A 0x60 |
+| I²C SCL | 22 | |
+| MPU-6050 INT (optional) | 35 | Input-only |
+| SPI SCK | 18 | Shared: OLED, LoRa |
+| SPI COPI (MOSI) | 23 | Shared: OLED ("SDA" on the module), LoRa |
+| SPI CIPO (MISO) | 19 | LoRa only |
+| OLED CS | 5 | Strapping pin |
+| OLED DC | 16 | |
+| OLED RES | 17 | |
+| LoRa CS (NSS) | 14 | |
+| LoRa RST | 26 | |
+| LoRa G0 (DIO0) | 25 | |
+
+: Kit pin map. {#tbl-pinmap}
+
+**Free pins** for project additions include GPIO 12 (a strapping pin: must not be pulled high at boot), 36 and 39 (input-only). Check @tbl-esp32-pins before using any pin.
+
+## `iot_pins.h`
+
+The starter projects define the pins in one header, so code refers to names rather than numbers:
+
+```cpp
+#pragma once
+#include <stdint.h>
+
+namespace IoTPins {
+  // Stage 1
+  constexpr uint8_t LED_1    = 2;    // red
+  constexpr uint8_t LED_2    = 4;    // yellow
+  constexpr uint8_t LED_3    = 15;   // green
+  constexpr uint8_t BUTTON_1 = 32;
+  constexpr uint8_t BUTTON_2 = 33;
+  constexpr uint8_t POT_ADC  = 34;
+  constexpr uint8_t BUZZER   = 27;
+  constexpr uint8_t SPI_SCK  = 18;
+  constexpr uint8_t SPI_MOSI = 23;
+  constexpr uint8_t SPI_MISO = 19;
+  constexpr uint8_t OLED_CS  = 5;
+  constexpr uint8_t OLED_DC  = 16;
+  constexpr uint8_t OLED_RES = 17;
+  // Stage 2
+  constexpr uint8_t I2C_SDA  = 21;
+  constexpr uint8_t I2C_SCL  = 22;
+  constexpr uint8_t MPU6050_INT = 35;
+  // Stage 3
+  constexpr uint8_t SERVO    = 13;
+  // Stage 4
+  constexpr uint8_t LORA_CS  = 14;
+  constexpr uint8_t LORA_RST = 26;
+  constexpr uint8_t LORA_G0  = 25;
+}
+
+namespace IoTAddr {
+  constexpr uint8_t BMP280    = 0x76;
+  constexpr uint8_t MPU6050   = 0x68;
+  constexpr uint8_t ATECC608A = 0x60;
+}
+```
+
+## Power
+
+- The board is powered from USB (5 V), regulated to **3.3 V** for the ESP32 and the 3V3 rails.
+- **VIN** carries the USB 5 V (minus a diode drop on some boards) and feeds only the **servo rail**.
+- Budget: the 3.3 V regulator on a typical DevKit supplies several hundred milliamperes, and Wi-Fi transmission alone can draw up to about 250 mA in bursts. Do not power motors or additional radios from 3V3.
+
+## Kit care
+
+- Unplug USB before changing wiring.
+- Keep the antenna attached to the LoRa radio.
+- Store the kit with wires pressed flat and parts seated; loose parts are the most common cause of "it worked yesterday".
+- Report damaged parts to the teaching staff rather than swapping in parts from elsewhere.

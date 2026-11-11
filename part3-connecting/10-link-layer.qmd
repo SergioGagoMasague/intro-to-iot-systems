@@ -151,7 +151,7 @@ void loop() {
 }
 ```
 
-A generic BLE explorer app on a phone (such as nRF Connect) can now discover the kit, connect and subscribe to the value. @sec-lab-l4 builds a BLE step counter on this foundation.
+A generic BLE explorer app on a phone (such as nRF Connect) can now discover the kit, connect and subscribe to the value. [Lab 4](/part7-lab-companion/L4-ble-step-counter.qmd) builds a BLE step counter on this foundation.
 
 ### Wi-Fi
 

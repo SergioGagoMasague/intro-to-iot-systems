@@ -1,5 +1,96 @@
 # Toolchain Setup {#sec-app-b}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.**
-:::
+## What you need
+
+- A laptop running macOS, Windows or Linux, with a free USB port (USB-A or USB-C, matching your cable).
+- **Visual Studio Code** and the **PlatformIO IDE** extension.
+- **Git**, and a GitHub (or similar) account for your team repository.
+- Optionally: **Wokwi** (browser-based ESP32 simulator), an **MQTT client** such as MQTT Explorer, **Node-RED**, and **Python 3** with Jupyter for data analysis.
+
+## Installing PlatformIO
+
+1. Install VS Code from code.visualstudio.com.
+2. In VS Code, open the Extensions view and install **PlatformIO IDE**. The first installation downloads its own Python environment and tools; this can take several minutes.
+3. Restart VS Code. The PlatformIO (alien-head) icon appears in the left sidebar.
+
+## USB drivers
+
+The DevKit's USB-to-UART bridge is usually a **Silicon Labs CP210x** or a **WCH CH340** chip. macOS and Linux usually recognize both; Windows may need the vendor's driver.
+
+To check that the board is detected:
+
+- **macOS**: `ls /dev/cu.*` should show `cu.usbserial-…`, `cu.SLAB_USBtoUART` or `cu.wchusbserial…`.
+- **Linux**: `ls /dev/ttyUSB*`; add yourself to the `dialout` (or `uucp`) group if uploads fail with a permission error.
+- **Windows**: Device Manager → Ports (COM & LPT) should list a new COM port.
+
+If nothing appears, try a different cable: many USB cables carry power only.
+
+## Opening a project
+
+Starter projects are complete PlatformIO projects.
+
+1. Unzip the starter.
+2. In VS Code: **PlatformIO → Open Project**, and select the folder that contains `platformio.ini`. Do not open a single `.cpp` file.
+3. Wait for PlatformIO to install the platform and libraries listed in `platformio.ini`.
+
+A typical project looks like this:
+
+```
+my-project/
+├── platformio.ini       build configuration: board, platform version, libraries
+├── include/
+│   ├── iot_pins.h       kit pin map
+│   ├── secrets.h        your credentials (git-ignored)
+│   └── secrets.example.h
+├── lib/                 project-specific libraries
+├── src/
+│   └── main.cpp         your code
+└── test/                unit tests
+```
+
+## Build, upload and monitor
+
+Use the buttons in the blue status bar at the bottom of VS Code:
+
+| Button | Action |
+|---|---|
+| ✓ | Build |
+| → | Upload |
+| 🔌 | Serial Monitor |
+| 🗑 | Clean |
+
+Or from the PlatformIO terminal:
+
+```bash
+pio run                 # build
+pio run -t upload       # upload
+pio device monitor      # Serial Monitor (uses monitor_speed from platformio.ini)
+pio test -e native      # run unit tests on the laptop (if configured)
+```
+
+If an upload hangs at "Connecting…", hold the **BOOT** button on the board until the upload starts.
+
+## Secrets
+
+Never commit passwords or keys.
+
+1. Keep credentials in `include/secrets.h`, and list that file in `.gitignore`.
+2. Commit a `secrets.example.h` with placeholder values so teammates know what to fill in.
+
+```cpp
+// secrets.example.h — copy to secrets.h and fill in
+#pragma once
+#define WIFI_SSID      "your-network"
+#define WIFI_PASSWORD  "your-password"
+#define MQTT_HOST      "xxxxxxxx.s1.eu.hivemq.cloud"
+#define MQTT_USER      "device-user"
+#define MQTT_PASS      "device-password"
+```
+
+## Wokwi
+
+Wokwi simulates an ESP32 with LEDs, buttons, displays and many sensors in the browser, and can also run inside VS Code. It is useful for the early activities, before the kit is built, and for testing logic without hardware. Simulated timing and radios are not identical to real hardware, so always confirm on the kit.
+
+## Networks
+
+Campus enterprise Wi-Fi (WPA2-Enterprise) and networks with captive portals generally do not work with small devices. Use the course IoT network, a phone hotspot (2.4 GHz), or a travel router.

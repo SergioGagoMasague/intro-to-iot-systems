@@ -59,7 +59,7 @@ A **solderless breadboard** lets you build and change circuits without soldering
 - In the main area, each **row of five holes** is connected. The rows on either side of the central gap are *not* connected to each other. Chips and modules straddle this gap so that each pin gets its own row.
 - The long **power rails** along the edges run the length of the board. By convention, the red rail carries the supply voltage and the blue rail carries ground. On some boards the rails are split in the middle, so check before relying on them.
 
-The kit uses two 830-point breadboards side by side, with the ESP32 bridging the seam. The rails carry 3.3 V and GND, except for one short rail section reserved for the servo's 5 V supply (@sec-lab-l1).
+The kit uses two 830-point breadboards side by side, with the ESP32 bridging the seam. The rails carry 3.3 V and GND, except for one short rail section reserved for the servo's 5 V supply ([Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)).
 
 ### From fixed circuits to microcontrollers
 
@@ -142,7 +142,7 @@ The kit gives each team one ESP32 and a set of parts that together exercise ever
 | 3 | Servo motor on its own 5 V rail, with a 470 µF capacitor | @sec-ch07 |
 | 4 | RFM95W LoRa radio | @sec-ch10 |
 
-The complete pin map is in @sec-app-a, and the build procedure is in @sec-lab-l1.
+The complete pin map is in @sec-app-a, and the build procedure is in [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd).
 
 ::: {.callout-tip title="Try it on your kit: blink and basic circuits"}
 This exercise corresponds to the first lecture activity and can be done in the Wokwi simulator before you have hardware.

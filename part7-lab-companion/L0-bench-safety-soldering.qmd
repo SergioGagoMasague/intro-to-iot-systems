@@ -1,4 +1,4 @@
-# Lab 0: Bench Safety and Soldering {#sec-lab-l0}
+# Lab 0: Bench Safety and Soldering {#sec-lab-l0 .unnumbered}
 
 ::: {.callout-note title="Lab Companion" appearance="simple"}
 The Lab Companion describes the labs as run with the current version of the IoT@UCI kit. Pin numbers, libraries and procedures are updated each term. Where this text and your term's handout differ, **the handout wins**.
@@ -59,7 +59,7 @@ The breakout boards in the kit (the OLED, BMP280, MPU-6050, ATECC608A and LoRa r
 | **Excess** | Large ball hiding the pin | Too much solder | Remove some with braid |
 | **Lifted pad** | Copper pad detached from board | Too much heat or force | Ask a TA; may need a wire repair |
 
-After soldering, run the kit check from @sec-lab-l1 or an I²C scan (@sec-ch05). A device that does not appear often has a cold joint or a bridge on its SDA or SCL pin.
+After soldering, run the kit check from [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd) or an I²C scan (@sec-ch05). A device that does not appear often has a cold joint or a bridge on its SDA or SCL pin.
 
 ## What to show
 

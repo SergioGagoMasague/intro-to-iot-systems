@@ -19,7 +19,7 @@ A real system, product or failure story that shows why this topic matters.
 …
 
 ::: {.callout-tip title="Try it on your kit"}
-A short exercise (10–20 minutes) on the kit. Link to the matching lecture activity or lab: see @sec-lab-lN.
+A short exercise (10–20 minutes) on the kit. Link to the matching lecture activity or lab: see the matching lab, for example `[Lab 1](/part7-lab-companion/L1-build-the-kit.qmd)`.
 :::
 
 ## Design trade-offs

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 330" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="440.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">A/B (dual-slot) OTA updates on the ESP32</text>
+<text x="165" y="93" text-anchor="end" font-size="13" fill="#1A2420" font-weight="bold">1. Running v1</text>
+<rect x="180" y="65" width="110" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="235.0" y="93" text-anchor="middle" font-size="12" fill="#1A2420">bootloader</text>
+<rect x="290" y="65" width="90" height="45" fill="#1A2420" fill-opacity="0.1" stroke="#1A2420" stroke-width="2"/>
+<text x="335.0" y="93" text-anchor="middle" font-size="12" fill="#1A2420">boot → ota_0</text>
+<rect x="380" y="65" width="60" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="410.0" y="93" text-anchor="middle" font-size="12" fill="#1A2420">nvs</text>
+<rect x="440" y="65" width="200" height="45" fill="#1C6B49" fill-opacity="0.25" stroke="#1C6B49" stroke-width="2"/>
+<text x="540.0" y="93" text-anchor="middle" font-size="12" fill="#1A2420">ota_0  v1 (running)</text>
+<rect x="640" y="65" width="200" height="45" fill="#2f5d8a" fill-opacity="0.08" stroke="#2f5d8a" stroke-width="2"/>
+<text x="740.0" y="93" text-anchor="middle" font-size="12" fill="#1A2420">ota_1  (free)</text>
+<text x="165" y="173" text-anchor="end" font-size="13" fill="#1A2420" font-weight="bold">2. Download</text>
+<rect x="180" y="145" width="110" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="235.0" y="173" text-anchor="middle" font-size="12" fill="#1A2420">bootloader</text>
+<rect x="290" y="145" width="90" height="45" fill="#1A2420" fill-opacity="0.1" stroke="#1A2420" stroke-width="2"/>
+<text x="335.0" y="173" text-anchor="middle" font-size="12" fill="#1A2420">boot → ota_0</text>
+<rect x="380" y="145" width="60" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="410.0" y="173" text-anchor="middle" font-size="12" fill="#1A2420">nvs</text>
+<rect x="440" y="145" width="200" height="45" fill="#1C6B49" fill-opacity="0.25" stroke="#1C6B49" stroke-width="2"/>
+<text x="540.0" y="173" text-anchor="middle" font-size="12" fill="#1A2420">ota_0  v1 (running)</text>
+<rect x="640" y="145" width="200" height="45" fill="#2f5d8a" fill-opacity="0.08" stroke="#2f5d8a" stroke-width="2"/>
+<text x="740.0" y="173" text-anchor="middle" font-size="12" fill="#1A2420">ota_1  v2 writing…</text>
+<text x="165" y="253" text-anchor="end" font-size="13" fill="#1A2420" font-weight="bold">3. Verified, reboot</text>
+<rect x="180" y="225" width="110" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="235.0" y="253" text-anchor="middle" font-size="12" fill="#1A2420">bootloader</text>
+<rect x="290" y="225" width="90" height="45" fill="#1A2420" fill-opacity="0.1" stroke="#1A2420" stroke-width="2"/>
+<text x="335.0" y="253" text-anchor="middle" font-size="12" fill="#1A2420">boot → ota_1</text>
+<rect x="380" y="225" width="60" height="45" fill="#6b7280" fill-opacity="0.1" stroke="#6b7280" stroke-width="2"/>
+<text x="410.0" y="253" text-anchor="middle" font-size="12" fill="#1A2420">nvs</text>
+<rect x="440" y="225" width="200" height="45" fill="#1C6B49" fill-opacity="0.08" stroke="#1C6B49" stroke-width="2"/>
+<text x="540.0" y="253" text-anchor="middle" font-size="12" fill="#1A2420">ota_0  v1 (fallback)</text>
+<rect x="640" y="225" width="200" height="45" fill="#2f5d8a" fill-opacity="0.25" stroke="#2f5d8a" stroke-width="2"/>
+<text x="740.0" y="253" text-anchor="middle" font-size="12" fill="#1A2420">ota_1  v2 (running)</text>
+<text x="500" y="310" text-anchor="middle" font-size="12" fill="#6b7280">If power fails in step 2, otadata still points to ota_0. If v2 fails its health check, the bootloader rolls back to ota_0.</text>
+</svg>

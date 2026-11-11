@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 500" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="410.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">Range and data rate of IoT link technologies (approximate)</text>
+<rect x="90" y="60" width="700" height="380" fill="none" stroke="#6b7280"/>
+<line x1="90.0" y1="440" x2="90.0" y2="446" stroke="#6b7280"/>
+<text x="90.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">1 m</text>
+<line x1="230.0" y1="440" x2="230.0" y2="446" stroke="#6b7280"/>
+<text x="230.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">10 m</text>
+<line x1="370.0" y1="440" x2="370.0" y2="446" stroke="#6b7280"/>
+<text x="370.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">100 m</text>
+<line x1="510.0" y1="440" x2="510.0" y2="446" stroke="#6b7280"/>
+<text x="510.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">1 km</text>
+<line x1="650.0" y1="440" x2="650.0" y2="446" stroke="#6b7280"/>
+<text x="650.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">10 km</text>
+<line x1="790.0" y1="440" x2="790.0" y2="446" stroke="#6b7280"/>
+<text x="790.0" y="462" text-anchor="middle" font-size="12" fill="#6b7280">100 km</text>
+<line x1="84" y1="440.0" x2="90" y2="440.0" stroke="#6b7280"/>
+<text x="80" y="444.0" text-anchor="end" font-size="11" fill="#6b7280">100 bit/s</text>
+<line x1="84" y1="389.3333333333333" x2="90" y2="389.3333333333333" stroke="#6b7280"/>
+<text x="80" y="393.3333333333333" text-anchor="end" font-size="11" fill="#6b7280">1 kbit/s</text>
+<line x1="84" y1="338.6666666666667" x2="90" y2="338.6666666666667" stroke="#6b7280"/>
+<text x="80" y="342.6666666666667" text-anchor="end" font-size="11" fill="#6b7280">10 kbit/s</text>
+<line x1="84" y1="288.0" x2="90" y2="288.0" stroke="#6b7280"/>
+<text x="80" y="292.0" text-anchor="end" font-size="11" fill="#6b7280">100 kbit/s</text>
+<line x1="84" y1="237.33333333333334" x2="90" y2="237.33333333333334" stroke="#6b7280"/>
+<text x="80" y="241.33333333333334" text-anchor="end" font-size="11" fill="#6b7280">1 Mbit/s</text>
+<line x1="84" y1="186.66666666666669" x2="90" y2="186.66666666666669" stroke="#6b7280"/>
+<text x="80" y="190.66666666666669" text-anchor="end" font-size="11" fill="#6b7280">10 Mbit/s</text>
+<line x1="84" y1="136.0" x2="90" y2="136.0" stroke="#6b7280"/>
+<text x="80" y="140.0" text-anchor="end" font-size="11" fill="#6b7280">100 Mbit/s</text>
+<line x1="84" y1="85.33333333333331" x2="90" y2="85.33333333333331" stroke="#6b7280"/>
+<text x="80" y="89.33333333333331" text-anchor="end" font-size="11" fill="#6b7280">1 Gbit/s</text>
+<rect x="230.0" y="222.08114688635828" width="97.85580060704262" height="61.00874578790024" rx="6" fill="#2f5d8a" fill-opacity="0.15" stroke="#2f5d8a" stroke-width="1.5"/>
+<text x="278.9279003035213" y="256.5855197803084" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">BLE</text>
+<rect x="230.0" y="267.83770622728343" width="140.0" height="55.57677399240822" rx="6" fill="#1C6B49" fill-opacity="0.15" stroke="#1C6B49" stroke-width="1.5"/>
+<text x="300.0" y="315.41448021969165" text-anchor="middle" font-size="11" fill="#1A2420" font-weight="bold">802.15.4 (Thread, Zigbee)</text>
+<rect x="254.6527762677954" y="85.33333333333331" width="84.28839878591475" height="101.33333333333337" rx="6" fill="#8F5119" fill-opacity="0.15" stroke="#8F5119" stroke-width="1.5"/>
+<text x="296.79697566075276" y="140.0" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">Wi-Fi</text>
+<rect x="370.0" y="156.16229377271657" width="140.0" height="122.91574910179554" rx="6" fill="#8F5119" fill-opacity="0.15" stroke="#8F5119" stroke-width="1.5"/>
+<text x="440.0" y="221.62016832361434" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">Wi-Fi HaLow</text>
+<rect x="552.1441993929573" y="321.3172508383415" width="122.50857687483813" height="94.50860558919555" rx="6" fill="#9E3629" fill-opacity="0.15" stroke="#9E3629" stroke-width="1.5"/>
+<text x="613.3984878303763" y="372.5715536329393" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">LoRaWAN</text>
+<rect x="510.0" y="279.0780428745121" width="206.79697566075276" height="44.33643734517955" rx="6" fill="#1A2420" fill-opacity="0.15" stroke="#1A2420" stroke-width="1.5"/>
+<text x="613.3984878303763" y="305.2462615471019" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">NB-IoT</text>
+<rect x="510.0" y="237.33333333333334" width="206.79697566075276" height="35.41448021969157" rx="6" fill="#1A2420" fill-opacity="0.15" stroke="#1A2420" stroke-width="1.5"/>
+<text x="613.3984878303763" y="259.04057344317914" text-anchor="middle" font-size="12" fill="#1A2420" font-weight="bold">LTE-M</text>
+<text x="440.0" y="485" text-anchor="middle" font-size="13" fill="#1A2420">Typical range (log scale)</text>
+<text x="22" y="250.0" font-size="13" fill="#1A2420" transform="rotate(-90 22 250.0)" text-anchor="middle">Data rate (log scale)</text>
+</svg>

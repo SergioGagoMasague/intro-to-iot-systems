@@ -292,7 +292,7 @@ Open-drain outputs also make two advanced features possible:
 I²C needs only two wires for up to dozens of devices, confirms that each byte was received, and lets software find devices by scanning. Its costs are speed and fragility: it is half duplex, slower than SPI, sensitive to pull-up values and wire length, and a single misbehaving device can hold the whole bus low.
 
 ::: {.callout-tip title="Try it on your kit: map your buses"}
-This exercise uses the kit wiring from Stage 2 of @sec-lab-l1, and corresponds to the I²C and SPI lecture activity.
+This exercise uses the kit wiring from Stage 2 of [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd), and corresponds to the I²C and SPI lecture activity.
 
 1. Run the bus scanner above. You should find exactly three devices: 0x60, 0x68 and 0x76. Write down what you see before going on.
 2. Unplug the USB cable, remove the MPU-6050's SDA wire, and scan again. Which addresses remain? Why does removing one device not break the others?

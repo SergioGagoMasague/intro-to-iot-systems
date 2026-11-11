@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 420" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="420.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">The IoT protocol stack</text>
+<text x="170" y="62" text-anchor="middle" font-size="14" fill="#1A2420" font-weight="bold">TCP/IP stack</text>
+<text x="560" y="62" text-anchor="middle" font-size="14" fill="#1A2420" font-weight="bold">IoT protocol stack</text>
+<rect x="40" y="80" width="260" height="114" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="170.0" y="133.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Application</text>
+<text x="170.0" y="152.0" text-anchor="middle" font-size="12" fill="#1A2420">HTTP, SMTP, DNS…</text>
+<rect x="40" y="200" width="260" height="54" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="170.0" y="223.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Transport</text>
+<text x="170.0" y="242.0" text-anchor="middle" font-size="12" fill="#1A2420">TCP, UDP</text>
+<rect x="40" y="260" width="260" height="54" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="170.0" y="283.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Internet</text>
+<text x="170.0" y="302.0" text-anchor="middle" font-size="12" fill="#1A2420">IPv4, IPv6</text>
+<rect x="40" y="320" width="260" height="54" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="170.0" y="343.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Link</text>
+<text x="170.0" y="362.0" text-anchor="middle" font-size="12" fill="#1A2420">Ethernet, Wi-Fi</text>
+<rect x="380" y="80" width="360" height="54" rx="8" fill="#2f5d8a" fill-opacity="0.10" stroke="#2f5d8a" stroke-width="2"/>
+<text x="560.0" y="103.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Application services</text>
+<text x="560.0" y="122.0" text-anchor="middle" font-size="12" fill="#1A2420">Data models: Matter, WoT, LwM2M, oneM2M</text>
+<text x="790" y="110.0" text-anchor="middle" font-size="12" fill="#6b7280">Ch. 13</text>
+<rect x="380" y="140" width="360" height="54" rx="8" fill="#2f5d8a" fill-opacity="0.10" stroke="#2f5d8a" stroke-width="2"/>
+<text x="560.0" y="163.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Application protocols</text>
+<text x="560.0" y="182.0" text-anchor="middle" font-size="12" fill="#1A2420">HTTP, CoAP, MQTT, XMPP, AMQP, DDS</text>
+<text x="790" y="170.0" text-anchor="middle" font-size="12" fill="#6b7280">Ch. 12</text>
+<rect x="380" y="200" width="360" height="54" rx="8" fill="#8F5119" fill-opacity="0.10" stroke="#8F5119" stroke-width="2"/>
+<text x="560.0" y="223.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Transport</text>
+<text x="560.0" y="242.0" text-anchor="middle" font-size="12" fill="#1A2420">UDP, TCP · DTLS, TLS</text>
+<text x="790" y="230.0" text-anchor="middle" font-size="12" fill="#6b7280">Ch. 8, 14</text>
+<rect x="380" y="260" width="360" height="54" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="560.0" y="283.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Internet</text>
+<text x="560.0" y="302.0" text-anchor="middle" font-size="12" fill="#1A2420">IPv6 · 6LoWPAN · RPL</text>
+<text x="790" y="290.0" text-anchor="middle" font-size="12" fill="#6b7280">Ch. 11</text>
+<rect x="380" y="320" width="360" height="54" rx="8" fill="#9E3629" fill-opacity="0.10" stroke="#9E3629" stroke-width="2"/>
+<text x="560.0" y="343.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Link</text>
+<text x="560.0" y="362.0" text-anchor="middle" font-size="12" fill="#1A2420">802.15.4, BLE, Wi-Fi, LoRaWAN, LTE-M/NB-IoT, TSN</text>
+<text x="790" y="350.0" text-anchor="middle" font-size="12" fill="#6b7280">Ch. 10</text>
+<line x1="300" y1="140" x2="380" y2="80" stroke="#6b7280" stroke-dasharray="4,4"/>
+<line x1="300" y1="140" x2="380" y2="200" stroke="#6b7280" stroke-dasharray="4,4"/>
+<text x="560" y="400" text-anchor="middle" font-size="12" fill="#6b7280">IP is the normalization layer: any application protocol over any link</text>
+</svg>

@@ -1,5 +1,187 @@
 # Glossary {#sec-app-d}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.**
-:::
+6LoWPAN
+: IPv6 over Low-Power Wireless Personal Area Networks; an adaptation layer that compresses and fragments IPv6 packets for small radio frames (@sec-ch11).
+
+ACK / NACK
+: Acknowledgment / negative acknowledgment, confirming whether data was received.
+
+Actuator
+: A device that converts a control signal into a physical effect such as motion, light or sound (@sec-ch07).
+
+ADC
+: Analog-to-digital converter; measures a voltage and converts it to a number (@sec-ch03).
+
+AEAD
+: Authenticated encryption with associated data; encryption that also guarantees integrity, such as AES-GCM (@sec-ch14).
+
+BLE
+: Bluetooth Low Energy (@sec-ch10).
+
+Border router
+: A router connecting a low-power network such as 6LoWPAN or Thread to the wider IP network (@sec-ch11).
+
+Broker
+: In publish/subscribe systems such as MQTT, the server that receives messages and forwards them to subscribers (@sec-ch12).
+
+Certificate (X.509)
+: A signed statement binding a public key to an identity (@sec-ch15).
+
+CoAP
+: Constrained Application Protocol; a REST protocol over UDP for constrained devices (@sec-ch12).
+
+Constrained device
+: A device with limited memory, processing and energy (@sec-ch09).
+
+Debouncing
+: Filtering the rapid on/off transitions of a mechanical switch (@sec-ch03).
+
+Deep sleep
+: An ESP32 low-power mode in which only the RTC domain stays powered (@sec-ch10).
+
+DODAG
+: Destination-oriented directed acyclic graph; the routing structure built by RPL (@sec-ch11).
+
+Duty cycle
+: The fraction of time a signal is on (PWM), or that a device or radio is active.
+
+eFuse
+: One-time-programmable memory bits inside a chip, used for keys and security configuration (@sec-ch16).
+
+Edge / fog computing
+: Processing close to where data is produced, between devices and the cloud (@sec-ch18).
+
+Encapsulation
+: Wrapping data with each protocol layer's header as it moves down the stack (@sec-ch08).
+
+Fail-safe state
+: The state that causes the least harm when something fails (@sec-ch07).
+
+Flash encryption
+: Transparent encryption of a device's external flash memory (@sec-ch16).
+
+GATT
+: Generic Attribute Profile; the BLE data model of services and characteristics (@sec-ch10).
+
+GPIO
+: General-purpose input/output pin.
+
+HMAC
+: Hash-based message authentication code; proves integrity and authenticity with a shared key (@sec-ch14).
+
+Hysteresis
+: Using separate on and off thresholds to prevent rapid switching near a set point (@sec-ch07).
+
+I²C
+: Inter-Integrated Circuit; a two-wire, addressed serial bus (@sec-ch05).
+
+IMU
+: Inertial measurement unit; an accelerometer and gyroscope, sometimes with a magnetometer (@sec-ch06).
+
+Interrupt / ISR
+: A hardware signal that pauses normal execution to run an interrupt service routine (@sec-ch03).
+
+Interoperability
+: The ability of systems to exchange information and use it (@sec-ch13).
+
+LLN
+: Low-power and lossy network (@sec-ch11).
+
+LoRa / LoRaWAN
+: A long-range, low-power radio modulation, and the network protocol built on it (@sec-ch10).
+
+LPWAN
+: Low-power wide-area network.
+
+Matter
+: A smart-home interoperability standard running over IP on Wi-Fi, Ethernet and Thread (@sec-ch13).
+
+MEMS
+: Micro-electro-mechanical systems; microscopic mechanical structures in silicon, used in most motion and pressure sensors.
+
+MQTT
+: A lightweight publish/subscribe messaging protocol (@sec-ch12).
+
+mTLS
+: Mutual TLS, in which both client and server present certificates (@sec-ch15).
+
+NAT
+: Network address translation, which maps private addresses to a public one (@sec-ch08).
+
+ODA loop
+: Observe–Decide–Act, the cycle connecting sensing to actuation (@sec-ch07).
+
+OTA update
+: Over-the-air update: delivering new firmware through the network (@sec-ch16).
+
+PKI
+: Public-key infrastructure; the certificate authorities, certificates and policies that establish trust (@sec-ch15).
+
+Provisioning
+: Giving a device its identity, credentials and configuration (@sec-ch15).
+
+Pull-up / pull-down resistor
+: A resistor that holds an input at a defined level when nothing else drives it (@sec-ch03).
+
+PWM
+: Pulse-width modulation; switching a signal rapidly to control average power or encode a value (@sec-ch03).
+
+QoS
+: Quality of service; in MQTT, the delivery guarantee level (@sec-ch12).
+
+Real-time system
+: A system that must respond within a specified time (@sec-ch04).
+
+Replay attack
+: Resending a captured valid message to repeat its effect (@sec-ch14).
+
+RPL
+: IPv6 Routing Protocol for Low-Power and Lossy Networks (@sec-ch11).
+
+RSSI / SNR
+: Received signal strength indicator / signal-to-noise ratio.
+
+RTOS
+: Real-time operating system (@sec-ch04).
+
+SBOM
+: Software bill of materials; a list of all software components in a product (@sec-ch16).
+
+Secure boot
+: Verifying the signature of each piece of software before running it (@sec-ch16).
+
+Secure element
+: A tamper-resistant chip that stores keys and performs cryptography without exposing keys (@sec-ch15).
+
+SoC
+: System on a chip; a microcontroller or processor integrated with larger subsystems such as radios.
+
+SPI
+: Serial Peripheral Interface; a fast synchronous bus with a chip-select line per device (@sec-ch05).
+
+STRIDE
+: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege; a threat-modeling mnemonic (@sec-ch14).
+
+Thing Description
+: A W3C JSON-LD document describing a device's properties, actions and events (@sec-ch13).
+
+Thread
+: An IPv6 mesh networking protocol on 802.15.4 radios (@sec-ch11).
+
+TinyML
+: Machine learning on microcontrollers (@sec-ch18).
+
+TLS / DTLS
+: Transport Layer Security, and its datagram (UDP) variant.
+
+TSN
+: Time-Sensitive Networking; IEEE standards for deterministic Ethernet (@sec-ch10).
+
+UART
+: Universal asynchronous receiver/transmitter; point-to-point serial communication without a clock wire (@sec-ch05).
+
+Vertical slice
+: A thin, end-to-end working version of a whole system (@sec-ch20).
+
+Watchdog timer
+: A timer that resets the processor unless software services it regularly (@sec-ch04).

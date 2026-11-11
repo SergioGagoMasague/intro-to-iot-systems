@@ -63,7 +63,7 @@ Some binary actuators are **bistable**: they hold their last state without power
 
 #### Lights
 
-LEDs are the most common actuator of all. They can be binary (a status light) or continuous (dimmed with PWM, @sec-ch03). A traffic light is a familiar example of a binary, stable-state output, and is the subject of @sec-lab-l2.
+LEDs are the most common actuator of all. They can be binary (a status light) or continuous (dimmed with PWM, @sec-ch03). A traffic light is a familiar example of a binary, stable-state output, and is the subject of [Lab 2](/part7-lab-companion/L2-traffic-controller.qmd).
 
 #### Displays
 

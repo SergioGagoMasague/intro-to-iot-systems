@@ -1,5 +1,74 @@
 # Troubleshooting {#sec-app-c}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.**
-:::
+Work from the bottom of the stack up: power and wiring first, then the bus, then the code, then the network. Change one thing at a time, and write down what you changed.
+
+## Power and upload
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| Board not detected by the laptop | Charge-only cable; missing driver; bad USB port | Another cable; install CP210x/CH340 driver; another port (@sec-app-b) |
+| Upload stuck at "Connecting…" | Auto-reset not working; strapping pin held at the wrong level | Hold BOOT during upload; disconnect parts on GPIO 0, 2, 5, 12, 15 and retry |
+| "A fatal error occurred: … No serial data received" | Serial Monitor holding the port | Close the monitor, then upload |
+| Board resets repeatedly | Brownout (servo, short circuit); crash loop | Check the reset reason (@sec-ch21); remove the servo; look for shorts between rails |
+| Board gets hot | Short circuit between 3V3/5V and GND | Unplug immediately; inspect the rails |
+
+## Serial Monitor
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| Garbled characters | Baud-rate mismatch | Set the monitor to the speed in `Serial.begin()` (115200) |
+| Nothing printed | Wrong port; code stuck before printing; `Serial.begin()` missing | Print as the first line of `setup()`; check the port |
+| Output only after a reset | Monitor opened late | Press EN after opening the monitor |
+
+## GPIO, buttons and analog input
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| LED does not light | Reversed LED; resistor in the wrong row; wrong pin | Swap LED orientation; trace the row; check `pinMode` |
+| Button reads random values | Floating input | `INPUT_PULLUP`; check the button is wired to GND |
+| Button counts several presses | Bounce | Debounce (@sec-ch03) |
+| Analog reads fail after Wi-Fi starts | ADC2 pin | Use GPIO 32–39 |
+| Analog reading stuck at 0 or 4095 | Wiper or rail disconnected | Check all three potentiometer legs |
+
+## I²C
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| Scanner finds nothing | SDA/SCL swapped or loose; no power to breakout; cold solder joints | Check 21/22, 3V3 and GND; reflow joints ([Lab 0](/part7-lab-companion/L0-bench-safety-soldering.qmd)) |
+| Device at an unexpected address | Address pin left floating or tied differently | BMP280 SDO→GND (0x76); MPU-6050 AD0→GND (0x68) |
+| Device appears intermittently | Bad joint; long wires; missing pull-ups | Press-test joints; shorten wires |
+| MPU-6050 returns zeros | Still in sleep mode | Write 0 to register 0x6B (@sec-ch06) |
+| Readings are nonsense | Byte order or sign errors | Check endianness and signedness in the datasheet |
+
+## SPI and the OLED
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| OLED blank | Module "SDA" on 21 instead of 23; DC/RES swapped; `display()` not called | Re-check @tbl-stage1; call `display()` after drawing |
+| OLED works until LoRa is added | Both chip selects low; CS not initialized high | Set every CS pin HIGH in `setup()` before using SPI |
+| Garbled display | Wrong SPI mode or too high a clock | Use the library defaults |
+
+## LoRa
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| `LoRa.begin()` fails | Wiring (CS 14, RST 26, G0 25); MISO missing; no 3.3 V | Re-check @tbl-stage4 |
+| Nothing received | Different frequency, spreading factor, bandwidth or sync word | Match all settings on both kits |
+| Very short range | Missing or poorly soldered antenna | Attach and check the antenna |
+
+## Wi-Fi and MQTT
+
+| Symptom | Likely causes | What to try |
+|---|---|---|
+| Never connects to Wi-Fi | 5 GHz-only network; WPA2-Enterprise; captive portal; typo | Use a 2.4 GHz WPA2-Personal network (@sec-app-b) |
+| TLS connection fails | Wrong CA certificate; clock not set; wrong port | Set time with NTP; check the CA; use 8883 |
+| MQTT connects then drops repeatedly | Two clients with the same client ID; `mqtt.loop()` not called | Unique IDs; call `loop()` every pass |
+| Messages not received | Topic typo; subscribed before connecting; payload larger than the buffer | Watch with a desktop client subscribed to `#`; `setBufferSize()` |
+| Works on the bench, fails overnight | Memory leak; no reconnection logic; watchdog | Log free heap and reset reasons (@sec-ch21) |
+
+## When you are stuck
+
+1. Write down exactly what you expected and what happened.
+2. Reduce the problem to the smallest program that shows it.
+3. Swap one component with a known-good one (another team's sensor, another cable).
+4. Ask for help with the evidence from steps 1–3: the error message, the minimal program, a photo of the wiring.

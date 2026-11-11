@@ -1,5 +1,84 @@
-# Lab 4: BLE Step Counter {#sec-lab-l4}
+# Lab 4: BLE Step Counter {#sec-lab-l4 .unnumbered}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Lab 4 handout.
+::: {.callout-note title="Lab Companion" appearance="simple"}
+Pin numbers, libraries and settings reflect the current kit. If your term's handout differs, **it wins**.
 :::
+
+## Goals
+
+- Turn raw accelerometer data into a meaningful event: a **step**.
+- Expose the result over **Bluetooth Low Energy** using GATT services and characteristics (@sec-ch10).
+- Evaluate a detector's accuracy with real walking data.
+
+Uses: the MPU-6050 (Stage 2) and the OLED (Stage 1). You also need a phone with a BLE explorer app, such as nRF Connect.
+
+## Part 1: detecting steps
+
+When you walk with the kit in your hand or pocket, each step produces a peak in the **magnitude** of the acceleration:
+
+$$
+|a| = \sqrt{a_x^2 + a_y^2 + a_z^2}
+$$
+
+Using the magnitude makes the detector independent of how the kit is oriented. At rest, $|a| \approx 1$ g.
+
+1. Configure the MPU-6050 for a **±4 g** range (register `0x1C`, `ACCEL_CONFIG`), where the sensitivity is **8 192 counts per g**. Sample at a steady rate, such as 50 Hz, using `millis()`.
+2. **Smooth** the magnitude with a short moving average or an exponential moving average (@sec-ch06).
+3. **Detect peaks**: count a step when the smoothed magnitude rises above an upper threshold and then falls below a lower threshold (hysteresis), and ignore new peaks for a short **refractory period** (around 250–300 ms) after each step, since people do not take more than three or four steps per second.
+4. Show the step count on the OLED.
+
+```cpp
+// Sketch of a peak detector with hysteresis and a refractory period
+constexpr float HIGH_G = 1.20f, LOW_G = 1.05f;      // starting values: tune them
+constexpr uint32_t REFRACTORY_MS = 300;
+
+uint32_t steps = 0;
+
+void onSample(float magSmoothed) {
+  static bool above = false;
+  static uint32_t lastStep = 0;
+  uint32_t now = millis();
+  if (!above && magSmoothed > HIGH_G && now - lastStep > REFRACTORY_MS) {
+    above = true;
+    steps++;
+    lastStep = now;
+  } else if (above && magSmoothed < LOW_G) {
+    above = false;
+  }
+}
+```
+
+The thresholds above are starting points. **Tune them with data**: print the smoothed magnitude over the serial port while walking, plot it, and choose thresholds that separate steps from noise.
+
+## Part 2: publishing over BLE
+
+1. Create a BLE peripheral named after your team (for example `IoT-Team-07`) with a custom **Step Counter service**.
+2. Add a **step-count characteristic** (read and notify) that sends the count as a 32-bit unsigned integer, and notify connected clients whenever the count changes.
+3. Add a **reset characteristic** (write): writing `1` resets the count to zero.
+4. Connect with the phone app, enable notifications, and watch the count update as you walk.
+
+The BLE stack uses a lot of flash. If the build reports that the program is too large, select a larger application partition in `platformio.ini`:
+
+```ini
+board_build.partitions = huge_app.csv
+```
+
+## Part 3: evaluating accuracy
+
+1. Walk exactly **100 steps** (have a teammate count) at a normal pace, three times. Record the counts.
+2. Repeat walking slowly, walking quickly and climbing stairs.
+3. Shake the kit by hand for 10 seconds without walking. How many false steps are counted?
+4. Report the **error** for each condition as $(\text{counted} - \text{actual}) / \text{actual}$.
+
+## What to show and submit
+
+- A live demonstration: walk 20 steps while the count updates on both the OLED and the phone, then reset it from the phone.
+- Your code, your tuned thresholds and how you chose them, and your accuracy table.
+
+## Analysis questions
+
+1. Why does the detector use the magnitude of acceleration rather than one axis?
+2. What do the hysteresis and the refractory period each prevent?
+3. Where was your detector least accurate, and why?
+4. How would you reduce the energy this device uses, if it had to run on a coin cell for a month? Consider sampling rate, BLE advertising and connection intervals, and the sensor's own features.
+5. How could you replace the hand-tuned thresholds with a learned model (@sec-ch18)?

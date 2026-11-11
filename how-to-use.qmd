@@ -15,8 +15,8 @@ Most chapters include a **Try it on your kit** box. These exercises assume the I
 | Servo motor | Actuator on its own 5 V rail | PWM | @sec-ch07 |
 | RFM95W (SX1276) | LoRa radio | SPI | @sec-ch10 |
 
-The kit is built in stages, so that each part is wired just before the chapter that first needs it. The full build is described in @sec-lab-l1, and the complete pin map is in @sec-app-a.
+The kit is built in stages, so that each part is wired just before the chapter that first needs it. The full build is described in [Lab 1](/part7-lab-companion/L1-build-the-kit.qmd), and the complete pin map is in @sec-app-a.
 
 ## Safety
 
-Always unplug the USB cable before changing any wiring. Never connect the servo's 5 V rail to the 3.3 V rail. Read @sec-lab-l0 before you solder.
+Always unplug the USB cable before changing any wiring. Never connect the servo's 5 V rail to the 3.3 V rail. Read [Lab 0](/part7-lab-companion/L0-bench-safety-soldering.qmd) before you solder.

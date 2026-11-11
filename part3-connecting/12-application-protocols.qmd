@@ -238,7 +238,7 @@ The protocol moves bytes; the **payload format** gives them structure:
 : Comparing the three main IoT application protocols. {#tbl-app-protocols}
 
 ::: {.callout-tip title="Try it on your kit: MQTT command center"}
-This exercise corresponds to the MQTT lecture activity and to @sec-lab-l5.
+This exercise corresponds to the MQTT lecture activity and to [Lab 5](/part7-lab-companion/L5-cloud-communication.qmd).
 
 1. Connect the kit to the course broker. Publish the potentiometer reading every 2 s and subscribe to a command topic that controls the LEDs and the buzzer.
 2. Use a desktop MQTT client (such as MQTT Explorer) to watch all kits with a wildcard subscription and to send commands to yours.
