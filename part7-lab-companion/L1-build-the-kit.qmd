@@ -1,5 +1,124 @@
 # Lab 1: Build the Kit in Stages {#sec-lab-l1}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Lab 1 handout.
+::: {.callout-note title="Lab Companion" appearance="simple"}
+Pin numbers and parts reflect the current kit. If your term's handout or `iot_pins.h` differs, **they win**.
 :::
+
+## Goals
+
+- Assemble the IoT@UCI team kit: two breadboards, the ESP32 and Stage 1 components.
+- Learn to wire carefully and verify each stage before moving on.
+- Understand why the kit is built in stages, just before each part is needed.
+
+Kit assembly is part of the course: you will cut and route wires, solder headers (@sec-lab-l0), place parts and test the board yourselves.
+
+## The layout
+
+The kit uses **two 830-point breadboards** side by side along their long edges, with the **ESP32 DevKit V1** at the bottom end, bridging the seam so that each row of pins lands on a different board.
+
+- **Left board**: LEDs, buttons, potentiometer and buzzer; at the top, the servo and its 470 µF capacitor on a short, separate **5 V rail**.
+- **Right board**: from top to bottom, the ATECC608A, the OLED, the MPU-6050 and the BMP280.
+- A holder at the top carries the servo and, in some kits, the LoRa radio and its antenna; otherwise the radio sits on the right board.
+
+Run the ESP32's **3V3** and **GND** pins to the power rails of both boards. Keep wires short, flat and color-coded: red for 3.3 V, black for ground, a different color for each signal type.
+
+::: {.callout-warning}
+The servo's **5 V rail** (fed from the ESP32's VIN pin) must **never** be connected to the 3.3 V rails. The ESP32's pins are not 5 V tolerant.
+:::
+
+## The stages
+
+### Stage 1: basic I/O and the display (this lab)
+
+| Part | Connection | Notes |
+|---|---|---|
+| Red LED (LED 1) | GPIO 2 → 220 Ω → LED → GND | Longer leg (anode) toward the resistor |
+| Yellow LED (LED 2) | GPIO 4 → 220 Ω → LED → GND | |
+| Green LED (LED 3) | GPIO 15 → 220 Ω → LED → GND | |
+| Button 1 | GPIO 32 → button → GND | `INPUT_PULLUP`; reads LOW when pressed |
+| Button 2 | GPIO 33 → button → GND | `INPUT_PULLUP` |
+| Potentiometer | Outer legs to 3V3 and GND; wiper → GPIO 34 | GPIO 34 is input-only (ADC1) |
+| Passive buzzer | GPIO 27 → buzzer + ; buzzer − → GND | |
+| OLED (SPI) | GND→GND, VDD→3V3, SCK→GPIO 18, SDA→GPIO 23, RES→GPIO 17, DC→GPIO 16, CS→GPIO 5 | "SDA" on this module is **SPI data** (COPI), not I²C |
+
+: Stage 1 wiring. {#tbl-stage1}
+
+Solder the headers on all breakout boards in this lab, even those you will wire later, so later stages only need wiring.
+
+### Stage 2: the I²C bus (before the serial-protocols activity)
+
+All three devices share **SDA = GPIO 21** and **SCL = GPIO 22**, plus 3V3 and GND.
+
+| Device | Address | Extra connections |
+|---|---|---|
+| BMP280 | 0x76 | CSB → 3V3 (selects I²C), SDO → GND (selects 0x76) |
+| MPU-6050 | 0x68 | AD0 → GND (selects 0x68); INT → GPIO 35 (optional) |
+| ATECC608A | 0x60 | — |
+
+: Stage 2 wiring. {#tbl-stage2}
+
+### Stage 3: the servo rail (before the actuators activity)
+
+| Part | Connection |
+|---|---|
+| Servo power | Red wire → 5 V rail (from VIN); brown/black → GND |
+| Servo signal | Orange/yellow → GPIO 13 |
+| Capacitor | 470 µF across the 5 V rail and GND; **observe polarity**: the stripe marks the negative lead |
+
+: Stage 3 wiring. {#tbl-stage3}
+
+### Stage 4: the LoRa radio (before the LoRa activity)
+
+| RFM95W pin | ESP32 | Notes |
+|---|---|---|
+| VIN (3.3V on bare modules) | 3V3 | |
+| GND | GND | |
+| SCK | GPIO 18 | Shared with the OLED |
+| MOSI | GPIO 23 | Shared with the OLED |
+| MISO | GPIO 19 | |
+| CS (NSS) | GPIO 14 | |
+| RST (RESET) | GPIO 26 | |
+| G0 (DIO0) | GPIO 25 | Interrupt on packet received/sent |
+
+: Stage 4 wiring. {#tbl-stage4}
+
+::: {.callout-warning}
+Solder the **antenna** to the radio before powering it. Transmitting without an antenna can damage the radio.
+:::
+
+Later labs need no new wiring.
+
+## Procedure
+
+1. **Inventory** your parts against the kit list in @sec-app-a. Report anything missing or damaged.
+2. **Solder** headers on the breakout boards (@sec-lab-l0).
+3. **Place** the breadboards and ESP32, and wire the power rails. With the USB cable connected and nothing else wired, measure 3.3 V between the rails (a TA can help with the multimeter). Unplug again.
+4. **Wire Stage 1** one part at a time, following @tbl-stage1. After each part, check the wiring against the table with a teammate.
+5. **Run the kit check**: open the provided kit-check project in PlatformIO, build, upload and open the Serial Monitor at 115200 baud. It blinks each LED, reads each button and the potentiometer, beeps the buzzer, and writes to the OLED. Fix anything that fails before moving on.
+6. **Photograph** your finished Stage 1 board from above, and label your kit with your team number.
+
+## What to show and submit
+
+- A TA checkoff of the Stage 1 kit passing the kit check.
+- A top-down photo of the board.
+- The answers to the questions below.
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| LED never lights | LED orientation; resistor in the same row as the LED; correct GPIO |
+| Button always reads pressed or never | Button orientation (try rotating it 90°); `INPUT_PULLUP` in code |
+| Potentiometer reads 0 or 4095 only | Wiper on GPIO 34; outer legs on 3V3 and GND |
+| OLED blank | All seven wires; SDA on GPIO 23 (not 21); RES and DC not swapped |
+| Upload fails | Data-capable USB cable; driver installed; hold BOOT while upload starts |
+| Board resets when the buzzer or servo runs | Loose ground; servo on 3.3 V instead of its 5 V rail; missing capacitor |
+
+See also @sec-app-c.
+
+## Questions
+
+1. Why are the buttons wired to ground with `INPUT_PULLUP`, rather than to 3.3 V?
+2. Why is the potentiometer on GPIO 34 rather than an ADC2 pin?
+3. The OLED's pin is labeled "SDA", yet it is not connected to the I²C bus. Explain.
+4. Why is the kit built in stages instead of all at once?

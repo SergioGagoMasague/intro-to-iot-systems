@@ -1,5 +1,73 @@
 # Lab 0: Bench Safety and Soldering {#sec-lab-l0}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: S01.
+::: {.callout-note title="Lab Companion" appearance="simple"}
+The Lab Companion describes the labs as run with the current version of the IoT@UCI kit. Pin numbers, libraries and procedures are updated each term. Where this text and your term's handout differ, **the handout wins**.
 :::
+
+## Goals
+
+- Work safely at an electronics bench.
+- Make reliable through-hole solder joints on header pins.
+- Recognize and fix common soldering defects.
+
+## Safety first
+
+| Hazard | Precaution |
+|---|---|
+| **Burns** (iron tips reach 300–450 °C) | Always return the iron to its stand. Never touch the tip or the metal shaft. Assume every iron is hot. |
+| **Fumes** from flux | Use the fume extractor or work in a well-ventilated area; keep your face out of the plume. |
+| **Lead** (in leaded solder) | Prefer lead-free solder. Do not eat or drink at the bench. Wash your hands afterwards. |
+| **Eye injury** from flying solder or clipped leads | Wear safety glasses. Hold leads when clipping and point them down. |
+| **Electrical** | Check the iron's cord before use. Keep liquids away. Never solder a powered circuit. |
+| **Fire** | Work on a heat-resistant mat. Turn the iron off when you leave the bench, even briefly. |
+
+Always **unplug the USB cable before changing any wiring** on the kit.
+
+## Background
+
+**Soldering** joins metal parts with a low-melting alloy (solder), making a joint that is both an electrical connection and a mechanical one. Electronics uses **soft soldering**, at roughly 180–450 °C. You will do **through-hole** soldering: component leads or header pins pass through holes in a circuit board and are soldered to the copper pads around them. (Surface-mount soldering, where parts sit on pads on the surface, needs finer technique and is not required.)
+
+### Tools and materials
+
+- **Soldering iron or station**, ideally temperature-controlled (25–40 W is typical). Around 330–370 °C suits most lead-free work on small pads.
+- **Tips**: a **conical** tip for precise work, a **chisel** tip for general use (headers and wires), **bevel** and **knife** tips for drag soldering.
+- **Solder**: lead-free (such as SAC305) or leaded (60/40, 63/37); thin (0.5–0.8 mm) wire is easiest for headers. Most solder wire has a **rosin flux core**; a **flux pen** helps when solder will not flow.
+- **Tip cleaner**: brass wool or a damp (not wet) sponge.
+- **Workholding**: helping hands or a board holder; a spare breadboard holds header pins straight.
+- **Corrections**: desoldering braid (wick) and a solder sucker.
+
+## Procedure: soldering header pins
+
+The breakout boards in the kit (the OLED, BMP280, MPU-6050, ATECC608A and LoRa radio) come with loose header pins.
+
+1. **Set up.** Heat the iron, clean the tip, and **tin** it: melt a small amount of solder onto the tip so it is shiny.
+2. **Hold the pins straight.** Push the long ends of the header into a breadboard, then place the breakout board on top, with the pins through its holes and the board level.
+3. **Tack one pin.** Touch the iron to *both* the pad and the pin for 1–2 seconds, then feed solder into the joint (not onto the iron). Remove the solder, then the iron.
+4. **Check alignment.** If the board is tilted, reheat the single joint and straighten it. This is much easier with one pin soldered than with all of them.
+5. **Solder the rest.** Heat the pad and pin together for 2–3 seconds, feed solder until it flows around the pin and covers the pad, then remove solder and iron. Move steadily; do not hold the iron on the board for long.
+6. **Inspect.** Each joint should be shiny (or slightly satin for lead-free), smooth and **cone- or volcano-shaped**, fully covering the pad.
+7. **Clean up.** Return the iron to its stand, clean and re-tin the tip, and switch off the iron when done.
+
+## Recognizing good and bad joints
+
+| Joint | Appearance | Cause | Fix |
+|---|---|---|---|
+| **Good** | Shiny, smooth, concave cone covering the pad | — | — |
+| **Cold** | Dull, grainy or lumpy; may not wet the pad | Not enough heat, or movement while cooling | Reheat with a touch of flux until it flows |
+| **Bridge** | Solder joining two adjacent pins | Too much solder | Drag the iron between pins, or use desoldering braid |
+| **Insufficient** | Pad only partly covered; gap around pin | Too little solder or heat | Add a little solder while heating |
+| **Excess** | Large ball hiding the pin | Too much solder | Remove some with braid |
+| **Lifted pad** | Copper pad detached from board | Too much heat or force | Ask a TA; may need a wire repair |
+
+After soldering, run the kit check from @sec-lab-l1 or an I²C scan (@sec-ch05). A device that does not appear often has a cold joint or a bridge on its SDA or SCL pin.
+
+## What to show
+
+- A breakout board with all header pins soldered, straight, and passing visual inspection by a TA.
+- The board working in a quick test (for example, appearing in an I²C scan).
+
+## Questions
+
+1. Why should solder be fed into the joint rather than onto the iron tip?
+2. Why tack a single pin first?
+3. A sensor appears in an I²C scan only when you press on it. What is the most likely cause, and how do you fix it?

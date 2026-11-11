@@ -8,7 +8,7 @@ book:
   author: "Sergio Gago-Masagué"
   date: last-modified
   date-format: "MMMM YYYY"
-  repo-url: https://github.com/OWNER/intro-to-iot-systems   # TODO: set once the repository exists
+  repo-url: https://github.com/SergioGagoMasague/intro-to-iot-systems
   repo-actions: [edit, issue]
   license: "CC BY 4.0"
   search: true
