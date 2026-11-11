@@ -146,7 +146,7 @@ MQTT 5, the current version, adds reason codes, message expiry, shared subscript
 
 #### MQTT on the ESP32
 
-The PubSubClient library is a simple MQTT 3.1.1 client. Connecting securely to a cloud broker such as HiveMQ Cloud looks like this:
+The PubSubClient library is a simple MQTT 3.1.1 client. Connecting securely to a cloud broker (such as an EMQX Serverless deployment) looks like this:
 
 ```cpp
 #include <WiFiClientSecure.h>

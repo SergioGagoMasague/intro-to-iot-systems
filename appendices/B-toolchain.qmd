@@ -82,7 +82,7 @@ Never commit passwords or keys.
 #pragma once
 #define WIFI_SSID      "your-network"
 #define WIFI_PASSWORD  "your-password"
-#define MQTT_HOST      "xxxxxxxx.s1.eu.hivemq.cloud"
+#define MQTT_HOST      "xxxxxxxx.ala.us-east-1.emqxsl.com"
 #define MQTT_USER      "device-user"
 #define MQTT_PASS      "device-password"
 ```

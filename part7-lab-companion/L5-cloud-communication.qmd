@@ -1,69 +1,127 @@
 # Lab 5: Cloud Communication {#sec-lab-l5 .unnumbered}
 
 ::: {.callout-note title="Lab Companion" appearance="simple"}
-Services, libraries and settings reflect the current term. If your term's handout differs, **it wins**.
+Services, libraries and settings reflect the current term. Free cloud plans change often; if your term's handout names a different broker or dashboard, **it wins**.
 :::
 
 ## Goals
 
-- Connect the kit to a cloud MQTT broker over TLS (@sec-ch12).
-- Design a topic hierarchy and message formats for telemetry, status and commands.
-- Build a dashboard and an alert that consume the data and send commands back.
-- Make the device survive network and broker outages.
+- Publish sensor data to a cloud MQTT broker over TLS (@sec-ch12).
+- Keep secrets out of the source code: store credentials in the board's flash and enter them over Serial.
+- Choose a publish rate on purpose and defend it.
+- Use MQTT's **Last Will** so that the broker announces when the device disappears.
+- Build a dashboard and an offline alert in Node-RED.
 
-Uses: the whole kit, a laptop, and a free **HiveMQ Cloud** (serverless) cluster per team. The dashboard runs in **Node-RED** on a team laptop.
+```text
+BMP280 + knob → ESP32 ──(Wi-Fi, TLS, MQTT, port 8883)──→ cloud broker (EMQX Serverless)
+                                                              │
+                         Node-RED on a team laptop  ←─────────┘
+                         dashboard + offline alert
+```
 
-This lab is also a natural point to build your project's **vertical slice** (@sec-ch20).
+This pipeline is the backbone of the team project: the reliability test (@sec-ch21) reuses the same broker, status topic and dashboard, and the lab is a natural point to build your project's **vertical slice** (@sec-ch20).
 
-## Part 1: the broker
+## What you need
 
-1. Create a free HiveMQ Cloud serverless cluster. Note its host name; the TLS port is **8883**.
-2. Create **separate credentials** for the kit and for the dashboard.
-3. Test the broker from your laptop with a desktop MQTT client: subscribe to `#`, publish a test message, and see it arrive.
+- The kit as wired for [Lab 3](/part7-lab-companion/L3-serial-communication.qmd); nothing new. The lab uses the BMP280 (I²C, 0x76), the potentiometer (GPIO 34) and the OLED.
+- A laptop with VS Code and PlatformIO, and Node.js 18 or newer (or Docker) for Node-RED.
+- A 2.4 GHz WPA2-Personal network. Enterprise networks such as eduroam need a username and certificate that a plain `WiFi.begin(ssid, password)` cannot provide, and campus networks may block port 8883. A phone hotspot (on an iPhone, turn on *Maximize Compatibility*) or the lab's travel router works (@sec-app-b).
+- The term's starter project, which compiles before you start.
 
-## Part 2: the device
+| Topic (replace `T07` with your team ID) | Payload | Published by | Retained |
+|---|---|---|---|
+| `iot/T07/telemetry` | JSON, every `PERIOD_MS` | the device | no |
+| `iot/T07/status` | `online` | the device, right after it connects | yes |
+| `iot/T07/status` | `offline` | **the broker**, as the device's Last Will | yes |
 
-Design your topics before writing code, for example:
+: Lab 5 topics.
 
-| Topic | Direction | Payload | QoS | Retained |
-|---|---|---|---|---|
-| `iot/team-07/telemetry` | device → cloud | `{"seq":42,"t":21.4,"p":1009.8,"pot":1830}` | 0 | no |
-| `iot/team-07/status` | device → cloud | `online` / `offline` (last will) | 1 | yes |
-| `iot/team-07/cmd` | cloud → device | `{"led":1,"on":true}`, `{"beep":200}` | 1 | no |
+## Part A: the cloud side
 
-Then implement:
+### A1. Create a broker
 
-1. Wi-Fi connection with automatic reconnection.
-2. MQTT over TLS with your device credentials, a **last will** on the status topic, and a retained `online` message after connecting (see the example in @sec-ch12).
-3. Telemetry every 5–10 seconds, with a **sequence number**.
-4. A command handler that parses JSON (ArduinoJson works well), validates the fields, and acts on the LEDs and buzzer. Make it **idempotent** (@sec-ch12): a duplicated command must not cause harm.
-5. Non-blocking reconnection with **exponential back-off**, so that sensing and the OLED keep working while the network or broker is down.
+In Fall 2026 the lab uses **EMQX Serverless**, which has a free plan with no credit card. (The free serverless plan used earlier, HiveMQ Cloud, was closed to new clusters in November 2026; existing clusters could be kept until the end of the year. Any broker that offers MQTT over TLS with username and password authentication works the same way.)
 
-In this lab the starter code may skip certificate verification with `setInsecure()` so that you can focus on MQTT. **That is not acceptable in a product**: anyone on the network path could impersonate the broker. You will fix it in [Lab 6](/part7-lab-companion/L6-harden-your-device.qmd).
+1. Sign up at the EMQX Cloud site (one account per team) and create a **Serverless** deployment on the free plan. Check the current free-tier limits on the provider's site; they are far above what this lab needs.
+2. From the deployment's overview page, copy its **address** (the MQTT host, of the form `xxxxxxxx.ala.us-east-1.emqxsl.com`). The port for MQTT over TLS is **8883**.
+3. Under **Access Control › Authentication**, add a credential: a username and a long password. Better: create **two**, one for the device and one for Node-RED, so either can be revoked without breaking the other. Keep them in a password manager, never in a file in your repository.
+4. Optional check: connect a desktop client such as MQTTX to the address on port 8883 with TLS on, subscribe to `iot/#`, and leave it open.
 
-## Part 3: the dashboard and an alert
+### A2. Node-RED and the dashboard
 
-1. In Node-RED, add an MQTT-in node subscribed to your telemetry topic (with the dashboard's credentials), parse the JSON, and show temperature and potentiometer value as gauges and a chart.
-2. Show the device status (online or offline).
-3. Add a button and a switch that publish commands to the kit.
-4. Add an **alert**: when the temperature crosses a threshold you choose (warm the BMP280 with your finger), show a notification on the dashboard and send a buzzer command to the kit. Use hysteresis so the alert does not chatter.
+Install Node-RED with npm (`npm install -g --unsafe-perm node-red`, then `node-red`) or Docker (`docker run -it -p 1880:1880 -v node_red_data:/data nodered/node-red`), open `http://localhost:1880`, and install **`@flowfuse/node-red-dashboard`** (Dashboard 2.0) from *Manage palette*.
 
-## Part 4: failure testing
+Import the starter flow, replace the team ID, and edit the MQTT broker node: your EMQX address, port 8883, **Use TLS** ticked with broker verification left on, and the Node-RED credential on the *Security* tab. Deploy; each MQTT-in node should show **connected**.
 
-1. Turn off Wi-Fi on your access point for one minute. What do the kit, the broker and the dashboard each show? Does the kit recover on its own?
-2. Unplug the kit. How long until the dashboard shows it offline? What determines that delay?
-3. Count lost telemetry messages over a 15-minute run using the sequence numbers.
+Node-RED stores the password separately in `flows_cred.json` in its own folder, so an exported flow does not contain it. Never commit that file.
+
+## Part B: credentials in flash, not in code
+
+A `secrets.h` file ends up in Git, in zip files and on course sites. In this lab the board instead asks for its credentials once over Serial and keeps them in **NVS** (non-volatile storage, a key-value area of the flash) with the `Preferences` library. The source code contains no secrets at all.
+
+1. `loadCredentials()`: open the namespace read-only, read the Wi-Fi SSID and password, MQTT host, username and password with `getString()`, and close it. Return `true` only if the SSID, host and username are present.
+2. `saveCredentials()`: open it read-write and `putString()` the same keys.
+3. On first boot the board prompts for each value and echoes passwords only as `********`. After a reset it prints *Credentials loaded from NVS* and asks nothing; the values survive power cycles and new uploads.
+4. Type `PROVISION` within 3 seconds of a reset to change the values, or `FORGET` to erase them. **Erase them before the kit is returned**: kits are reused.
+
+## Part C: TLS, Last Will, back-off and telemetry
+
+1. **TLS client.** Configure `WiFiClientSecure` and PubSubClient: server and port 8883, a keepalive of about 15 s, a short socket timeout and a buffer of about 512 bytes. In this lab the client may call `setInsecure()`. Put a comment above it, in your own words, saying that **the connection is encrypted but the broker is not verified**, so a fake hotspot could impersonate the broker and collect the MQTT password. [Lab 6](/part7-lab-companion/L6-harden-your-device.qmd) fixes this; do not fix it here.
+2. **Connect with a Last Will.** Use the seven-argument `connect()`: client ID, username, password, will topic (`iot/T07/status`), will QoS 1, will retained `true`, will message `offline`. On success, publish `online` to the same topic, **retained**, so that a dashboard started later still sees the current state.
+3. **Reconnect with back-off.** `loop()` calls `maintainWiFi()`, `maintainMqtt()` and `mqtt.loop()` on every pass, and never uses `delay()`. In `maintainMqtt()`, retry only when the back-off interval has passed; on failure, print the client's state, double the interval up to 30 s and add a little random **jitter**, so that 40 boards do not all retry at the same instant after a router reboot.
+4. **Telemetry at a rate you can defend.** Set `PERIOD_MS` and justify it in a comment: how fast does room temperature change, how many messages per day is `86400000 / PERIOD_MS`, and what does that add up to over a 72-hour test? Then publish, not retained:
+
+```json
+{"seq":42,"temp_c":23.41,"press_hpa":1012.60,"pot_pct":37,"rssi":-61,"uptime_s":420}
+```
+
+`seq` increases by one per message, so a gap reveals a lost message.
+
+::: {.callout-tip title="Why does offline take about 20 seconds?"}
+The broker cannot see a pulled cable. It waits for a message or a keepalive ping and gives up after **1.5 × keepalive** of silence (about 22 s with a 15 s keepalive), then publishes the Will. A shorter keepalive detects failures faster but costs more pings, and therefore more traffic and energy. The telemetry rate does not change detection time; the keepalive does. A *clean* `disconnect()` tells the broker the device left on purpose, so no Will is sent; publish `offline` yourself before a planned disconnect.
+:::
+
+## Part D: dashboard and alert
+
+1. **Dashboard.** Feed the parsed telemetry to a **gauge** and a **chart** of the temperature, plus at least one more value (pressure or the knob).
+2. **Alert.** Complete the *offline detector* function so that it outputs an alert message (with the time) only when the status **changes** to `offline`, remembering the previous state in the node's context. It drives a dashboard notification.
+3. **Test.** Unplug the board: within about 25 s the status changes to offline and the notification appears. Plug it back in and the status returns to online.
+
+## Part E: project analysis
+
+**Where is the weakest point in this pipeline, and what would it cost to fix?** Follow the data from the sensor to the alert on the screen: sensor, ESP32, Wi-Fi, the local network, TLS, the free cloud broker, the laptop running Node-RED, the browser. Pick the link most likely to fail first or easiest to attack, give your evidence, and estimate the cost of fixing it in money, time, power and complexity. Candidates include `setInsecure()`, a laptop that must stay awake, one shared password, a free tier with no service-level agreement, flaky Wi-Fi and QoS 0 telemetry.
 
 ## What to show and submit
 
-- A live demonstration: telemetry on the dashboard, a dashboard command changing the kit, the alert, and recovery after a Wi-Fi outage.
-- Your code, your topic table, and an export of your Node-RED flow (with credentials removed).
-- Answers to the analysis questions.
+- A live demonstration: data reaching the broker, the dashboard updating, the Last Will marking the device offline when unplugged, and the alert. Any team member should be able to explain the NVS, Last Will, back-off and `mqtt.loop()` code.
+- Your source code with the `PERIOD_MS` justification, and the written analysis. **No passwords anywhere**: search your repository (`git grep -i` part of the password) before pushing. If a password ever reaches Git, change it in the broker console; deleting the commit is not enough.
+
+## Troubleshooting
+
+| PubSubClient state | Meaning | Usual cause |
+|---|---|---|
+| −4 | Connection timeout | Weak Wi-Fi, or the network drops port 8883; try a hotspot |
+| −3 | Connection lost | `loop()` blocked (a `delay()`), or Wi-Fi dropped |
+| −2 | Connect failed | Wrong host (the console URL instead of the deployment address), wrong port, or port 8883 blocked |
+| 3 | Server unavailable | Deployment stopped; check the console |
+| 4 | Bad credentials | Wrong username or password; `PROVISION` again (case-sensitive) |
+| 5 | Not authorized | Credential lacks permission for `iot/#`; check the broker's authorization rules |
+
+: Common MQTT connection states.
+
+- **Status flips online/offline every few seconds:** two boards share a client ID, or `loop()` is blocked longer than the keepalive.
+- **Dashboard shows offline right after deploying:** that is the retained Will from the last unplug; power the board.
+- **Alert fires on every message:** the detector does not compare with the previous state.
+- **Board resets after connecting:** brown-out on a weak USB port; try another cable or port.
+
+## Stretch goal
+
+Add a **stale-data watchdog** in Node-RED: if no telemetry arrives for 3 × `PERIOD_MS`, show a warning even while the status says online. A frozen sensor loop still looks online to the broker.
 
 ## Analysis questions
 
 1. Why does the device connect out to the broker instead of the dashboard connecting to the device?
-2. Which QoS did you choose for each topic, and why?
-3. What does the last-will message give you that a heartbeat alone does not?
+2. Which QoS and retain settings did you use for each topic, and why?
+3. What does the Last Will give you that a heartbeat alone does not?
 4. What is the risk of `setInsecure()`? Describe an attack it allows.
-5. How would your topic design change for 1 000 devices owned by different customers?
+5. How would your topic design change for 1000 devices owned by different customers?
