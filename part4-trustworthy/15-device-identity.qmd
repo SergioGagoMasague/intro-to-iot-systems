@@ -1,5 +1,207 @@
 # Device Identity and Secure Elements {#sec-ch15}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C14 (new material).
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Distinguish identifiers from credentials, and explain why every device needs a unique credential.
+2. Explain public-key infrastructure, X.509 certificates and mutual TLS in the context of IoT devices.
+3. Describe how a device proves its identity without revealing its secret.
+4. Explain what a secure element is, and use the kit's ATECC608A to identify the device and generate random numbers.
+5. Describe how devices are provisioned with identities during manufacturing and onboarding.
+6. Compare hardware roots of trust: secure elements, eFuses, TPMs and trusted execution environments.
 :::
+
+## Why it matters
+
+Almost every security property in @sec-ch14 rests on one question: **is this really the device it claims to be?** A server that cannot tell a genuine thermostat from an impostor cannot trust its readings or decide who may send it commands. A device that cannot tell the genuine update server from an attacker will install whatever it is given.
+
+Identity on the web is mostly about people, who can type passwords and answer second-factor prompts. Devices cannot. Their identity must be built in, unique to each unit, and protected even from someone who holds the device in their hands. This chapter explains how that is done, using the secure element in your kit as an example.
+
+## Concepts
+
+### Identifiers and credentials
+
+Two things are easily confused:
+
+- An **identifier** names a device: a serial number, a MAC address, a UUID, a client ID. Identifiers are not secret. Anyone can read a MAC address from the air.
+- A **credential** proves the device is entitled to that name: a password, a shared key, or a private key with a certificate. Credentials must be secret, or at least their private part must be.
+
+A device that authenticates with only its identifier ("I am kit-07") is not authenticated at all.
+
+Credentials must also be **unique per device**. If every unit shares the same key or password, compromising one device, for example by reading its flash memory, compromises the whole fleet. The Mirai botnet (@sec-ch09) and many later attacks exploited exactly this.
+
+### Shared secrets and public keys
+
+There are two broad ways for a device to prove its identity:
+
+- **Shared secrets.** The device and the server both know a key, and the device proves it knows the key, for example by computing an HMAC over a random challenge from the server. This is cheap, but the server must store every device's secret, and anything that holds the secret can impersonate the device.
+- **Public-key cryptography.** The device holds a **private key** that never leaves it, and the server knows the matching **public key**. The device proves its identity by **signing** a challenge; anyone with the public key can verify the signature, but only the private key could have produced it. The server stores nothing secret about the device.
+
+Elliptic-curve cryptography (ECC) makes public-key operations practical on small devices: a 256-bit ECC key (such as on the NIST P-256 curve) offers security comparable to a 3 072-bit RSA key, with much smaller keys and signatures and much less computation.
+
+### Certificates and PKI
+
+How does a server know which public key belongs to which device, without a list of every device in advance? With a **certificate**: a signed statement, in the standard **X.509** format, that binds a public key to an identity ("this public key belongs to device kit-07, made by IoT@UCI"). The statement is signed by a **certificate authority** (CA).
+
+A **public-key infrastructure** (PKI) is the system of CAs, certificates and policies that makes this work. It forms a **chain of trust**:
+
+1. A **root CA** certificate, whose key is kept offline and highly protected, is trusted in advance by the server.
+2. The root signs an **intermediate CA** certificate, used day to day, for example at the factory.
+3. The intermediate signs each **device certificate**.
+
+To authenticate, the device presents its certificate and the intermediate certificate, and signs a challenge. The server checks each signature in the chain up to the root it trusts, then checks the device's signature with the public key in the device certificate.
+
+The same structure protects the other direction. When your kit connects to a broker with TLS, it verifies the **server's** certificate chain against a root CA certificate stored in the firmware (`setCACert()` in @sec-ch12). When **both** sides present certificates, the connection uses **mutual TLS** (mTLS), the standard way for devices to authenticate to cloud IoT platforms such as AWS IoT Core and Azure IoT Hub.
+
+Certificates also carry **validity periods**, and CAs can **revoke** compromised certificates. Devices that run for years need a plan for both, including a way to check the current time securely.
+
+### Protecting the private key
+
+A private key stored in ordinary flash memory can be read by anyone who can attach a programmer to the chip or extract the firmware image. Protecting it is the job of a **hardware root of trust**: hardware that stores keys and performs cryptographic operations so that the key itself is never exposed, even to the device's own software.
+
+#### Secure elements
+
+A **secure element** is a small, dedicated chip designed to store keys and use them without revealing them, and to resist physical attacks: probing, glitching the power supply, and measuring power consumption or timing to infer secrets.
+
+The kit's **Microchip ATECC608A** is a typical example [@microchip_atecc608a]. Connected to the I²C bus at address 0x60 (often listed as 0xC0 in its 8-bit form), it provides:
+
+- **16 key slots** for private keys, public keys, certificates and other data, each with configurable access rules;
+- **ECC P-256** key generation inside the chip, **ECDSA** signing and verification, and **ECDH** key agreement;
+- **SHA-256** and **HMAC**;
+- a **hardware random number generator**;
+- **monotonic counters**, useful for replay protection and limiting key use;
+- a unique **72-bit serial number**.
+
+A private key generated inside the ATECC608A **never leaves the chip**. Software asks the chip to sign a digest, and the chip returns only the signature. Even if an attacker dumps the ESP32's entire flash, the device's identity remains safe.
+
+#### Configuration and locking
+
+A new ATECC608A has two zones that must be **locked** before it can be used for real cryptography:
+
+- the **configuration zone**, which defines what each slot may hold and how it may be used;
+- the **data zone**, which holds keys and certificates.
+
+**Locking is permanent.** Once the configuration zone is locked, it can never be changed. Until it is locked, some functions are restricted: for example, the random number generator returns a fixed test pattern rather than random data. In the course, kits are provisioned and locked by the teaching staff; do not run locking examples on your own kit.
+
+#### Using the secure element
+
+Libraries such as SparkFun's ATECCX08A library or Microchip's CryptoAuthLib wrap the chip's command set. Reading the chip's identity and generating random numbers on a provisioned kit looks like this:
+
+```cpp
+#include <Wire.h>
+#include <SparkFun_ATECCX08a_Arduino_Library.h>
+
+ATECCX08A atecc;
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(21, 22);
+  if (!atecc.begin(0x60)) {                      // 7-bit address
+    Serial.println("ATECC608A not found");
+    while (true) delay(1000);
+  }
+  atecc.readConfigZone(false);                   // reads serial number and lock bits
+  Serial.print("Serial: ");
+  for (int i = 0; i < 9; i++) Serial.printf("%02X", atecc.serialNumber[i]);
+  Serial.printf("\nConfig locked: %s  Data locked: %s\n",
+                atecc.configLockStatus ? "yes" : "no",
+                atecc.dataOTPLockStatus ? "yes" : "no");
+
+  if (atecc.configLockStatus) {
+    Serial.printf("Random: %lu\n", atecc.getRandomLong());   // true hardware randomness
+  }
+}
+
+void loop() {}
+```
+
+With a key in slot 0, signing a 32-byte message digest is a single call (`atecc.createSignature(digest, 0)` in the SparkFun library), and the matching public key can be read out and placed in a certificate.
+
+#### Other roots of trust
+
+| Mechanism | What it is | Examples |
+|---|---|---|
+| Secure element | Separate tamper-resistant chip with its own key storage and crypto | ATECC608A, NXP SE050, Infineon OPTIGA Trust M |
+| eFuses | One-time-programmable bits inside the MCU, readable only by hardware | ESP32 keys for secure boot and flash encryption (@sec-ch16) |
+| Digital signature peripheral | MCU block that signs with a key the CPU cannot read | ESP32-S2, S3, C3, C6 (not the original ESP32) |
+| Trusted Platform Module | Standardized secure chip, common in PCs and gateways | TPM 2.0 |
+| Trusted execution environment | Isolated region of the main processor | Arm TrustZone-M, ESP-TEE |
+| eSIM / iSIM | SIM functions, including identity, built into the module or chip | Cellular IoT devices |
+
+: Hardware roots of trust. {#tbl-roots-of-trust}
+
+Certification schemes such as **PSA Certified** and **SESIP** evaluate how well a chip or device protects its roots of trust.
+
+### Provisioning: giving a device its identity
+
+**Provisioning** is the process of giving each device its identity and credentials. It usually happens in two phases.
+
+**At manufacturing**, each device:
+
+1. generates a key pair inside its secure element (or has one injected in a secure facility);
+2. has its public key signed by the manufacturer's intermediate CA, producing a unique device certificate;
+3. stores the certificate in the secure element or flash;
+4. is registered (or its certificate chain is registered) with the cloud service.
+
+Secure-element vendors offer **pre-provisioned** parts, with keys and certificates loaded in the factory, so that even small companies can ship unique device identities without building their own secure facility.
+
+**At onboarding** (or **commissioning**), the owner claims the device and connects it to their network and account. Examples include scanning a QR code with a phone app, as in Matter, or **just-in-time registration**, where a cloud platform automatically accepts any device whose certificate chains to a registered CA. Matter combines both phases: every certified device carries a **device attestation certificate** proving it is a genuine, certified product, and commissioning adds operational credentials for the owner's network.
+
+### Identity beyond authentication
+
+A strong device identity enables much more than logging in:
+
+- **authorization** policies that refer to specific devices or groups;
+- **audit logs** that tie every action to a device, supporting non-repudiation;
+- **secure updates**, where devices verify the identity of the update server and the signer of the firmware (@sec-ch16);
+- **revocation**: disabling a stolen or compromised device without affecting the rest of the fleet;
+- **ownership transfer**: re-provisioning a device when it is sold, without letting the previous owner retain access.
+
+::: {.callout-tip title="Try it on your kit: who are you?"}
+1. Read and print your kit's ATECC608A serial number and lock status. Compare serial numbers with another team: are they really unique?
+2. Compare the ESP32's MAC address (`WiFi.macAddress()`) with the secure element's serial number. Which one is a credential? Which could an attacker copy?
+3. If your kit is provisioned, generate 10 random numbers with the secure element and 10 with `esp_random()`. Why might a product prefer one over the other?
+4. Design a challenge–response protocol in which the course server verifies that a message really came from your kit's secure element. Which parts must be secret, and where does each live?
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Shared secrets vs. certificates | Shared secrets are simple and cheap; certificates scale, keep servers free of secrets and support revocation |
+| Software keys vs. secure element | A secure element costs about a dollar per unit and a little complexity, and protects keys against physical extraction |
+| Own PKI vs. pre-provisioned parts | Running a CA requires secure processes; pre-provisioned parts outsource them |
+| Long-lived vs. short-lived certificates | Long-lived certificates avoid renewal in the field; short-lived ones limit damage from compromise |
+
+## Common pitfalls
+
+- **Using a MAC address or serial number as a credential.** Identifiers are public.
+- **The same key in every device.** One extraction compromises the fleet.
+- **Private keys in firmware images** or source repositories.
+- **Locking a secure element with the wrong configuration.** It is irreversible.
+- **Never planning for revocation or renewal.** Certificates expire, and some devices will be compromised.
+- **Accepting any certificate.** Disabling verification makes TLS useless against impersonation.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Build a mini-PKI.** With OpenSSL on your laptop, create a root CA, an intermediate CA and a device certificate for your kit's public key. Configure a local Mosquitto broker to require client certificates, and connect the kit with mutual TLS. Then revoke the device certificate and show that the broker rejects it.
+
+**Side channels.** Software ECC implementations can leak private keys through timing or power consumption. Read about the "Minerva" and "TPM-Fail" timing attacks, and explain which properties of a secure element are designed to resist them.
+
+**Ownership transfer.** Design the process for reselling a used smart lock: what the seller does, what the buyer does, what the cloud service does, and how you guarantee that the seller can no longer open the door.
+:::
+
+## Check your understanding
+
+1. What is the difference between an identifier and a credential? Give an example of each from your kit.
+2. Why must credentials be unique per device?
+3. What does a certificate bind together, and who vouches for the binding?
+4. Describe the chain of trust from a root CA to a device certificate.
+5. What is mutual TLS, and why is it common in IoT cloud platforms?
+6. How can the ATECC608A sign a message without ever revealing its private key to the ESP32?
+7. Why is locking the ATECC608A's configuration zone a decision to make carefully?
+8. What happens at manufacturing and at onboarding when a device is provisioned?
+
+## Further reading
+
+- Microchip, *ATECC608A CryptoAuthentication Device Summary Datasheet* [@microchip_atecc608a].
+- NIST IR 8259, *Foundational Cybersecurity Activities for IoT Device Manufacturers* [@nistir8259], including device identity as a core capability.

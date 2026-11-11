@@ -1,5 +1,251 @@
 # Security and Privacy {#sec-ch14}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C14_01–04 · Activity 8.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Explain why security and privacy failures in IoT have physical and personal consequences.
+2. Describe the challenges that make IoT harder to secure than traditional IT.
+3. State the security requirements of an IoT system, from confidentiality to forward and backward secrecy.
+4. Threat-model a device with STRIDE.
+5. Describe attacks and countermeasures in the cloud, fog and sensing domains.
+6. Use the basic cryptographic building blocks (hashes, MACs, symmetric encryption, signatures, TLS) correctly, and protect messages against tampering and replay.
 :::
+
+## Why it matters
+
+When a web service is breached, data leaks. When an IoT system is breached, the damage can be physical. Researchers have shown that cars can be controlled remotely through their entertainment systems, and that implanted medical devices can be reprogrammed wirelessly. Doctors disabled the wireless features of a pacemaker implanted in a former US vice president because of exactly that concern. Botnets built from insecure cameras and routers have taken down major internet services (@sec-ch09).
+
+IoT also raises privacy concerns that traditional computing rarely did. Smart-home sensors, wearables and cameras record intimate details of daily life: when people are home, when they sleep, how they move, even their heartbeats. Facial, speech and activity recognition amplify what raw sensor data can reveal, and **combining metadata** from several devices can expose far more than any one of them. UCI's TIPPERS project, an IoT testbed for privacy-preserving smart buildings, studied exactly these risks.
+
+Security and privacy are not features to add at the end. They shape every layer of the design.
+
+## Concepts
+
+### Why IoT is hard to secure
+
+| Challenge | Why it matters |
+|---|---|
+| **Multiple technologies** | An IoT system chains radios, gateways, cloud services, mobile apps and virtualization, each with its own vulnerabilities. Security is set by the weakest link. |
+| **Multiple verticals** | eHealth, industry, smart homes and smart cities have very different requirements; one solution does not fit all. |
+| **Scale** | Billions of devices make centralized, manual defenses impossible. |
+| **Big data** | Each device produces streams of data that must be protected in transit and at rest. |
+| **Availability** | Many systems must run continuously, sometimes to "five nines" (99.999%, about five minutes of downtime per year). Defenses must not take the system down. |
+| **Resource limits** | Constrained devices are easy targets for denial of service, and expensive cryptography may not fit. |
+| **Remote locations** | Unattended devices can be physically tampered with. |
+| **Mobility** | Devices move between networks and owners' infrastructure. |
+| **Delay sensitivity** | Security mechanisms must not break real-time deadlines. |
+| **Long lifetimes** | Devices may stay in service for 10–20 years, far longer than many vendors support them. |
+
+: Why IoT security is difficult. {#tbl-iot-sec-challenges}
+
+### Security requirements
+
+A secure IoT system must provide:
+
+- **Confidentiality**: only the intended parties can understand exchanged messages.
+- **Integrity**: messages cannot be altered without detection.
+- **Availability**: the service keeps working. Denial-of-service attacks target this.
+- **Authentication**: every party is who it claims to be: devices, users, servers.
+- **Authorization**: every party may perform only the operations it is permitted to.
+- **Freshness**: data is current. **Replay attacks** resend an old, valid message, such as "unlock", to drive a device back into an old state.
+- **Non-repudiation**: a party cannot deny an action it performed.
+- **Forward secrecy** (in the group-membership sense): a device that leaves the network cannot understand communications exchanged after it leaves.
+- **Backward secrecy**: a device that joins cannot understand communications exchanged before it joined.
+
+### Threat modeling with STRIDE
+
+Before choosing defenses, identify what can go wrong. **Threat modeling** systematically asks how each part of a system could be attacked. Microsoft's **STRIDE** mnemonic names six threat categories, each violating one security property:
+
+| Threat | Violates | IoT example |
+|---|---|---|
+| **S**poofing | Authentication | A fake sensor reports false readings; a fake server sends commands |
+| **T**ampering | Integrity | A message changing "set 21 °C" to "set 35 °C" in transit; modified firmware |
+| **R**epudiation | Non-repudiation | A user denies sending the "unlock" command; no logs exist |
+| **I**nformation disclosure | Confidentiality | Unencrypted MQTT reveals when a house is empty |
+| **D**enial of service | Availability | Jamming the radio; flooding a device until it crashes or drains its battery |
+| **E**levation of privilege | Authorization | A guest's phone app gains administrator control of a lock |
+
+: STRIDE threats in IoT. {#tbl-stride}
+
+A simple process: draw the system's data flows (devices, gateways, brokers, cloud services, apps), mark the **trust boundaries** where data crosses from one party's control to another's, and for each element and flow ask which STRIDE threats apply. Then rank threats by likelihood and impact, and choose mitigations for the important ones.
+
+### A three-domain view of IoT security
+
+It helps to divide an IoT system into three domains, each with its own attacks:
+
+- the **cloud domain**, which performs heavy computation and storage;
+- the **fog domain** (the edge), which aggregates, preprocesses and stores data close to the devices (@sec-ch18);
+- the **sensing domain**, the smart objects themselves and their networks.
+
+#### Cloud domain
+
+Cloud IoT applications run in virtual machines (VMs) or containers that share physical servers, managed by a **hypervisor**. Sharing creates attack opportunities:
+
+| Attack | How it works | Countermeasures |
+|---|---|---|
+| Side-channel (hidden-channel) | A malicious VM placed on the same server infers a victim's secrets from shared hardware, for example by timing cache accesses | Hard isolation (dedicated caches or servers), co-residency allow-lists, cache flushing on switch |
+| VM migration attacks | Attackers flood migration requests, advertise false capacity to attract VMs, or sniff and intercept VM memory in transit | Mutual authentication of servers, signed and encrypted control messages, sequence numbers, authenticated ARP |
+| Theft of service | A VM games the scheduler to obtain more than its share of resources | Fair, precise scheduling and accounting |
+| VM escape | A software bug lets a VM break out of the hypervisor and control the host | Patching, minimal hypervisors, nested isolation layers |
+| Insider attacks | A data-center administrator accesses sensitive data | Encryption with keys the provider never sees; homomorphic encryption or secret-sharing storage for sensitive workloads |
+
+: Cloud-domain attacks. {#tbl-cloud-attacks}
+
+#### Fog domain
+
+Fog devices virtualize computing resources close to the objects, so they inherit all cloud-domain attacks, and add some of their own:
+
+- **Authentication and trust.** Fog devices may be owned by many, less well-known parties, and a mobile device may hop between them. Devices must authenticate the fog node and decide whether to trust its owner; **reputation systems** can help.
+- **Migration over the internet.** VMs that follow mobile users move between fog nodes over the public internet, not a private data-center network, so migrations must be encrypted and authenticated.
+- **Denial of service.** Lower computing capacity makes fog nodes easier to overwhelm.
+- **Privacy.** A fog node can infer the location and habits of every connected device. Even wireless signals alone can reveal people's presence, location and breathing; signal **obfuscation** can make such inference harder.
+- **Containers.** Lightweight containers share the operating system kernel as well as the hardware, which creates more opportunities for leakage and hijacking than full virtualization.
+
+#### Sensing domain
+
+The sensing domain faces attacks on its radios, its batteries and its routing:
+
+| Attack | How it works | Countermeasures |
+|---|---|---|
+| **Jamming** | A transmitter interferes with legitimate signals at the receiver, or makes senders think the channel is busy. Jammers may be constant, deceptive (mimicking real frames), reactive (only when others transmit) or random. | Frequency hopping, spread spectrum, directional antennas, jamming detection (from signal strength and corrupted-packet ratios) |
+| **Vampire attacks** | Drain batteries: *denial of sleep* (keeping devices awake, even with replayed encrypted control messages), flooding, and routing tricks such as *carousel* (looping source routes) and *stretch* (needlessly long routes) | Timestamps and freshness checks on control messages, rate limiting, path checks, disabling source routing |
+| **Selective forwarding** | A malicious relay drops some packets (or all of them: a *black hole*) | Direct links where possible, path redundancy, trusted checkpoint nodes that acknowledge |
+| **Sinkhole** | A node advertises a falsely short route to attract traffic, then reads or drops it | Intrusion detection using neighbor reports; authenticated routing |
+
+: Sensing-domain attacks. {#tbl-sensing-attacks}
+
+Physical access adds further risks: reading secrets from flash memory, attaching a debugger, or replacing firmware. @sec-ch15 and @sec-ch16 cover the hardware defenses.
+
+### Cryptographic building blocks
+
+You do not need to design cryptography, and you never should. You do need to pick the right building block for each job:
+
+| Goal | Building block | Common algorithms |
+|---|---|---|
+| Detect accidental corruption | Checksum / CRC | CRC-32 (not a security mechanism) |
+| Fingerprint data | Cryptographic hash | SHA-256 |
+| Integrity + authenticity with a shared key | Message authentication code (MAC) | HMAC-SHA-256, AES-CMAC |
+| Confidentiality with a shared key | Symmetric encryption | AES |
+| Confidentiality + integrity together | Authenticated encryption (AEAD) | AES-GCM, AES-CCM, ChaCha20-Poly1305 |
+| Agree on a key over an open channel | Key exchange | ECDH (X25519, P-256) |
+| Integrity + authenticity + non-repudiation | Digital signature | ECDSA (P-256), Ed25519 |
+| All of the above for a connection | Secure transport | TLS 1.3, DTLS 1.3 |
+
+: Cryptographic building blocks. {#tbl-crypto}
+
+Three rules prevent most mistakes:
+
+1. **Use standard, well-reviewed libraries** (mbedTLS on the ESP32) and standard protocols (TLS) rather than inventing your own.
+2. **Encryption is not integrity.** An encrypted message can still be modified in ways that change its meaning unless it is also authenticated. Use AEAD or add a MAC.
+3. **Integrity is not freshness.** A correctly signed "unlock" message can be replayed. Include a **counter**, a **timestamp** or a **nonce**, and reject messages that are old or repeated.
+
+#### Signing messages on the kit
+
+The ESP32 includes mbedTLS with hardware-accelerated SHA and AES. The following sketch attaches an HMAC and a monotonic counter to each command, so the receiver can detect both tampering and replay:
+
+```cpp
+#include <mbedtls/md.h>
+
+// Shared secret: provisioned per device, never hard-coded in a real product
+static const uint8_t KEY[32] = { /* 32 random bytes */ };
+
+String hmacHex(const String& msg) {
+  uint8_t mac[32];
+  const mbedtls_md_info_t* sha256 = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+  mbedtls_md_hmac(sha256, KEY, sizeof KEY,
+                  (const uint8_t*)msg.c_str(), msg.length(), mac);
+  char hex[65];
+  for (int i = 0; i < 32; i++) sprintf(hex + 2 * i, "%02x", mac[i]);
+  return String(hex);
+}
+
+// Sender: "counter|command|mac"
+String signCommand(uint32_t counter, const String& cmd) {
+  String body = String(counter) + "|" + cmd;
+  return body + "|" + hmacHex(body);
+}
+
+// Receiver: accept only authentic messages with a counter it has not seen
+bool verifyCommand(const String& msg, String& cmdOut) {
+  static uint32_t lastCounter = 0;              // persist this in flash in practice
+  int a = msg.indexOf('|'), b = msg.lastIndexOf('|');
+  if (a < 0 || b <= a) return false;
+  String body = msg.substring(0, b);
+  String mac  = msg.substring(b + 1);
+  if (hmacHex(body) != mac) return false;       // tampered or wrong key
+  uint32_t counter = msg.substring(0, a).toInt();
+  if (counter <= lastCounter) return false;     // replayed or out of date
+  lastCounter = counter;
+  cmdOut = msg.substring(a + 1, b);
+  return true;
+}
+```
+
+In production code, compare MACs in **constant time** (so that timing does not reveal how many characters matched), store the counter in non-volatile memory so a reboot does not reset it, and keep the key in protected storage (@sec-ch15). With a shared key, any device holding the key can also forge messages; digital signatures, where only the sender holds the private key, remove that limitation and also provide non-repudiation.
+
+### Privacy by design
+
+Security protects data from attackers; **privacy** protects people, including from the system's own operators. Practical principles include:
+
+- **Data minimization**: collect only what the application needs, at the coarsest resolution that works.
+- **Local processing**: compute on the device or at the edge, and send results instead of raw data (@sec-ch18).
+- **Purpose limitation and retention limits**: use data only for the stated purpose, and delete it when it is no longer needed.
+- **Transparency and control**: tell people what is collected, and let them see, export and delete it.
+- **Separation of identity**: decouple device identifiers and data from the owner's identity where possible, while still allowing the owner to prove ownership.
+
+Many of these principles are also legal requirements (@sec-ch17).
+
+::: {.callout-tip title="Try it on your kit: signed messages and STRIDE"}
+This exercise corresponds to the security lecture activity.
+
+1. Draw a data-flow diagram of the MQTT command center from @sec-ch12: kits, broker, laptop client. Mark the trust boundaries.
+2. Apply STRIDE to each element and flow. List at least one threat per category and rank the top three.
+3. Add the HMAC scheme above to the command topic. Show that a command with a modified payload is rejected, and that replaying a captured valid command is also rejected.
+4. Reboot the receiving kit and replay an old command. Does it succeed? Fix the problem.
+5. Which STRIDE threats does your HMAC scheme *not* address?
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Shared keys vs. public-key cryptography | Shared keys are fast and small but any key holder can impersonate others; public keys cost more computation but scale and give non-repudiation |
+| Hop-by-hop vs. end-to-end security | Hop-by-hop (TLS to a broker) is simple but exposes data at each intermediary; end-to-end protects data through brokers and proxies |
+| Security vs. availability | Locking out a device after failed checks can itself become a denial-of-service vector |
+| Data collection vs. privacy | More data enables more features and more harm |
+
+## Common pitfalls
+
+- **Default or shared passwords** across all units.
+- **Disabling certificate verification** to "make TLS work".
+- **Rolling your own cryptography** or using outdated algorithms (MD5, SHA-1, DES, RC4).
+- **No replay protection** on commands.
+- **Secrets in source code or firmware images**, readable by anyone with the binary.
+- **Debug interfaces left enabled** in production (serial consoles, JTAG, open telnet).
+- **Logging sensitive data** in plain text.
+- **Treating privacy as a policy document** rather than as design decisions about what data exists.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Red-team review.** Exchange your project's architecture and repository with another team. Perform a structured security code review: threat-model their system with STRIDE, review their code for the pitfalls above, and write a short report with findings ranked by severity and concrete fixes. @sec-ch22 describes the method in detail.
+
+**Lightweight cryptography.** In 2023 NIST selected the Ascon family as its standard for lightweight cryptography, aimed at devices too constrained for AES-GCM. Read the NIST announcement and compare Ascon's code size and performance with AES-GCM on a microcontroller.
+
+**Post-quantum readiness.** Devices deployed today may still be in service when large quantum computers can break ECC and RSA. NIST published its first post-quantum standards (ML-KEM and ML-DSA) in 2024. What would it take to support them on an ESP32-class device, and why does this matter most for firmware-signing keys?
+:::
+
+## Check your understanding
+
+1. Give two examples of IoT security failures with physical consequences.
+2. Why does combining metadata from several devices threaten privacy more than any single device?
+3. Explain the difference between integrity and freshness, with an example attack that violates freshness but not integrity.
+4. What are forward and backward secrecy in a group of devices?
+5. Apply STRIDE to a smart door lock with a phone app. Give one threat per category.
+6. How does a denial-of-sleep attack work, even when control messages are encrypted? How do you defend against it?
+7. What is a sinkhole attack, and why is it specific to multi-hop networks?
+8. Why is encryption alone not enough to protect a command message?
+
+## Further reading
+
+- OWASP, *IoT Top 10* [@owasp_iot_top10], a list of the most common IoT security weaknesses.
+- V. Hassija et al., "A survey on IoT security: application areas, security threats, and solution architectures" [@hassija_survey].
+- A. Shostack, *Threat Modeling: Designing for Security* [@shostack_threat_modeling].

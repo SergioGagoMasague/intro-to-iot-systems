@@ -1,5 +1,133 @@
 # Where IoT Is Heading {#sec-ch19}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C16 (trimmed), C17.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Summarize the main ideas of the book as one connected picture.
+2. Explain how continuous integration and continuous deployment apply to IoT firmware.
+3. Describe several current directions in IoT: new connectivity, batteryless devices, digital twins, AI agents and sustainability.
+4. Evaluate claims about emerging technologies, such as blockchain for IoT, against the requirements of real IoT systems.
 :::
+
+## Why it matters
+
+The technologies in this book will change. The ESP32 will be replaced by newer chips; today's protocol versions will be superseded; regulations will tighten. What lasts are the questions and trade-offs: how to sense and act reliably, how to move data at the right cost, how to keep devices trustworthy for years, and where computation should happen.
+
+This chapter looks back at the whole stack, then looks forward at directions that are shaping the next generation of IoT systems, and offers a way to evaluate new technologies as they appear.
+
+## Concepts
+
+### Looking back: one connected picture
+
+Every chapter in this book addressed part of a single system:
+
+- **The things** (Parts I and II): microcontrollers, embedded software, buses, sensors and actuators, tied together by the Observe–Decide–Act loop.
+- **The connections** (Part III): a layered stack, from radios that trade range for power, through IPv6 adapted to small networks, to application protocols and the shared semantics that make devices interoperate.
+- **Trust** (Part IV): security requirements, threat modeling, device identity, secure updates and the regulations that now require them.
+- **Intelligence and systems** (Parts V and VI): where computation should run, and how to build, test and review a complete system.
+
+The recurring theme is **trade-offs under constraints**: energy, memory, bandwidth, latency, cost, security and time to market. A good IoT engineer makes those trade-offs explicitly and can defend them.
+
+### Scalable deployment: CI/CD for firmware
+
+Web services are often updated many times a day, thanks to **continuous integration** (CI) and **continuous deployment** (CD). The same practices increasingly apply to device firmware:
+
+- **Continuous integration**: every change to the repository triggers an automated build for every supported board, unit tests on the host, static analysis, and, ideally, tests on real hardware in a test rack ("hardware in the loop").
+- **Continuous deployment**: successful builds are signed and stored as release candidates. They flow first to internal test devices, then to a **staging** group, and only then, in stages, to customer devices, using the OTA mechanisms and rollout safeguards from @sec-ch16.
+
+CI/CD shortens the time to deliver features and fixes, reduces risk by making each change small and quick to reverse, improves code quality through automation, and produces the build records (including SBOMs) that regulators increasingly expect.
+
+### Directions to watch
+
+#### Connectivity everywhere
+
+- **Cellular IoT keeps evolving.** LTE-M and NB-IoT continue to replace 2G and 3G, and **5G RedCap** ("reduced capability") brings 5G to wearables and industrial sensors at lower cost and power.
+- **Satellite IoT.** Standards for non-terrestrial networks let small devices send messages directly to satellites, extending coverage to oceans, deserts and farms with no terrestrial network.
+- **Wi-Fi and Bluetooth** add features aimed at IoT: target wake time, longer range, and precise distance measurement.
+
+#### Batteryless and ambient IoT
+
+Batteries limit device lifetime and create waste. **Energy harvesting** from light, vibration, heat differences or radio waves can power devices that use very little energy. **Backscatter** communication lets a device send data by reflecting an existing radio signal instead of generating its own, as passive RFID tags do. Cellular standards bodies are defining "ambient IoT" devices that work this way, aiming at billions of very low-cost tags for logistics and retail.
+
+#### Digital twins
+
+A **digital twin** is a continuously updated software model of a physical asset (a machine, a building, a city) fed by IoT data. Engineers use it to monitor the asset, test changes in simulation before applying them, and predict failures. Digital twins depend on good sensing, reliable data pipelines and shared semantics, so they build directly on Parts II and III.
+
+#### AI agents and natural-language control
+
+Language models are beginning to act as interfaces to devices: "make the house comfortable before I get home" is translated into commands for thermostats, blinds and lights. This raises new questions in the spirit of Part IV: what an AI agent is authorized to do, how its actions are logged and reversed, how it handles ambiguous or malicious instructions, and how fail-safe defaults (@sec-ch07) still apply when the "decide" step is a model rather than code you wrote.
+
+#### Interoperable homes and buildings
+
+Matter and Thread (@sec-ch11, @sec-ch13) are pushing the smart home toward devices that work across ecosystems. Similar efforts in buildings and industry, using shared semantic models, aim to make data from different vendors usable together.
+
+#### Regulation and long-term support
+
+The EU Cyber Resilience Act and similar laws (@sec-ch17) make security, vulnerability handling and multi-year support mandatory. This changes product economics: maintenance becomes a planned cost from day one, and devices that cannot be updated become hard to sell.
+
+#### Sustainability
+
+Billions of devices consume energy and materials, and become electronic waste. Sustainable IoT design means low-power operation, repairability, long support periods, recyclable materials and graceful end-of-life, and asking honestly whether a product needs to be connected at all.
+
+### Evaluating emerging technologies: the case of blockchain
+
+New technologies are often proposed as the solution to IoT's problems. A useful way to evaluate them is to compare their properties with the requirements and constraints in this book.
+
+**Blockchain** has been widely proposed for IoT. A blockchain is a ledger, replicated across many parties, to which records can be appended but not changed, with agreement among parties reached without a central authority. Proposed uses include:
+
+- tamper-evident logs of sensor data, for example in supply chains (where was this shipment, and was it kept cold?);
+- device identity and ownership records that no single company controls;
+- automated payments between devices ("machine-to-machine micropayments") using smart contracts.
+
+Measured against IoT requirements, the picture is mixed:
+
+| Requirement | Blockchain's fit |
+|---|---|
+| Constrained devices | Poor: devices cannot store a ledger or run consensus; they must rely on gateways |
+| Throughput and latency | Public blockchains confirm transactions in seconds to minutes, with limited throughput |
+| Energy | Proof-of-work chains are very energy-intensive; proof-of-stake chains much less so |
+| Privacy | Public ledgers are permanent and visible to all, which conflicts with data minimization and deletion rights |
+| Data integrity | Good for records once written, but cannot verify that the sensor reading was true in the first place |
+| Trust among parties | Useful when several organizations must share records and none is trusted to run a central database |
+
+The honest conclusion is that blockchain helps in a narrow set of cases: multi-party settings without a trusted operator, where tamper-evidence matters more than speed or privacy. For most IoT systems, a conventional database with signed records (@sec-ch14) and good access control meets the same needs more cheaply. The same method of evaluation applies to the next technology to be proposed.
+
+::: {.callout-tip title="Try it on your kit: a CI pipeline for your project"}
+1. Add a GitHub Actions (or similar) workflow to your project repository that builds your firmware with PlatformIO on every push.
+2. Make the build fail if the code does not compile for the kit's board, or if a simple unit test of your non-hardware logic (for example, your debounce or classification function) fails.
+3. Have the workflow publish the compiled `firmware.bin` as a build artifact, named with the commit hash.
+4. Describe the additional steps needed to turn this into continuous deployment to a fleet of kits, safely.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Adopting new technology early | Possible advantage versus immature tools, changing standards and unknown failure modes |
+| Automated deployment | Speed versus the risk of shipping bad firmware quickly; requires strong testing and staged rollouts |
+| Connectivity choice for the long term | Networks are retired (2G, 3G); choose technologies with a long expected life |
+
+## Common pitfalls
+
+- **Choosing technology for novelty**, not because it meets a requirement better than simpler options.
+- **Ignoring total lifetime cost**: support, updates, connectivity fees and disposal.
+- **Automating deployment without automating testing.**
+- **Assuming today's network will exist for the device's whole life.**
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Technology assessment memo.** Choose one emerging IoT technology (for example satellite IoT, ambient backscatter devices, digital twins or LLM-based home agents). Write a two-page memo for a product team: what problem it solves, its maturity, how it measures against the requirements in Chapters 9, 14 and 17, the risks of adopting it now, and your recommendation.
+:::
+
+## Check your understanding
+
+1. Summarize, in one paragraph, how the parts of this book fit together into one IoT system.
+2. What do continuous integration and continuous deployment add to an IoT development process, and what safeguards does CD need for firmware?
+3. Explain how a batteryless device can communicate.
+4. What is a digital twin, and what does it require from the underlying IoT system?
+5. Give two security questions raised by letting an AI agent control physical devices.
+6. In which situations does blockchain help an IoT system, and why is it a poor fit for most?
+
+## Further reading
+
+- IoT Analytics, *State of IoT* reports [@iotanalytics_state_2025], for current market and technology trends.
+- M. Ali et al., "Applications of blockchains in the Internet of Things: A comprehensive survey" [@ali_blockchain_iot].

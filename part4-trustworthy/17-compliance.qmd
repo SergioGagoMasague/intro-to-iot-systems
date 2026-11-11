@@ -1,5 +1,178 @@
 # Compliance and Regulation {#sec-ch17}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: New topic.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Explain why connected products are regulated, and name the main areas of regulation: radio, safety, environment, cybersecurity and privacy.
+2. Describe how radio certification works in the US and the EU, and why pre-certified modules matter.
+3. Summarize the main IoT cybersecurity laws and labels in the EU, UK and US, and the baseline requirements they share.
+4. Identify the privacy obligations that apply to IoT data.
+5. Recognize sector-specific rules, for example for medical devices.
+6. Turn regulatory requirements into concrete engineering tasks for a product.
 :::
+
+::: {.callout-warning title="Not legal advice"}
+This chapter explains the landscape as of late 2026 so that engineers know which questions to ask. Regulations change, and their details depend on the product and the market. Real products need review by compliance specialists, and you should always check the current text of any regulation you rely on.
+:::
+
+## Why it matters
+
+A prototype on a lab bench is not a product. Before a connected device can be sold, it must usually show that its radio stays within its assigned frequencies and power, that it will not electrocute or burn anyone, that it does not contain banned substances, and, increasingly, that it meets minimum cybersecurity standards. Selling in another country often means another set of rules.
+
+For a long time, cybersecurity was voluntary. That has changed. The European Union's **Cyber Resilience Act** makes security requirements mandatory for almost all products with digital elements sold in the EU, and its first obligations took effect in September 2026. The UK already bans default passwords. Asking "does it ship in the EU?" now changes design decisions from the first week of a project: whether the device has unique credentials, whether it can be updated, and how long the company will support it.
+
+## Concepts
+
+### Why connected products are regulated
+
+Regulation protects people and shared resources from harms that individual buyers cannot judge for themselves:
+
+- **Radio spectrum** is shared; one badly designed transmitter can disrupt many other users, including emergency services.
+- **Electrical safety and fire** risks are invisible until something fails.
+- **Hazardous substances and electronic waste** harm the environment.
+- **Insecure devices** harm not only their owners but everyone else, as botnets such as Mirai showed (@sec-ch09).
+- **Personal data** collected by devices can be misused.
+
+Regulation typically works through **conformity assessment**: the manufacturer (or an independent test lab) shows that the product meets the relevant requirements, documents the evidence in a **technical file**, and marks the product accordingly.
+
+### Radio and electromagnetic compatibility
+
+Every device that transmits radio waves, or that unintentionally emits radio-frequency noise, is regulated:
+
+- **United States.** The **FCC** regulates radio devices. Most IoT radios operate in unlicensed bands under **Part 15** of the FCC rules, which limits transmit power, bandwidth, and, in some bands, how long a device may occupy a channel. Products need **FCC equipment authorization** and display an **FCC ID**.
+- **European Union.** The **Radio Equipment Directive** (RED) covers radio products. A manufacturer who shows compliance affixes the **CE mark**. In the EU's 868 MHz band, devices must respect strict **duty-cycle** limits, often 1% of the time.
+
+Testing a radio product costs time and money. **Pre-certified modules**, such as the ESP32-WROOM-32 or the RFM95W, have already passed radio testing. A product that uses one, without changing its antenna or RF design, can often rely on the module's certification for the radio part (in the US, under the **modular approval** rules), and only needs testing for unintentional emissions and the complete product. This is a major reason products use modules rather than bare radio chips.
+
+Hardware is also regional: a LoRa radio built for the US 902–928 MHz band must not be operated in Europe, and vice versa (@sec-ch10).
+
+### Safety and environmental rules
+
+- **Electrical safety** standards such as IEC/UL 62368-1 cover audio, video and IT equipment, including most IoT devices; battery-powered products also face battery-safety and transport rules for lithium cells.
+- **RoHS** restricts hazardous substances such as lead, mercury and cadmium in electronics sold in the EU, and similar rules apply in other regions.
+- **WEEE** requires producers in the EU to finance the collection and recycling of electronic waste, which is why products carry a crossed-out wheelie-bin symbol.
+
+### Cybersecurity regulation
+
+#### A common baseline
+
+Most IoT cybersecurity rules draw on the same baseline. The European standard **ETSI EN 303 645** [@etsi_en303645] and the US **NIST IR 8259** series [@nistir8259] are the most influential sources. Their key provisions are:
+
+1. **No universal default passwords.** Each device must have a unique credential or require the user to set one.
+2. **A vulnerability disclosure policy.** A public way for researchers to report vulnerabilities, and a process to act on reports.
+3. **Software updates.** Devices must be securely updatable, and the manufacturer must state how long updates will be provided.
+4. **Secure storage of credentials and sensitive data.**
+5. **Secure communication**, using current cryptography.
+6. **Minimized attack surface**: unused ports, services and debug interfaces disabled.
+7. **Software integrity**: verifying software before it runs.
+8. **Protection of personal data.**
+9. **Resilience** to outages of networks and power.
+10. **Easy deletion** of user data, and ways for users to configure the device securely.
+
+Each of these maps directly onto techniques in Part IV.
+
+#### European Union
+
+- **RED cybersecurity requirements.** Since 1 August 2025, internet-connected radio equipment sold in the EU must meet cybersecurity, privacy and anti-fraud requirements under a delegated act of the Radio Equipment Directive. The harmonized standards **EN 18031-1, -2 and -3** describe how to meet them.
+- **The Cyber Resilience Act** (CRA) [@eu_cra] covers almost all hardware and software "products with digital elements". It entered into force in December 2024 with a staged timeline:
+  - **From 11 September 2026**, manufacturers must report actively exploited vulnerabilities and severe security incidents to authorities (through ENISA's single reporting platform) within strict deadlines.
+  - **From 11 December 2027**, the full requirements apply: security by design and by default, a vulnerability-handling process, security updates for a defined **support period** (generally at least five years, or the expected product lifetime if shorter), an SBOM, conformity assessment and CE marking. Products deemed "important" or "critical" face stricter assessment.
+- **The EU Data Act**, applying from September 2025, gives users of connected products rights to access and share the data their devices generate.
+
+#### United Kingdom
+
+The **Product Security and Telecommunications Infrastructure (PSTI)** regime, in force since 29 April 2024, requires consumer connectable products sold in the UK to have no universal default passwords, to publish a way to report vulnerabilities, and to state the minimum period for which security updates will be provided.
+
+#### United States
+
+The US has no single federal IoT security law for consumer products. Instead:
+
+- **California's SB-327** (in force since 2020), and a similar Oregon law, require connected devices to have "reasonable security features", including unique passwords or a forced password change on first use.
+- The **IoT Cybersecurity Improvement Act** of 2020 sets security requirements for IoT devices bought by federal agencies, based on NIST guidance.
+- The **US Cyber Trust Mark** is a voluntary FCC labeling program for consumer IoT products, based on NIST criteria. After its first lead administrator withdrew, the FCC selected the ioXt Alliance in April 2026; as of late October 2026 the FCC was still finalizing testing procedures, and no labeled products had yet reached store shelves [@nextgov_cybertrust_2026].
+- Sector regulators add their own rules (below).
+
+### Privacy and data protection
+
+IoT devices often collect **personal data**, which data-protection laws regulate regardless of the product's security:
+
+- The EU's **General Data Protection Regulation** (GDPR) requires a lawful basis for processing, data minimization, purpose limitation, security, and rights for individuals to access, correct and delete their data. Its principle of **data protection by design and by default** is effectively an engineering requirement.
+- In the US, state laws such as California's **CCPA** (as amended by the CPRA) give consumers rights over personal information, and the **FTC** acts against companies whose security or privacy practices are deceptive or unfair.
+- Data that crosses borders may face transfer restrictions.
+
+The design principles in @sec-ch14 (minimization, local processing, retention limits, transparency) are the practical way to meet these obligations.
+
+### Sector-specific rules
+
+Some domains add their own requirements on top of the general ones:
+
+- **Medical devices.** In the US, the FDA regulates connected medical devices; since 2023, manufacturers of "cyber devices" must submit cybersecurity plans, an SBOM and evidence of secure design with their applications. The EU Medical Device Regulation includes similar requirements. Health data may also fall under HIPAA.
+- **Automotive.** UN Regulations No. 155 (cybersecurity management) and No. 156 (software updates) apply to new vehicles in many markets.
+- **Industrial systems.** The **IEC 62443** series defines security levels and processes for industrial automation and control systems.
+- **Critical infrastructure and government procurement** often add their own lists of approved or prohibited components and suppliers.
+
+### From regulation to engineering tasks
+
+Regulatory requirements become concrete work items:
+
+| Requirement | Engineering task |
+|---|---|
+| No default passwords | Per-device credentials from provisioning (@sec-ch15); first-use setup flow |
+| Secure updates for a support period | Signed OTA with rollback (@sec-ch16); budget for maintenance |
+| Vulnerability handling and reporting | A `security.txt` or disclosure page; an internal triage process; ability to ship fixes quickly |
+| SBOM | Generate a component list at build time |
+| Secure storage and communication | Secure element or flash encryption; TLS with verification |
+| Minimal attack surface | Disable debug interfaces and unused services in production builds |
+| Data protection | Data inventory; minimization; deletion and export features |
+| Radio compliance | Pre-certified modules; correct regional frequency plans; respect duty cycles |
+
+: Turning regulation into engineering work. {#tbl-reg-to-eng}
+
+::: {.callout-tip title="Try it on your kit: does it ship in the EU?"}
+This exercise corresponds to the compliance discussion in lecture.
+
+1. Assume your course project will be sold as a consumer product in the EU and the UK. Go through the ETSI EN 303 645 baseline above and mark each provision as *met*, *partly met* or *not met* by your current design.
+2. List the three changes that would close the biggest gaps, and estimate the effort for each.
+3. Your kit's LoRa radio is a US 915 MHz part. What would have to change to sell the product in Europe?
+4. Write a one-paragraph "security support statement" for your product, stating how long it will receive security updates and how people can report vulnerabilities.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Pre-certified module vs. custom radio design | Modules cost more per unit but save testing time, money and risk |
+| Global vs. regional products | One design for all markets simplifies manufacturing but must meet the strictest rules; regional variants add SKUs |
+| Long support periods | Required by law in some markets; costly for low-margin products |
+| Collecting data | Each data type collected adds legal obligations as well as value |
+
+## Common pitfalls
+
+- **Treating compliance as a final step.** Many requirements, such as unique credentials and updatability, cannot be added at the end.
+- **Modifying a pre-certified module's antenna** and assuming the certification still applies.
+- **Using the wrong regional radio frequencies.**
+- **Shipping without a vulnerability disclosure contact.**
+- **Promising updates without budgeting for them.**
+- **Collecting personal data "just in case".**
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Read the source.** Read the requirements annex of the Cyber Resilience Act (Annex I) and compare it, provision by provision, with ETSI EN 303 645. Where does the CRA go further?
+
+**Compliance as competitive advantage.** Some companies treat strict compliance as a cost; others market it. Choose a consumer IoT company and examine its published security policy, support periods and certifications. Write a short assessment of whether its practices would meet the EU's 2027 requirements.
+:::
+
+## Check your understanding
+
+1. Name five areas in which connected products are regulated.
+2. Why can a product that uses a pre-certified radio module often skip some radio testing?
+3. List five provisions shared by most IoT cybersecurity baselines.
+4. What changed for manufacturers selling in the EU on 11 September 2026, and what changes on 11 December 2027?
+5. What three things does the UK PSTI regime require?
+6. How does GDPR's "data protection by design and by default" translate into engineering decisions?
+7. Give an example of a sector with additional IoT requirements, and one such requirement.
+
+## Further reading
+
+- ETSI EN 303 645, *Cyber Security for Consumer Internet of Things: Baseline Requirements* [@etsi_en303645].
+- Regulation (EU) 2024/2847, the *Cyber Resilience Act* [@eu_cra].
+- NIST IR 8259 series, *Foundational Cybersecurity Activities for IoT Device Manufacturers* [@nistir8259].

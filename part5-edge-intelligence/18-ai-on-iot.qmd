@@ -1,5 +1,216 @@
 # AI on IoT and Edge ML {#sec-ch18}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: C15.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Explain the limits of cloud-only processing for IoT, and place computation along the device–edge–cloud continuum.
+2. Describe Edge AI and TinyML, and give examples of where they are used.
+3. Review the supervised-learning concepts most used in IoT: classification, regression, features, training and testing.
+4. Explain why model size matters on microcontrollers, and how quantization and pruning shrink models.
+5. Follow the TinyML workflow from data collection to on-device inference.
+6. Evaluate an edge model on accuracy, latency, memory and energy.
 :::
+
+## Why it matters
+
+IoT devices produce enormous volumes of raw data: accelerations sampled hundreds of times a second, audio, images, vibration spectra. The first generation of IoT systems sent all of it to the cloud for analysis. That works for a few devices with good connections, but it breaks down at scale, for battery-powered devices, and whenever a decision is needed immediately or the data is too sensitive to leave the device.
+
+Advances in algorithms, model compression and microcontroller hardware now make it possible to run machine-learning models directly on devices like the ESP32. A smart doorbell can tell a person from a package without contacting a server; a wearable can detect a fall in milliseconds; a vibration sensor can flag a failing bearing and send one alert instead of streaming data all day. This chapter explains how.
+
+## Concepts
+
+### The limits of cloud-only processing
+
+Sending all raw data to the cloud has four costs:
+
+- **Latency.** A round trip to the cloud takes tens to hundreds of milliseconds, and much longer on poor networks, too slow for emergency stops, fall detection or control loops.
+- **Bandwidth.** Streaming audio or video from many devices consumes network capacity and, on cellular links, money.
+- **Energy.** Transmitting data usually costs far more energy than processing it locally (@sec-ch10).
+- **Privacy.** Raw data, such as audio from a living room, must leave the device, increasing the risk of leaks and misuse (@sec-ch14).
+
+There is also **availability**: a device that depends on the cloud to make every decision stops working when the network does.
+
+### The device–edge–cloud continuum
+
+Computation can happen at several places between the sensor and the data center:
+
+| Tier | Examples | Strengths | Limits |
+|---|---|---|---|
+| **Device** (extreme edge) | Microcontroller in a sensor or wearable | Lowest latency, works offline, raw data never leaves | Kilobytes of RAM, tight energy budget |
+| **Edge / fog** | Gateway, router, phone, on-premises server | More compute, sees many devices, still local | Must be deployed and managed; shared by many devices |
+| **Cloud** | Data-center servers | Effectively unlimited compute and storage; fleet-wide view | Latency, bandwidth, connectivity and privacy costs |
+
+: The device–edge–cloud continuum. {#tbl-continuum}
+
+**Fog computing** describes the middle tier: computing, storage and networking resources between devices and the cloud, often virtualized and shared, close to where the data is produced. Real systems split work across tiers. A camera might detect motion on the device, identify objects at the edge, and train improved models in the cloud.
+
+### Edge AI and TinyML
+
+**Edge AI** means running machine-learning models on devices or edge nodes instead of only in the cloud. Only the result ("person detected", "fall", "abnormal vibration") needs to be sent. Its benefits are real-time response, offline operation, lower bandwidth and energy, and privacy.
+
+**TinyML** is the part of Edge AI that runs on the smallest devices: microcontrollers with kilobytes of memory and milliwatts of power. It sits at the overlap of machine learning and embedded systems, and applies when rule-based logic is not enough but the device is too small for conventional ML.
+
+Typical applications include:
+
+- **keyword spotting** ("Hey…") in smart speakers, running continuously at very low power;
+- **activity recognition** and **fall detection** in wearables;
+- **anomaly detection** in industrial machines (predictive maintenance);
+- **visual wake words** (is there a person in the image?) in cameras and doorbells;
+- **gesture recognition** from IMUs.
+
+### A machine-learning refresher
+
+**Machine learning** teaches a computer rules from data instead of hard-coding them. Instead of writing "if acceleration > X then running", you collect labeled acceleration data and **train** a model that learns the boundary.
+
+- **Supervised learning** uses labeled examples. **Classification** predicts a category (walking or running); **regression** predicts a number (the temperature in an hour, a motor's speed from its sound).
+- **Unsupervised learning** finds structure without labels, for example clustering, or **anomaly detection**: learning what "normal" looks like and flagging what is not.
+- **Training** adjusts the model's parameters to reduce errors on labeled examples. **Testing** evaluates it on data it has never seen, to check that it **generalizes** rather than memorizing.
+
+Common supervised models for edge IoT include:
+
+| Model | Idea | Edge suitability |
+|---|---|---|
+| k-nearest neighbors | Predict from the labels of the most similar stored examples | Simple, but must store training data |
+| Decision trees and small forests | A sequence of threshold tests | Tiny, fast, interpretable; easy to export as code |
+| Linear and logistic regression | Weighted sum of features | Tiny and fast |
+| Neural networks (MLPs, 1D/2D CNNs, small RNNs) | Layers of learned weights; CNNs capture spatial or temporal patterns | Most powerful; need compression to fit |
+
+### Features from sensor data
+
+Raw sensor streams are usually turned into **features** before (or inside) a model. For time series, a common pipeline is:
+
+1. **Windowing**: split the stream into fixed-length windows, for example 2 s of accelerometer data at 50 Hz (100 samples), often overlapping.
+2. **Feature extraction**: compute summary statistics for each window and axis, such as mean, standard deviation, minimum, maximum, energy, zero crossings or the magnitudes of frequency components.
+3. **Classification** of each window.
+
+Neural networks can learn their own features from raw windows, at the cost of more computation and data.
+
+### Why model size matters
+
+A model that works in a notebook may be far too large for a microcontroller:
+
+| | Cloud server | ESP32 |
+|---|---|---|
+| Memory | Hundreds of GB of RAM | 520 KB of SRAM (part used by Wi-Fi and the RTOS) |
+| Storage | Terabytes | 4 MB of flash, shared with the firmware |
+| Compute | GPUs, TFLOPS | Two 240 MHz cores, single-precision FPU |
+| Power | Hundreds of watts | Tens to hundreds of milliwatts |
+
+Edge models must therefore be **tiny and efficient**, trading some accuracy for size and speed. The main compression techniques are:
+
+- **Quantization**: storing weights and activations as 8-bit integers instead of 32-bit floats. This makes models about **four times smaller** and much faster on hardware without a strong floating-point unit, usually with only a small loss of accuracy. **Post-training quantization** converts a trained model; **quantization-aware training** simulates quantization during training for better accuracy.
+- **Pruning**: removing weights or whole neurons that contribute little.
+- **Knowledge distillation**: training a small "student" model to imitate a large "teacher".
+- **Architecture choice**: using small, efficient model families designed for embedded devices.
+
+### The TinyML toolchain
+
+| Tool | Role |
+|---|---|
+| **LiteRT for Microcontrollers** (formerly TensorFlow Lite for Microcontrollers) | The most widely used inference runtime for MCUs; runs quantized models converted from TensorFlow, Keras, PyTorch or JAX |
+| **Edge Impulse** | End-to-end platform: collect data from a device, label, train, optimize and generate firmware |
+| **ExecuTorch** | PyTorch's lightweight runtime for edge and embedded devices |
+| **Vendor libraries** | Espressif ESP-DL, esp-tflite-micro and ESP-DSP; Arm CMSIS-NN; ST X-CUBE-AI; NXP eIQ. These use each chip's accelerators and special instructions. |
+
+The typical workflow is:
+
+1. **Collect and label data** on the real device, in realistic conditions.
+2. **Train** a model on a PC, often in a Jupyter notebook.
+3. **Optimize**: quantize, prune, and check accuracy after each step.
+4. **Convert** to the runtime's format (for LiteRT, a `.tflite` flat buffer, embedded in firmware as a C array).
+5. **Deploy** to the device and run inference on live data.
+6. **Evaluate on the device**: accuracy, latency, memory and energy, then iterate.
+
+### A tiny example: classifying motion with a decision tree
+
+Not every edge model needs a neural network. A decision tree trained in Python (for example with scikit-learn) can be exported as plain C code. This one classifies 2-second accelerometer windows from the MPU-6050 (@sec-ch06) as still, walking or running, using two features:
+
+```cpp
+// Features computed over a 2 s window of acceleration magnitude (in g)
+struct Features { float meanMag; float stdMag; };
+
+Features extract(const float* mag, int n) {
+  float sum = 0, sq = 0;
+  for (int i = 0; i < n; i++) { sum += mag[i]; sq += mag[i] * mag[i]; }
+  float mean = sum / n;
+  return { mean, sqrtf(fmaxf(sq / n - mean * mean, 0.0f)) };
+}
+
+// Exported from a depth-2 decision tree (thresholds learned from labeled data)
+const char* classify(const Features& f) {
+  if (f.stdMag < 0.05f) return "still";
+  if (f.stdMag < 0.45f) return "walking";
+  return "running";
+}
+```
+
+The whole model is a few comparisons and takes microseconds. The thresholds above are illustrative; yours must come from your own labeled data, collected on your kit and with the sensor mounted the way it will be used.
+
+### Evaluating an edge model
+
+Accuracy alone does not decide whether a model is suitable for a device. Measure, on the device:
+
+- **accuracy** on held-out data collected separately from the training data, preferably from different people or machines; also precision and recall when classes are imbalanced;
+- **latency** per inference;
+- **memory**: flash for the model and code, RAM for activations ("tensor arena" in LiteRT);
+- **energy** per inference and per day, given how often inference runs.
+
+Two practical risks recur:
+
+- **Distribution shift.** Models trained in the lab fail in the field when conditions differ: a different user, a different mounting position, a noisier machine.
+- **Silent failure.** A model always returns *some* answer. Monitoring confidence and occasionally sending samples for review helps detect when it has stopped working.
+
+### Larger models at the edge
+
+More capable edge hardware runs much larger models. Camera boards such as the ESP-EYE run face and object detection with Espressif's ESP-WHO framework. Gateways and single-board computers with neural accelerators run real-time vision, and even small language models, on premises. The same principles apply: move computation toward the data when latency, bandwidth, energy or privacy demand it.
+
+::: {.callout-tip title="Try it on your kit: from rules to a learned classifier"}
+1. Record 2-second windows of MPU-6050 data while standing still, walking and running, at least 30 windows of each. Stream them over the serial port to a CSV file.
+2. In a notebook, compute the mean and standard deviation of the acceleration magnitude per window, and train a small decision tree. Report its accuracy on windows recorded by a different team member.
+3. Export the tree as C code and run it on the kit, showing the predicted activity on the OLED.
+4. Measure the classification time with `micros()`, and the RAM used by your window buffer.
+5. Optional: train a small neural network on the same data, quantize it to int8, and run it with LiteRT for Microcontrollers. Compare accuracy, size and latency with the tree.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Device vs. edge vs. cloud inference | Latency, energy, privacy and offline operation versus model capability and ease of updating |
+| Hand-crafted features vs. learned features | Features plus small models are tiny and interpretable; neural networks need less feature design but more data and compute |
+| Quantization | Smaller and faster, with some accuracy loss |
+| Updating models | Models need OTA updates too (@sec-ch16), and versioning alongside firmware |
+
+## Common pitfalls
+
+- **Testing on the training data**, or on windows from the same recording, which overstates accuracy.
+- **Collecting data in only one condition.** Models fail on other users, placements or environments.
+- **Ignoring RAM for activations.** A model that fits in flash can still run out of RAM at inference time.
+- **Measuring latency on a PC** instead of on the device.
+- **Using ML where a threshold would do.** Start with the simplest model that meets the requirement.
+- **Shipping without monitoring.** Model accuracy degrades silently.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Federated learning.** Instead of sending raw data to the cloud, devices can train locally and send only model updates, which a server aggregates. Read about federated averaging and explain what it protects and what it does not (model updates can still leak information).
+
+**Energy-aware inference.** Design a cascade: a tiny, always-on model (such as a motion threshold) wakes a larger model only when needed. Estimate the energy saved compared with running the larger model continuously.
+
+**Benchmarks.** MLPerf Tiny defines standard tasks (keyword spotting, visual wake words, image classification, anomaly detection) and reports accuracy, latency and energy on microcontrollers. Compare published results for two microcontroller families.
+:::
+
+## Check your understanding
+
+1. Give four reasons not to send all raw IoT data to the cloud.
+2. What is the difference between Edge AI and TinyML?
+3. Distinguish classification from regression with an IoT example of each.
+4. Why must test data be collected separately from training data?
+5. How does int8 quantization reduce model size, and what does it cost?
+6. List the six steps of the TinyML workflow.
+7. A model fits in flash but crashes at inference time. What is the likely cause?
+8. When would you choose a decision tree over a neural network on a microcontroller?
+
+## Further reading
+
+- P. Warden and D. Situnayake, *TinyML* [@warden_tinyml].
+- Google AI Edge, *LiteRT for Microcontrollers* documentation [@litert_micro].
+- C. R. Banbury et al., "MLPerf Tiny Benchmark" [@banbury_mlperf_tiny].

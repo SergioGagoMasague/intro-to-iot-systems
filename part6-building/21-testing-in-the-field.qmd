@@ -1,5 +1,188 @@
 # Testing in the Field {#sec-ch21}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Project guidelines, field-test report.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Explain why IoT systems need testing beyond unit tests and bench demos.
+2. Plan tests at several levels: unit, hardware-in-the-loop, integration, long-duration and field.
+3. Design and run a multi-day reliability test with clear metrics and logging.
+4. Conduct a field test in a realistic environment and report its results.
+5. Instrument a device so that failures can be diagnosed remotely.
+6. Prepare a robust final demonstration.
 :::
+
+## Why it matters
+
+A device that works for five minutes on a desk has proven very little. In the field it will meet weak signals, crowded radio bands, power glitches, network outages, memory leaks that only appear after two days, sensors that drift, and users who press buttons in the wrong order. Many IoT failures appear only after hours or days, or only in a particular place.
+
+Testing in IoT therefore has two dimensions that ordinary software testing often lacks: **time** and **environment**. This chapter explains how to test along both.
+
+## Concepts
+
+### Levels of testing
+
+| Level | What it checks | How |
+|---|---|---|
+| **Unit tests** | Logic that does not need hardware: parsing, state machines, filters, classifiers | Run on a laptop or in CI (PlatformIO's native environment and Unity test framework) |
+| **Hardware-in-the-loop** | Drivers and firmware on the real board | Automated tests on a board connected to a test machine |
+| **Integration tests** | End-to-end paths: device → network → broker → back end → app | Scripted scenarios against the vertical slice |
+| **Fault-injection tests** | Behavior when things go wrong | Disconnect Wi-Fi, stop the broker, unplug a sensor, cut power mid-operation |
+| **Long-duration (reliability) tests** | Behavior over days: leaks, drift, reconnection, uptime | Run unattended for 24–72 hours or more, with logging |
+| **Field tests** | Behavior in the real environment with real users | Deploy where the system will actually be used |
+
+: Levels of testing for an IoT system. {#tbl-test-levels}
+
+Each level catches problems the others miss. Unit tests are fast and cheap but know nothing about radios; field tests are realistic but slow and hard to repeat.
+
+### Designing for testability
+
+Testing is much easier if the firmware is designed for it:
+
+- **Separate logic from hardware.** Put decision logic (state machines, thresholds, message formatting) in functions that take values and return results, so they can be tested on a laptop.
+- **Log meaningfully.** Every important event (boot, reset reason, connect, disconnect, error, command received) should be logged with a timestamp and enough context to diagnose it later (@sec-ch04).
+- **Report health.** Publish a periodic **heartbeat** with uptime, free heap, firmware version, signal strength (RSSI), reconnect counts and last error. A missing heartbeat is itself a signal.
+- **Record why the device restarted.** `esp_reset_reason()` distinguishes power-on, software reset, watchdog timeouts, brownouts and crashes.
+
+```cpp
+#include <esp_system.h>
+
+const char* resetReasonText() {
+  switch (esp_reset_reason()) {
+    case ESP_RST_POWERON:  return "power-on";
+    case ESP_RST_SW:       return "software";
+    case ESP_RST_PANIC:    return "crash";
+    case ESP_RST_INT_WDT:
+    case ESP_RST_TASK_WDT:
+    case ESP_RST_WDT:      return "watchdog";
+    case ESP_RST_BROWNOUT: return "brownout";
+    case ESP_RST_DEEPSLEEP:return "deep-sleep wake";
+    default:               return "other";
+  }
+}
+
+void publishHeartbeat() {
+  char msg[160];
+  snprintf(msg, sizeof msg,
+           "{\"up_s\":%lu,\"heap\":%u,\"rssi\":%d,\"fw\":\"%s\",\"reset\":\"%s\",\"reconnects\":%u}",
+           millis() / 1000, ESP.getFreeHeap(), WiFi.RSSI(), FIRMWARE_VERSION,
+           resetReasonText(), reconnectCount);
+  mqtt.publish(HEARTBEAT_TOPIC, msg);
+}
+```
+
+### Fault injection
+
+Deliberately break things and watch what happens:
+
+| Fault | Expected behavior to verify |
+|---|---|
+| Wi-Fi access point switched off for 10 minutes | Device keeps sensing and acting locally; buffers or drops data as designed; reconnects automatically |
+| Broker or server unreachable | Back-off between retries; no crash; no battery drain from tight retry loops |
+| Sensor unplugged or returning nonsense | Plausibility checks reject bad data; actuator goes to its fail-safe state (@sec-ch07) |
+| Power cut during a write or an update | Settings and firmware remain valid (@sec-ch16) |
+| Burst of commands or malformed messages | Device rejects invalid input without crashing |
+| Clock not yet synchronized | Timestamps and certificate checks behave sensibly |
+
+### Long-duration reliability testing
+
+A **reliability test** runs the complete system, unattended, for an extended period, typically 24 to 72 hours, and measures how well it keeps working.
+
+Plan it like an experiment:
+
+1. **Define the configuration**: firmware version, hardware, location, network, power source.
+2. **Define the metrics** and how each is measured:
+   - **uptime** and the number and causes of **resets**;
+   - **message delivery ratio**: messages received ÷ messages sent, using sequence numbers to count gaps;
+   - **latency** distribution (median and 95th percentile), using timestamps;
+   - **reconnections** and how long each outage lasted;
+   - **free heap over time** (a steady decline indicates a memory leak);
+   - **power** or battery voltage over time, if battery-powered;
+   - application-specific correctness, such as sensor values within plausible ranges.
+3. **Log everything to a place that survives the device**: the broker and a back-end database, not just the serial port.
+4. **Run it without touching it.** Intervening invalidates the result; if you must, record what you did and when.
+5. **Analyze and report**: plots of each metric over time, a list of every incident with its cause, and what you changed as a result.
+
+A simple sequence-number scheme makes message loss measurable:
+
+```cpp
+RTC_DATA_ATTR uint32_t seq = 0;      // survives deep sleep; resets on power loss
+
+void publishReading(float value) {
+  char msg[96];
+  snprintf(msg, sizeof msg, "{\"seq\":%lu,\"t_ms\":%lu,\"v\":%.2f}", ++seq, millis(), value);
+  mqtt.publish(DATA_TOPIC, msg);
+}
+// On the server: delivery ratio = received / (max_seq - min_seq + 1), per boot
+```
+
+Expect the first long test to find problems. That is its purpose. Typical findings include memory leaks from repeated `String` concatenation, connections that never recover after a router restart, watchdog resets from blocking network calls, and TLS sessions that fail after the device's clock drifts.
+
+### Field testing
+
+A **field test** places the system where it will actually be used, with the people who will actually use it. It reveals problems no lab can: a wall that blocks the signal, a sensor that reads differently in sunlight, a user who misunderstands the display.
+
+A useful field-test plan includes:
+
+- **objectives**: which requirements and risks the test addresses;
+- **site and setup**: where devices are placed, with photos and a map;
+- **procedure**: what testers and users do, and for how long;
+- **data collected**: logs, measurements, observations, user feedback;
+- **safety and permissions**: permission to install devices, electrical and physical safety, and the privacy of anyone whose data is collected (@sec-ch14, @sec-ch17).
+
+Report the results honestly. A field test that shows the range is half what you expected is valuable, provided you explain what you learned and what you would change.
+
+### Preparing the final demonstration
+
+A live demo is a small field test under pressure. Reduce the risk:
+
+- Have a **rehearsed script** with a clear story: the problem, the system, the evidence that it works.
+- **Bring your own network** if possible (a travel router), or confirm the venue's network in advance.
+- Keep a **backup**: a recorded video of the system working and screenshots of dashboards and long-test results.
+- **Charge everything**, and bring spare cables.
+- Show **evidence**, not just features: the reliability plots and field-test results are often more convincing than the live demo.
+
+::: {.callout-tip title="Try it on your kit: a 72-hour reliability test"}
+1. Add a heartbeat and sequence-numbered data messages to your project firmware.
+2. Write a small script on a laptop or server that subscribes to your topics and stores every message with its arrival time.
+3. Run the complete system unattended for 72 hours.
+4. Produce plots of message delivery ratio per hour, latency, free heap and RSSI, and a table of every reset and disconnection with its cause.
+5. Write one page on what failed, why, and what you changed.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Test duration | Longer tests find rarer problems but delay feedback |
+| Logging detail | More detail aids diagnosis but costs bandwidth, storage, energy and possibly privacy |
+| Automated vs. manual testing | Automation is repeatable and runs in CI; some field behavior can only be observed by people |
+| Lab vs. field | Labs are controlled and repeatable; the field is realistic |
+
+## Common pitfalls
+
+- **Testing only the happy path.**
+- **Logging only to the serial monitor**, so the record disappears when the laptop sleeps.
+- **No sequence numbers or timestamps**, so loss and latency cannot be measured.
+- **Changing firmware during a long test** without restarting the clock.
+- **Ignoring resets** because "it came back".
+- **A demo that depends on unfamiliar Wi-Fi.**
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Statistics of rare failures.** If your device runs 72 hours with no failures, what can you say about its mean time between failures? Using the "rule of three", estimate a 95% upper bound on the failure rate, and discuss how many device-hours you would need to claim a mean time between failures of one year.
+
+**Chaos testing.** Write a script that randomly disconnects the broker, delays messages and restarts the access point during a long test, and compare the system's behavior with an undisturbed run.
+:::
+
+## Check your understanding
+
+1. Name four levels of testing for an IoT system and one problem each is good at finding.
+2. Why should decision logic be separated from hardware access?
+3. What should a heartbeat message contain, and why is a *missing* heartbeat useful?
+4. How do sequence numbers let you measure message loss?
+5. What does a steadily falling free-heap value during a long test indicate?
+6. List five elements of a field-test plan.
+
+## Further reading
+
+- PlatformIO, *Unit Testing* documentation [@platformio_docs].
+- M. T. Nygard, *Release It!* [@nygard_release_it], on designing systems that survive production.

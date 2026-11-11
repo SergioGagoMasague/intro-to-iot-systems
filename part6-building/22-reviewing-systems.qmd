@@ -1,5 +1,156 @@
 # Reviewing Someone Else's System {#sec-ch22}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Project guidelines (Advanced track).
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Explain why independent review finds problems that the builders miss.
+2. Conduct a hands-on device review: use, observe and probe another team's device.
+3. Conduct a structured security code review of another team's repository.
+4. Report findings with clear severity, evidence and recommended fixes.
+5. Respond to a review constructively and track fixes to completion.
 :::
+
+## Why it matters
+
+Builders test their systems the way they expect them to be used. They know which button not to press, which order to power things up in, and which warning to ignore. Attackers and real users know none of this. An independent reviewer, with fresh eyes and a different set of assumptions, finds failures and vulnerabilities that the builders cannot see.
+
+Professional teams build review into their process: code review on every change, design reviews before major decisions, and penetration tests or security audits before release. Many regulations now expect evidence of such reviews (@sec-ch17). This chapter describes two forms of review you can apply to a peer team's project: a **device review**, where you receive and probe their device, and a **security code review** *(Advanced track)*, where you examine their source code and design.
+
+## Concepts
+
+### Ground rules
+
+Reviews work only when both sides trust the process:
+
+- **Scope and permission.** Review only the systems you have been given, within the agreed scope. Do not attack shared infrastructure (the course broker, campus Wi-Fi) or other teams' systems. This is the same rule that separates professional security testing from attacks.
+- **Do no harm.** Do not damage hardware, delete data or leave changes behind. Report what you could have done instead of doing it.
+- **Critique the system, not the people.** Findings describe behavior and code, with evidence, not judgments about the builders.
+- **Confidentiality.** Findings go to the team (and the teaching staff), not to everyone, until they are fixed.
+
+### Preparing for a review
+
+The team being reviewed provides a short **review package**:
+
+- a one-page description of the system and its intended use;
+- the architecture and data-flow diagram, with trust boundaries (@sec-ch14);
+- instructions to set up and use the device;
+- the repository (for a code review), with build instructions;
+- the team's own threat model and any known issues.
+
+The reviewers read the package first, then plan their review around the most valuable targets: where trust boundaries are crossed, where commands reach actuators, and where secrets are stored.
+
+### The device review
+
+In a device review, reviewers receive the other team's working device, use it as intended, then try to make it fail. A useful structure follows the STRIDE categories (@tbl-stride) and the reliability concerns from @sec-ch21:
+
+| Area | Questions to investigate |
+|---|---|
+| **First use** | Can you set it up from the instructions alone? Are there default credentials? |
+| **Normal use** | Does it meet its stated requirements? Is feedback clear? |
+| **Physical access** | Are secrets readable over the serial console? Is a debug menu exposed? What happens if you press buttons during boot? |
+| **Network observation** | Using a desktop MQTT client or packet capture on a network you control: are messages encrypted? Do they reveal personal or sensitive information? |
+| **Spoofing and tampering** | Can you send commands that the device accepts without authorization? Can you replay a captured command? |
+| **Denial of service** | What happens with a flood of messages, malformed payloads, a disconnected network or a removed sensor? |
+| **Recovery** | After power loss or network loss, does it recover on its own, and into a safe state? |
+
+Record every test, including the ones where the device behaved well. A finding of "replay rejected" is useful evidence.
+
+### The security code review *(Advanced track)*
+
+In a security code review, reviewers read another team's repository with an attacker's eye. Work through it systematically rather than skimming:
+
+1. **Build and run it.** Confirm that the instructions work. Many problems surface here.
+2. **Map the attack surface.** Find every place where external input enters: network callbacks, serial input, configuration pages, BLE characteristics, sensor readings.
+3. **Trace each input** to where it is used. Is it validated? Can it overflow a buffer, change a command, or reach an actuator without authorization?
+4. **Check secrets.** Search the repository and its *history* for passwords, keys and tokens (`git log -p`, or a secret-scanning tool). Check that `secrets.h` is ignored.
+5. **Check cryptography and TLS.** Is certificate verification disabled (`setInsecure()`)? Are standard libraries used correctly? Is there replay protection on commands (@sec-ch14)?
+6. **Check the update path.** Can firmware be replaced over the network? Is it authenticated (@sec-ch16)?
+7. **Check failure handling.** Do network calls have timeouts? Are fail-safe states defined?
+8. **Check privacy.** What personal data is collected, logged or retained, and is all of it needed?
+
+A checklist of common findings in student IoT code:
+
+- Wi-Fi passwords, broker credentials or API keys committed to the repository, sometimes later "removed" but still in the history;
+- `setInsecure()` or disabled certificate checks;
+- one MQTT topic for everything, with any client able to send commands;
+- commands accepted without authentication, or authenticated without replay protection;
+- `strcpy`, `sprintf` and fixed-size buffers fed with network input;
+- `String` concatenation in loops, causing heap fragmentation over days;
+- blocking calls without timeouts, triggering watchdog resets;
+- verbose debug output in production builds, including secrets.
+
+### Writing findings
+
+Each finding should let the receiving team understand, reproduce and fix the problem:
+
+| Field | Content |
+|---|---|
+| **Title** | A short description: "Unlock command can be replayed" |
+| **Severity** | Critical, high, medium or low, based on impact and likelihood |
+| **Category** | STRIDE category, or reliability, privacy, usability |
+| **Evidence** | Steps to reproduce, captured messages, file and line references, screenshots |
+| **Impact** | What an attacker or a failure could cause in the real use case |
+| **Recommendation** | A concrete fix, with references to standard practices |
+
+A simple severity guide:
+
+- **Critical**: remote control of actuators or full device compromise without credentials.
+- **High**: exposure of credentials or sensitive personal data; reliable denial of service.
+- **Medium**: weaknesses that need special access or conditions to exploit.
+- **Low**: hardening and best-practice improvements.
+
+End the report with a short summary: the most important findings, what the team did well, and the overall risk.
+
+### Responding to a review
+
+Receiving a review is part of the exercise. The team should:
+
+1. **Acknowledge** each finding, and ask clarifying questions if needed.
+2. **Triage**: agree or disagree with each severity, with reasons.
+3. **Fix** the important findings, and **verify** each fix, ideally with the reviewers.
+4. **Document** what was fixed, what was accepted as a known risk and why, and what was deferred.
+
+The response is evidence of engineering maturity, and is often worth as much as the fixes themselves.
+
+::: {.callout-tip title="Try it on your kit: review a peer team"}
+1. Prepare your team's review package and exchange it with your assigned peer team.
+2. Perform a device review of their kit (or, on the Advanced track, a security code review of their repository) using the structure above, within the agreed scope.
+3. Write a findings report with at least five findings, each with severity, evidence and a recommendation.
+4. When you receive your own report, write a response that triages every finding and documents your fixes.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Device review vs. code review | A device review tests what is actually built and deployed; a code review finds issues that are hard to trigger from outside |
+| Breadth vs. depth | A broad checklist finds common issues; depth on the riskiest path finds serious ones |
+| Fixing everything vs. accepting risk | Not every finding is worth fixing before release; document accepted risks explicitly |
+
+## Common pitfalls
+
+- **Reviewing outside the agreed scope**, or disrupting shared systems.
+- **Vague findings** ("security is weak") without evidence or a fix.
+- **Severity inflation**, which hides the findings that matter.
+- **Checking only the current code**, not the repository history, for secrets.
+- **Defensive responses** instead of triage and fixes.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Coordinated disclosure.** In industry, researchers who find vulnerabilities in products they do not own follow coordinated disclosure: report privately to the vendor, give a reasonable time to fix, then publish. Read ISO/IEC 29147 (vulnerability disclosure) or a vendor's published policy, and write a disclosure policy for your project as if it were a product.
+
+**Automated analysis.** Run a static analyzer (such as cppcheck or clang-tidy) and a secret scanner (such as gitleaks) on the repository you reviewed. Which of your manual findings did the tools catch, which did they miss, and what did they find that you missed?
+:::
+
+## Check your understanding
+
+1. Why do independent reviewers find problems that builders miss?
+2. What is the most important ground rule when reviewing someone else's system?
+3. Give four areas to investigate in a device review.
+4. Why must a code review check the repository's history, not just its current files?
+5. What six fields make a finding actionable?
+6. How should a team respond to a finding it disagrees with?
+
+## Further reading
+
+- OWASP, *IoT Security Testing Guide* [@owasp_istg].
+- A. Shostack, *Threat Modeling: Designing for Security* [@shostack_threat_modeling].

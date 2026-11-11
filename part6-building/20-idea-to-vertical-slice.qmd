@@ -1,5 +1,170 @@
 # From Idea to Vertical Slice {#sec-ch20}
 
-::: {.callout-note appearance="minimal"}
-**Not yet written.** Will be drafted from: Project guidelines.
+::: {.callout-tip title="Learning objectives" appearance="simple"}
+After this chapter you should be able to:
+
+1. Turn an IoT product idea into a problem statement, users and measurable requirements.
+2. Write a project proposal with a system architecture, risks and a plan.
+3. Explain what a vertical slice is and why it beats building one layer at a time.
+4. Plan milestones that retire the biggest risks first.
+5. Organize a small team with clear roles, version control and working agreements.
 :::
+
+## Why it matters
+
+Most failed student IoT projects do not fail because a sensor was too hard. They fail because the team spent weeks perfecting one part (a beautiful dashboard, an elaborate enclosure, a complex sensor driver) and discovered in the last week that the parts did not fit together: the radio could not reach the gateway, the battery lasted four hours, or the broker rejected the device's messages.
+
+The remedy is a disciplined path from idea to a thin, working, end-to-end system, followed by deliberate improvement. This chapter describes that path. It applies equally to a ten-week course project and to the first months of a real product.
+
+## Concepts
+
+### From idea to problem statement
+
+Start with a problem, not a technology. A good **problem statement** says who has the problem, what it is, and why current solutions fall short:
+
+> *Weak*: "A LoRa-based smart garden."
+>
+> *Better*: "Community-garden volunteers water every plot daily because they cannot tell which plots are dry, wasting water and time. A low-cost soil-moisture monitor visible from a phone would let them water only plots that need it."
+
+From the problem statement, identify:
+
+- **Users and stakeholders**: who uses the system, who installs and maintains it, and who else is affected (neighbors, building managers, people whose data is collected).
+- **Use scenarios**: short stories of the system in use, including what goes wrong (the network is down; a sensor is stolen; the battery is low).
+
+### Requirements
+
+Turn scenarios into **requirements**: statements that can be checked.
+
+- **Functional requirements** say what the system does: "The dashboard shows each plot's moisture, updated at least every 30 minutes."
+- **Non-functional requirements** say how well: battery life, range, latency, reliability, security, cost, size, privacy. They drive most IoT design decisions.
+
+Make requirements measurable. "Long battery life" cannot be tested; "runs at least 30 days on two AA cells" can. Mark each requirement **must**, **should** or **could**, so that you know what to cut if time runs short.
+
+### Architecture
+
+Sketch the **system architecture** on the four levels of @sec-ch01: devices, network, services platform and applications. For each element, choose technologies using the trade-offs from earlier chapters:
+
+| Question | See |
+|---|---|
+| Which sensors and actuators, and how are they connected? | @sec-ch05, @sec-ch06, @sec-ch07 |
+| Which link technology meets the range, power and data-rate needs? | @sec-ch10 |
+| Which application protocol and message format? | @sec-ch12, @sec-ch13 |
+| Where does processing happen: device, edge or cloud? | @sec-ch18 |
+| What are the threats, and how are devices identified and updated? | @sec-ch14, @sec-ch15, @sec-ch16 |
+
+Include a **data-flow diagram** showing every message, its topic or endpoint, its format and how often it is sent. It will be the basis of your threat model and of your testing.
+
+### Risks
+
+List what could stop the project from working, and rank each risk by likelihood and impact. Typical IoT risks include:
+
+- a sensor that is less accurate or noisier than its datasheet suggests;
+- radio range or reliability that is worse than expected indoors;
+- power consumption that is far higher than estimated;
+- parts that arrive late or not at all;
+- a cloud service or library that does not do what you assumed;
+- integration problems between team members' parts.
+
+For each major risk, plan a **spike**: a quick, throwaway experiment that answers the question early. Measure the range with two kits before designing the network; measure the current before promising battery life.
+
+### The proposal
+
+A project proposal brings these together. A useful structure is:
+
+1. **Problem statement and users**
+2. **Proposed solution** and how it will be used
+3. **Requirements**, with priorities and measurable targets
+4. **System architecture** and data-flow diagram
+5. **Hardware and software**: parts (from the kit and any extras), libraries, services
+6. **Risks** and how you will reduce them
+7. **Plan**: milestones and who does what
+8. **Evaluation**: how you will show that the requirements are met
+
+A proposal is a starting point, not a contract. Feedback on a proposal is usually about making the project achievable and testable, not replacing it.
+
+### The vertical slice
+
+A **vertical slice** is a thin version of the whole system that works **end to end**, through every layer of the architecture:
+
+> one real sensor reading → over the real network → through the real broker or server → stored → shown on the real dashboard, and one real command flowing back to one real actuator.
+
+It does not need to be pretty, complete or efficient. It needs to be **real**: the actual hardware, protocols and services you intend to use, not stand-ins.
+
+Building the vertical slice first has three benefits:
+
+1. **It retires integration risk early.** Most surprises in IoT appear at the boundaries between layers, so you meet them while there is time to change course.
+2. **It gives everyone something to build on.** Team members can improve their layer while the rest of the system keeps working.
+3. **It is always demonstrable.** From then on, the project works at every moment, and progress means adding features to a working system.
+
+The alternative, building each layer completely before connecting them ("horizontal" development), postpones integration to the end, where it is most expensive.
+
+### Milestones
+
+Plan milestones that build on the vertical slice:
+
+| Milestone | Typical content |
+|---|---|
+| **Proposal** | Problem, requirements, architecture, risks, plan |
+| **Spikes** | Answers to the riskiest questions (range, power, sensor quality) |
+| **Vertical slice** | One end-to-end path working on real hardware and services |
+| **Progress report** | Status against the plan; what changed and why; updated risks |
+| **Feature complete** | All *must* requirements implemented |
+| **Security review** | Threat model, review by another team, fixes (@sec-ch22) |
+| **Reliability and field testing** | Long-duration and real-environment tests (@sec-ch21) |
+| **Final demonstration and report** | Evidence that requirements are met; lessons learned |
+
+### Working as a team
+
+A team of three can easily lose a week to coordination problems. A few practices prevent most of them:
+
+- **Clear ownership.** Assign an owner to each part of the architecture (for example device firmware, networking and back end, application and data), plus shared responsibility for integration and testing.
+- **Version control.** Keep all code, configuration and documentation in one repository. Use branches and pull requests, and review each other's code. Never commit secrets: keep them in an ignored `secrets.h` and provide a `secrets.example.h`.
+- **Interfaces first.** Agree early on message formats and topics, written down in the repository (a Thing Description, @sec-ch13, works well). Then each member can work against the agreement.
+- **Short, regular check-ins.** Ten minutes, twice a week: what was done, what is next, what is blocking.
+- **A shared hardware log.** Note wiring changes, pin assignments and anything that was damaged.
+- **Working agreements.** How quickly to answer messages, how decisions are made, and what happens when someone falls behind.
+
+::: {.callout-tip title="Try it on your kit: your first vertical slice"}
+1. Write your project's problem statement and five measurable requirements.
+2. Draw the architecture and data-flow diagram.
+3. Build a vertical slice: one sensor reading from your kit reaches your dashboard or app through your chosen protocol and services, and one command from the dashboard changes an actuator on the kit.
+4. Record a short video of the slice working, and list the three things that surprised you while building it.
+:::
+
+## Design trade-offs
+
+| Decision | Considerations |
+|---|---|
+| Ambition vs. feasibility | An ambitious project is more interesting; a feasible one gets finished. Use must/should/could priorities to have both. |
+| Buy vs. build | Cloud services, libraries and dashboards save time but add dependencies and costs |
+| Extra parts vs. kit only | Extra parts expand what you can build but add delivery, integration and budget risk |
+| Polishing vs. integrating | Time spent polishing one layer is time not spent finding integration problems |
+
+## Common pitfalls
+
+- **Starting with the technology** instead of the problem.
+- **Unmeasurable requirements** such as "fast", "secure" or "low power".
+- **Building horizontally** and integrating in the last week.
+- **Ignoring power and range** until the demo.
+- **One person holding all the knowledge** of a critical part.
+- **Undocumented interfaces** between team members' code.
+
+::: {.callout-note title="Advanced track" collapse="true"}
+**Requirements traceability.** Build a table linking each requirement to the design elements that implement it and the tests that verify it. Use it to show, at the end of the project, which requirements are met and how you know.
+
+**Cost model.** Estimate the bill of materials for 1 000 units of your device, plus monthly connectivity and cloud costs per device. At what price would the product break even over three years, including the support period required by regulation (@sec-ch17)?
+:::
+
+## Check your understanding
+
+1. Rewrite "a smart parking system" as a problem statement.
+2. Give one functional and two non-functional requirements for a fall-detection wearable, all measurable.
+3. What is a spike, and when should you use one?
+4. Define a vertical slice. Why must it use the real hardware and services?
+5. Why is integration risk the main reason to build vertically?
+6. What should a team agree on first to let members work in parallel?
+
+## Further reading
+
+- A. Cockburn, *Writing Effective Use Cases* [@cockburn_use_cases].
+- F. P. Brooks, *The Mythical Man-Month* [@brooks_mythical], on why adding people and postponing integration rarely helps.
