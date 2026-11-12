@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Sensors – Introduction to IoT Systems</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../part2-things/07-actuators.html" rel="next">
+<link href="../part2-things/05-serial-communication.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7165337bd1de6b8f03f71a37d453c8f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html">Part II — The Things</a></li><li class="breadcrumb-item"><a href="../part2-things/06-sensors.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to IoT Systems</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/SergioGagoMasague/intro-to-iot-systems" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Introduction-to-IoT-Systems.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to-use.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using This Book with the IoT@UCI Kit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Part I — Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/01-what-is-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/02-boards-and-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/03-programming-the-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/04-embedded-systems-os.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Part II — The Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/05-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/06-sensors.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/07-actuators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Part III — Connecting Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/08-communication-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Communication Models: OSI and TCP/IP</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/09-network-requirements-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/10-link-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/11-internet-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/12-application-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Application Protocols: HTTP, CoAP, MQTT and More</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/13-interoperability-standards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Interoperability and Standards</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Part IV — Trustworthy IoT</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/14-security-privacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Security and Privacy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/15-device-identity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Device Identity and Secure Elements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/16-ota-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Over-the-Air Updates and the Device Lifecycle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/17-compliance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Compliance and Regulation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Part V — Intelligence at the Edge</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/18-ai-on-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">AI on IoT and Edge ML</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/19-where-iot-is-heading.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Where IoT Is Heading</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Part VI — Building an IoT System</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/20-idea-to-vertical-slice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From Idea to Vertical Slice</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/21-testing-in-the-field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Testing in the Field</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/22-reviewing-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reviewing Someone Else’s System</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-7-label">Part VII — Lab Companion</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L0-bench-safety-soldering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Bench Safety and Soldering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L1-build-the-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Build the Kit in Stages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L2-traffic-controller.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Traffic Controller</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L3-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Serial Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L4-ble-step-counter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: BLE Step Counter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L5-cloud-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Cloud Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L6-harden-your-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Harden Your Device</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Part VIII — Lecture Activities</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A0-about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About the Activities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A1-blink.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 1: Blink and Basic Circuits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A2-buttons-interrupts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 2: Buttons, Debouncing and Interrupts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A3-i2c-spi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 3: Scan the I²C Bus, Report on SPI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A4-oda-loop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 4: The Observe–Decide–Act Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A5-http-poll.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 5: A Classroom Poll over HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A6-lora-beacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 6: A LoRa Emergency Beacon</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A7-mqtt-qos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 7: MQTT Command Center and Picking the QoS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A8-signed-messages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 8: Signed Messages and STRIDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/A-kit-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Kit Reference</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/B-toolchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Toolchain Setup</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/C-troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Troubleshooting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/D-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/E-teaching-lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Setting Up a Teaching Lab</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#why-it-matters" id="toc-why-it-matters" class="nav-link active" data-scroll-target="#why-it-matters"><span class="header-section-number">6.1</span> Why it matters</a></li>
+  <li><a href="#concepts" id="toc-concepts" class="nav-link" data-scroll-target="#concepts"><span class="header-section-number">6.2</span> Concepts</a>
+  <ul class="collapse">
+  <li><a href="#what-a-sensor-does" id="toc-what-a-sensor-does" class="nav-link" data-scroll-target="#what-a-sensor-does">What a sensor does</a></li>
+  <li><a href="#smart-sensors" id="toc-smart-sensors" class="nav-link" data-scroll-target="#smart-sensors">Smart sensors</a></li>
+  <li><a href="#classifying-sensors" id="toc-classifying-sensors" class="nav-link" data-scroll-target="#classifying-sensors">Classifying sensors</a></li>
+  <li><a href="#common-sensor-types" id="toc-common-sensor-types" class="nav-link" data-scroll-target="#common-sensor-types">Common sensor types</a></li>
+  <li><a href="#reading-a-sensors-specifications" id="toc-reading-a-sensors-specifications" class="nav-link" data-scroll-target="#reading-a-sensors-specifications">Reading a sensor’s specifications</a></li>
+  <li><a href="#the-kits-sensors" id="toc-the-kits-sensors" class="nav-link" data-scroll-target="#the-kits-sensors">The kit’s sensors</a></li>
+  <li><a href="#making-readings-trustworthy" id="toc-making-readings-trustworthy" class="nav-link" data-scroll-target="#making-readings-trustworthy">Making readings trustworthy</a></li>
+  </ul></li>
+  <li><a href="#sec-ch06-depth" id="toc-sec-ch06-depth" class="nav-link" data-scroll-target="#sec-ch06-depth"><span class="header-section-number">6.3</span> In depth (optional)</a>
+  <ul class="collapse">
+  <li><a href="#from-voltage-to-physics" id="toc-from-voltage-to-physics" class="nav-link" data-scroll-target="#from-voltage-to-physics">From voltage to physics</a></li>
+  </ul></li>
+  <li><a href="#design-trade-offs" id="toc-design-trade-offs" class="nav-link" data-scroll-target="#design-trade-offs"><span class="header-section-number">6.4</span> Design trade-offs</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">6.5</span> Common pitfalls</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">6.6</span> Check your understanding</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">6.7</span> Further reading</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part2-things/06-sensors.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html">Part II — The Things</a></li><li class="breadcrumb-item"><a href="../part2-things/06-sensors.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ch06" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After this chapter you should be able to:</p>
+<ol type="1">
+<li>Describe the signal chain from a physical quantity to a number in software.</li>
+<li>Explain what makes a sensor “smart”, and why most modern sensors are.</li>
+<li>Classify sensors along several dimensions and read the key specifications on a datasheet.</li>
+<li>Distinguish accuracy, precision and resolution, and explain calibration and drift.</li>
+<li>Read the kit’s pressure/temperature sensor and inertial measurement unit, and convert raw readings to physical units.</li>
+<li>Apply simple filtering and sampling rules to make sensor data trustworthy.</li>
+</ol>
+</div>
+</div>
+<section id="why-it-matters" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="why-it-matters"><span class="header-section-number">6.1</span> Why it matters</h2>
+<p>A modern smartphone contains more than a dozen sensors. A fitness band carries an accelerometer, a gyroscope, an altimeter, an optical heart-rate sensor, skin-temperature and ambient-light sensors, and a satellite-positioning receiver. A modern car has well over a hundred: cameras, ultrasonic parking sensors, wheel-speed sensors, seat-occupancy sensors that tune the airbags, battery-temperature sensors, tire-pressure sensors and more.</p>
+<p>Sensing is what puts the “things” into the Internet of Things. Every decision a device makes, and every chart on a dashboard, is only as good as the sensor readings behind it. This chapter explains how sensors work, how to read their specifications, and how to turn raw readings into numbers you can trust.</p>
+</section>
+<section id="concepts" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="concepts"><span class="header-section-number">6.2</span> Concepts</h2>
+<section id="what-a-sensor-does" class="level3">
+<h3 class="anchored" data-anchor-id="what-a-sensor-does">What a sensor does</h3>
+<p>A <strong>sensor</strong> detects a physical quantity, or a change in one, and produces a corresponding signal that another device can use. Sensors can measure almost anything: temperature, pressure, light, sound, motion, magnetic field, humidity, flow, distance, or chemical and biological properties.</p>
+<p>The heart of every sensor is a <strong>transducer</strong>: an element whose electrical properties change with the quantity being measured. A thermistor’s resistance changes with temperature; a photodiode’s current changes with light; a tiny silicon structure flexes under acceleration and changes its capacitance.</p>
+<p>Between the transducer and your code there is a <strong>signal chain</strong> (<a href="#fig-sensor-chain" class="quarto-xref">Figure&nbsp;<span>6.1</span></a>):</p>
+<div id="fig-sensor-chain" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sensor-chain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/sensor-signal-chain.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sensor-chain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: The sensor signal chain. In a smart sensor, everything inside the dashed box is on one chip.
+</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li>The <strong>transducer</strong> converts the physical quantity to an electrical quantity.</li>
+<li><strong>Conditioning</strong> circuits amplify and filter the signal and make it suitable for conversion.</li>
+<li>An <strong>ADC</strong> converts it to a number (<a href="../part1-foundations/03-programming-the-device.html" class="quarto-xref"><span>Chapter 3</span></a>).</li>
+<li><strong>Processing</strong> applies calibration, compensation and filtering.</li>
+<li>An <strong>interface</strong> (I²C, SPI or UART, <a href="05-serial-communication.html" class="quarto-xref"><span>Chapter 5</span></a>) delivers the result to the microcontroller.</li>
+</ol>
+</section>
+<section id="smart-sensors" class="level3">
+<h3 class="anchored" data-anchor-id="smart-sensors">Smart sensors</h3>
+<p>In the simplest sensors, such as a potentiometer or a thermistor, the microcontroller’s own ADC does the conversion and your code does everything else. A <strong>smart sensor</strong> <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span> integrates the whole chain on one small chip, with its own ADC, a small processor and a digital interface. Smart sensors bring several advantages:</p>
+<ul>
+<li><strong>Self-calibration.</strong> Factory calibration coefficients are stored in the chip, and the sensor or its driver applies them automatically.</li>
+<li><strong>Communication.</strong> The sensor reports over a digital bus, which is far less sensitive to noise than a small analog voltage on a long wire.</li>
+<li><strong>Local computation.</strong> Many smart sensors average, filter, detect events (a tap, a fall, a step) or raise an interrupt when a threshold is crossed, so the main processor can sleep.</li>
+<li><strong>Multi-sensing.</strong> Several sensing elements share one package. The kit’s MPU-6050 combines an accelerometer, a gyroscope and a temperature sensor.</li>
+</ul>
+<p>Both of the kit’s environmental and motion sensors, the BMP280 and the MPU-6050, are smart sensors on the I²C bus.</p>
+</section>
+<section id="classifying-sensors" class="level3">
+<h3 class="anchored" data-anchor-id="classifying-sensors">Classifying sensors</h3>
+<p>Sensors can be grouped in several useful ways <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Dimension</th>
+<th>Options</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Power</td>
+<td><strong>Active</strong> (needs an external supply) or <strong>passive</strong> (generates its own signal)</td>
+<td>A thermocouple is passive; an ultrasonic range finder is active</td>
+</tr>
+<tr class="even">
+<td>Intrusiveness</td>
+<td><strong>Invasive</strong> (part of the system it measures) or <strong>non-invasive</strong></td>
+<td>An implanted glucose sensor versus a camera</td>
+</tr>
+<tr class="odd">
+<td>Contact</td>
+<td><strong>Contact</strong> or <strong>non-contact</strong></td>
+<td>A thermistor on a pipe versus an infrared thermometer</td>
+</tr>
+<tr class="even">
+<td>Reference</td>
+<td><strong>Absolute</strong> or <strong>relative</strong> (measured against a reference)</td>
+<td>Absolute pressure versus differential pressure across a filter</td>
+</tr>
+<tr class="odd">
+<td>Output</td>
+<td><strong>Analog</strong> or <strong>digital</strong></td>
+<td>A potentiometer versus the BMP280</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-sensor-types" class="level3">
+<h3 class="anchored" data-anchor-id="common-sensor-types">Common sensor types</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Sensor</th>
+<th>Measures</th>
+<th>Common technologies</th>
+<th>Typical applications</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Inertial (IMU)</td>
+<td>Acceleration and rotation rate</td>
+<td>MEMS accelerometers and gyroscopes</td>
+<td>Activity tracking, drones, vibration monitoring</td>
+</tr>
+<tr class="even">
+<td>Tachometer</td>
+<td>Rotational speed</td>
+<td>Magnetic (Hall effect), optical</td>
+<td>Motors, wheels, fans</td>
+</tr>
+<tr class="odd">
+<td>Proximity</td>
+<td>Presence of a nearby object</td>
+<td>Capacitive, inductive, infrared, ultrasonic</td>
+<td>Phones, parking aids, factory lines</td>
+</tr>
+<tr class="even">
+<td>Occupancy</td>
+<td>People in a space</td>
+<td>Passive infrared (PIR), ultrasonic, mm-wave radar</td>
+<td>Lighting and HVAC control</td>
+</tr>
+<tr class="odd">
+<td>Temperature / humidity</td>
+<td>Heat, water vapor</td>
+<td>Thermistor, RTD, thermocouple, solid-state</td>
+<td>HVAC, cold chain, weather</td>
+</tr>
+<tr class="even">
+<td>Pressure</td>
+<td>Force per area</td>
+<td>Piezoresistive, capacitive MEMS</td>
+<td>Weather, altitude, tire pressure</td>
+</tr>
+<tr class="odd">
+<td>Light</td>
+<td>Illuminance</td>
+<td>Photoresistor, photodiode</td>
+<td>Automatic lighting, display brightness</td>
+</tr>
+<tr class="even">
+<td>Soil moisture</td>
+<td>Water content</td>
+<td>Capacitive, resistive</td>
+<td>Irrigation control</td>
+</tr>
+<tr class="odd">
+<td>Touch / force</td>
+<td>Contact and pressure</td>
+<td>Capacitive, resistive, piezoresistive</td>
+<td>User interfaces, pressure mats</td>
+</tr>
+<tr class="even">
+<td>Gas</td>
+<td>Concentrations of CO₂, CO, VOCs</td>
+<td>Metal-oxide, NDIR, electrochemical</td>
+<td>Air-quality monitoring</td>
+</tr>
+</tbody>
+</table>
+<p>Most motion and pressure sensors today are <strong>MEMS</strong> (micro-electro-mechanical systems) devices: microscopic mechanical structures etched into silicon alongside their electronics. MEMS made precise motion sensing cheap enough for every phone and wearable.</p>
+</section>
+<section id="reading-a-sensors-specifications" class="level3">
+<h3 class="anchored" data-anchor-id="reading-a-sensors-specifications">Reading a sensor’s specifications</h3>
+<p>A datasheet describes a sensor with a handful of terms that are easy to confuse:</p>
+<ul>
+<li><strong>Range</strong>: the minimum and maximum values the sensor can measure. The BMP280 measures 300 to 1100 hPa.</li>
+<li><strong>Resolution</strong>: the smallest change the sensor can report. A 16-bit reading across a ±2 g range has a resolution of about 0.06 mg.</li>
+<li><strong>Accuracy</strong>: how close a reading is to the true value.</li>
+<li><strong>Precision</strong> (or repeatability): how close repeated readings of the same value are to each other.</li>
+<li><strong>Sensitivity</strong>: how much the output changes for a given change in the input, such as 16 384 counts per g.</li>
+<li><strong>Offset (bias)</strong>: the reading when the true input is zero.</li>
+<li><strong>Drift</strong>: slow change of offset or sensitivity over time or temperature.</li>
+<li><strong>Noise</strong>: random variation in readings, often given as a noise density or an RMS value.</li>
+<li><strong>Response time and sampling rate</strong>: how quickly the sensor follows a change, and how often it can produce a reading.</li>
+</ul>
+<p>A sensor can be precise but inaccurate (readings tightly clustered around the wrong value) or accurate on average but imprecise (readings scattered around the right value). High resolution does not imply high accuracy: a sensor can report many digits, all of them wrong.</p>
+<p><strong>Calibration</strong> measures a sensor’s offset and sensitivity against a known reference and corrects for them. Many smart sensors ship with factory calibration; others, such as gyroscopes, need a quick calibration at start-up, for example by averaging readings while the device is held still.</p>
+</section>
+<section id="the-kits-sensors" class="level3">
+<h3 class="anchored" data-anchor-id="the-kits-sensors">The kit’s sensors</h3>
+<section id="bmp280-pressure-and-temperature" class="level4">
+<h4 class="anchored" data-anchor-id="bmp280-pressure-and-temperature">BMP280: pressure and temperature</h4>
+<p>The Bosch BMP280 measures barometric pressure and temperature <span class="citation" data-cites="bosch_bmp280">(<a href="../references.html#ref-bosch_bmp280" role="doc-biblioref"><em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>, n.d.</a>)</span>. On the kit it sits on the I²C bus at address 0x76. Internally it produces raw readings that must be combined with factory calibration coefficients stored in the chip. The Adafruit library handles this:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Wire.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Adafruit_BMP280.h&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Adafruit_BMP280 bmp<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>begin<span class="op">(</span><span class="dv">21</span><span class="op">,</span> <span class="dv">22</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>bmp<span class="op">.</span>begin<span class="op">(</span><span class="bn">0x76</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"BMP280 not found: check wiring and address"</span><span class="op">);</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">)</span> delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> tempC <span class="op">=</span> bmp<span class="op">.</span>readTemperature<span class="op">();</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> hPa   <span class="op">=</span> bmp<span class="op">.</span>readPressure<span class="op">()</span> <span class="op">/</span> <span class="fl">100.0</span><span class="bu">f</span><span class="op">;</span>      <span class="co">// Pa → hPa</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> altM  <span class="op">=</span> bmp<span class="op">.</span>readAltitude<span class="op">(</span><span class="fl">1013.25</span><span class="bu">f</span><span class="op">);</span>       <span class="co">// sea-level reference pressure</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"</span><span class="sc">%.2f</span><span class="st"> °C  </span><span class="sc">%.2f</span><span class="st"> hPa  </span><span class="sc">%.1f</span><span class="st"> m</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> tempC<span class="op">,</span> hPa<span class="op">,</span> altM<span class="op">);</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pressure falls by roughly 12 Pa for every meter of height near sea level, so a pressure sensor can estimate altitude:</p>
+<p><span class="math display">\[
+h \approx 44\,330 \left(1 - \left(\frac{p}{p_0}\right)^{1/5.255}\right)\ \text{m}
+\]</span></p>
+<p>where <span class="math inline">\(p_0\)</span> is the pressure at sea level. Because weather changes <span class="math inline">\(p_0\)</span> by tens of hectopascals, absolute altitude estimates are only rough unless you use the local sea-level pressure. <em>Changes</em> in altitude, such as climbing a flight of stairs, can be detected much more reliably, because the BMP280’s relative accuracy is about ±0.12 hPa, or around ±1 m.</p>
+<p>The temperature reading reflects the temperature of the chip, which is warmed slightly by its neighbors on the breadboard. Expect it to read a little above room temperature.</p>
+</section>
+<section id="mpu-6050-acceleration-and-rotation" class="level4">
+<h4 class="anchored" data-anchor-id="mpu-6050-acceleration-and-rotation">MPU-6050: acceleration and rotation</h4>
+<p>The InvenSense MPU-6050 is an <strong>inertial measurement unit</strong> (IMU) with a three-axis accelerometer and a three-axis gyroscope <span class="citation" data-cites="invensense_mpu6050">(<a href="../references.html#ref-invensense_mpu6050" role="doc-biblioref"><em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>, n.d.</a>)</span>. On the kit it is at I²C address 0x68.</p>
+<ul>
+<li>The <strong>accelerometer</strong> measures acceleration, including gravity. Lying flat and still, it reads about +1 g on its Z axis and 0 g on X and Y. Its default range is ±2 g, with a sensitivity of 16 384 counts per g.</li>
+<li>The <strong>gyroscope</strong> measures the rate of rotation around each axis. Its default range is ±250 °/s, with a sensitivity of 131 counts per °/s.</li>
+</ul>
+<p>Reading the MPU-6050 directly shows how a register-based smart sensor works. It starts in sleep mode, so the first step is to wake it by writing 0 to its power-management register. Then all six motion readings, plus temperature, can be read in one 14-byte burst starting at register 0x3B:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Wire.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">uint8_t</span> MPU <span class="op">=</span> <span class="bn">0x68</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> writeReg<span class="op">(</span><span class="dt">uint8_t</span> reg<span class="op">,</span> <span class="dt">uint8_t</span> value<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>beginTransmission<span class="op">(</span>MPU<span class="op">);</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>write<span class="op">(</span>reg<span class="op">);</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>write<span class="op">(</span>value<span class="op">);</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>endTransmission<span class="op">();</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>begin<span class="op">(</span><span class="dv">21</span><span class="op">,</span> <span class="dv">22</span><span class="op">);</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  writeReg<span class="op">(</span><span class="bn">0x6B</span><span class="op">,</span> <span class="bn">0x00</span><span class="op">);</span>                      <span class="co">// PWR_MGMT_1: wake up</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>beginTransmission<span class="op">(</span>MPU<span class="op">);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>write<span class="op">(</span><span class="bn">0x3B</span><span class="op">);</span>                          <span class="co">// ACCEL_XOUT_H</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>endTransmission<span class="op">(</span><span class="kw">false</span><span class="op">);</span>               <span class="co">// repeated START</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>requestFrom<span class="op">(</span>MPU<span class="op">,</span> <span class="op">(</span><span class="dt">uint8_t</span><span class="op">)</span><span class="dv">14</span><span class="op">);</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int16_t</span> raw<span class="op">[</span><span class="dv">7</span><span class="op">];</span>                            <span class="co">// ax, ay, az, temp, gx, gy, gz</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">7</span><span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    raw<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">(</span>Wire<span class="op">.</span>read<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="dv">8</span><span class="op">)</span> <span class="op">|</span> Wire<span class="op">.</span>read<span class="op">();</span>   <span class="co">// big-endian, two's complement</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> ax <span class="op">=</span> raw<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">/</span> <span class="fl">16384.0</span><span class="bu">f</span><span class="op">,</span> ay <span class="op">=</span> raw<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">/</span> <span class="fl">16384.0</span><span class="bu">f</span><span class="op">,</span> az <span class="op">=</span> raw<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">/</span> <span class="fl">16384.0</span><span class="bu">f</span><span class="op">;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> gz <span class="op">=</span> raw<span class="op">[</span><span class="dv">6</span><span class="op">]</span> <span class="op">/</span> <span class="fl">131.0</span><span class="bu">f</span><span class="op">;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"a = (</span><span class="sc">%.2f</span><span class="st">, </span><span class="sc">%.2f</span><span class="st">, </span><span class="sc">%.2f</span><span class="st">) g   gz = </span><span class="sc">%.1f</span><span class="st"> °/s</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> ax<span class="op">,</span> ay<span class="op">,</span> az<span class="op">,</span> gz<span class="op">);</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">100</span><span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>From the accelerometer alone, the device’s tilt can be estimated whenever it is not otherwise accelerating, because gravity then points straight down:</p>
+<p><span class="math display">\[
+\text{pitch} = \operatorname{atan2}\left(-a_x,\ \sqrt{a_y^2 + a_z^2}\right),\qquad
+\text{roll} = \operatorname{atan2}(a_y,\ a_z)
+\]</span></p>
+</section>
+</section>
+<section id="making-readings-trustworthy" class="level3">
+<h3 class="anchored" data-anchor-id="making-readings-trustworthy">Making readings trustworthy</h3>
+<section id="sampling" class="level4">
+<h4 class="anchored" data-anchor-id="sampling">Sampling</h4>
+<p>How often should you read a sensor? The <strong>Nyquist criterion</strong> says you must sample at more than twice the highest frequency present in the signal to capture it faithfully. Sampling too slowly causes <strong>aliasing</strong>: fast changes masquerade as slow ones. In practice, sample several times faster than the fastest change you care about. Room temperature changes over minutes; footsteps produce accelerations of a few hertz; machine vibration can reach kilohertz.</p>
+<p>Sampling faster than necessary wastes energy and bandwidth, which matters for battery-powered devices.</p>
+</section>
+<section id="filtering" class="level4">
+<h4 class="anchored" data-anchor-id="filtering">Filtering</h4>
+<p>Real readings are noisy. Two simple filters cover most needs:</p>
+<ul>
+<li><p>A <strong>moving average</strong> of the last <span class="math inline">\(N\)</span> readings reduces random noise by about <span class="math inline">\(\sqrt{N}\)</span>, at the cost of delay.</p></li>
+<li><p>An <strong>exponential moving average</strong> needs only one stored value:</p>
+<p><span class="math display">\[
+y_k = \alpha\, x_k + (1 - \alpha)\, y_{k-1},\qquad 0 &lt; \alpha \le 1
+\]</span></p>
+<p>A small <span class="math inline">\(\alpha\)</span> smooths heavily but responds slowly; a large <span class="math inline">\(\alpha\)</span> follows changes quickly but passes more noise.</p></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> ema<span class="op">(</span><span class="dt">float</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">float</span> y <span class="op">=</span> NAN<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">constexpr</span> <span class="dt">float</span> ALPHA <span class="op">=</span> <span class="fl">0.2</span><span class="bu">f</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  y <span class="op">=</span> isnan<span class="op">(</span>y<span class="op">)</span> <span class="op">?</span> x <span class="op">:</span> ALPHA <span class="op">*</span> x <span class="op">+</span> <span class="op">(</span><span class="dv">1</span> <span class="op">-</span> ALPHA<span class="op">)</span> <span class="op">*</span> y<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> y<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="sensor-fusion" class="level4">
+<h4 class="anchored" data-anchor-id="sensor-fusion">Sensor fusion</h4>
+<p>Different sensors have complementary weaknesses. A gyroscope gives smooth, fast rotation estimates but drifts over time when integrated. An accelerometer gives a drift-free tilt reference but is disturbed by every bump. <strong>Sensor fusion</strong> combines them. The simplest example is a <strong>complementary filter</strong>:</p>
+<p><span class="math display">\[
+\theta_k = \beta\,(\theta_{k-1} + \omega_k\,\Delta t) + (1 - \beta)\,\theta_{\text{accel},k},\qquad \beta \approx 0.98
+\]</span></p>
+<p>It trusts the gyroscope over short time scales and the accelerometer over long ones. Phones, drones and wearables use more sophisticated versions, such as Kalman filters, but the idea is the same.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Try it on your kit: from raw counts to physics
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This exercise uses Stage 2 of the kit build.</p>
+<ol type="1">
+<li>Read the BMP280 for one minute and compute the mean and standard deviation of the pressure. Then lift the kit from the floor to a table. Can you see the change?</li>
+<li>Read the MPU-6050 with the board flat and still. Which axis reads about 1 g? Compute the gyroscope’s offsets by averaging 200 samples, and subtract them from later readings.</li>
+<li>Tilt the board and print pitch and roll from the accelerometer. Now shake it gently. What happens to the tilt estimate?</li>
+<li>Apply an exponential moving average to the pitch with α = 0.1 and α = 0.5. Describe the trade-off you see.</li>
+<li>Optional: implement the complementary filter and compare it with the accelerometer-only estimate while shaking the board.</li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="sec-ch06-depth" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-ch06-depth"><span class="header-section-number">6.3</span> In depth (optional)</h2>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Optional, in-depth explanation.</strong> This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.</p>
+</div>
+</div>
+</div>
+<section id="from-voltage-to-physics" class="level3">
+<h3 class="anchored" data-anchor-id="from-voltage-to-physics">From voltage to physics</h3>
+<p><strong>Quantization.</strong> An <span class="math inline">\(N\)</span>-bit ADC with reference voltage <span class="math inline">\(V_\text{ref}\)</span> divides the input range into <span class="math inline">\(2^N\)</span> steps of one <strong>least significant bit</strong>, <span class="math inline">\(\text{LSB} = V_\text{ref}/2^N\)</span>. For the ESP32’s 12-bit ADC over roughly 3.3 V, one LSB is about 0.8 mV. Rounding to the nearest step adds an error spread uniformly over ±½ LSB, whose standard deviation is</p>
+<p><span class="math display">\[
+\sigma_q = \frac{\text{LSB}}{\sqrt{12}},
+\]</span></p>
+<p>which gives the ideal signal-to-quantization-noise ratio <span class="math inline">\(\text{SQNR} \approx 6.02N + 1.76\)</span> dB (74 dB for 12 bits). Real converters add their own noise and non-linearity; the ESP32’s ADC behaves more like a 9- or 10-bit converter, its <strong>effective number of bits</strong> (ENOB).</p>
+<p><strong>Averaging.</strong> Averaging <span class="math inline">\(M\)</span> independent readings reduces random noise by <span class="math inline">\(\sqrt{M}\)</span>: 16 samples give a factor of 4, two extra effective bits. It does not remove systematic errors such as offset or non-linearity; those need calibration.</p>
+<p><strong>The potentiometer is a voltage divider.</strong> With the wiper at fraction <span class="math inline">\(x\)</span> of the track, <span class="math inline">\(V_\text{out} = x\,V_{DD}\)</span> regardless of the total resistance, as long as the ADC draws negligible current. A 10 kΩ potentiometer has a worst-case source resistance of 2.5 kΩ (at mid-travel), low enough for the ADC to sample accurately.</p>
+<p><strong>Pressure to altitude.</strong> In the standard atmosphere, pressure falls with height. A widely used approximation for the lower atmosphere is</p>
+<p><span class="math display">\[
+h = 44\,330 \left[ 1 - \left(\frac{p}{p_0}\right)^{1/5.255} \right]\ \text{m},
+\]</span></p>
+<p>where <span class="math inline">\(p_0\)</span> is the pressure at sea level (1013.25 hPa by default). Near sea level, pressure falls about 12 Pa per metre, so the BMP280’s resolution of a few pascals corresponds to tens of centimetres. Weather changes <span class="math inline">\(p_0\)</span> by several hectopascals a day, however, so absolute altitude needs a local reference, while <em>changes</em> in altitude (a floor climbed) are measured well.</p>
+<p><strong>Tilt from an accelerometer.</strong> At rest, an accelerometer measures only gravity. With the MPU-6050 at ±2 g, 16 384 counts represent 1 g. Pitch and roll follow from the gravity vector’s components:</p>
+<p><span class="math display">\[
+\theta_\text{pitch} = \operatorname{atan2}\left(-a_x,\ \sqrt{a_y^2 + a_z^2}\right), \qquad
+\phi_\text{roll} = \operatorname{atan2}(a_y,\ a_z).
+\]</span></p>
+<p><strong>Fusing gyro and accelerometer.</strong> The accelerometer’s angle is correct on average but noisy; the gyroscope’s integrated rate is smooth but drifts. A <strong>complementary filter</strong> combines them:</p>
+<p><span class="math display">\[
+\theta_k = \alpha\left(\theta_{k-1} + \omega_k\,\Delta t\right) + (1-\alpha)\,\theta_{\text{acc},k},
+\]</span></p>
+<p>with <span class="math inline">\(\alpha\)</span> close to 1 (for example 0.98 at 100 Hz). It is a high-pass filter on the gyroscope and a low-pass filter on the accelerometer, with a crossover time constant <span class="math inline">\(\tau = \alpha\,\Delta t/(1-\alpha) \approx 0.5\)</span> s.</p>
+<p><strong>Exercise.</strong> You average 64 ADC readings of a still potentiometer whose single readings have a standard deviation of 8 LSB. What standard deviation do you expect for the average, and how many effective bits did you gain?</p>
+<p>Sources for this section: <span class="citation" data-cites="bosch_bmp280 invensense_mpu6050 fraden_sensors">(<a href="../references.html#ref-bosch_bmp280" role="doc-biblioref"><em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>, n.d.</a>; <a href="../references.html#ref-invensense_mpu6050" role="doc-biblioref"><em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>, n.d.</a>; <a href="../references.html#ref-fraden_sensors" role="doc-biblioref">Fraden 2016</a>)</span>.</p>
+</section>
+</section>
+<section id="design-trade-offs" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="design-trade-offs"><span class="header-section-number">6.4</span> Design trade-offs</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Decision</th>
+<th>Considerations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Analog vs.&nbsp;digital (smart) sensor</td>
+<td>Analog sensors are cheap and simple but sensitive to noise and wiring; digital sensors are calibrated and robust but cost more and need a bus.</td>
+</tr>
+<tr class="even">
+<td>Sampling rate</td>
+<td>Faster sampling captures more detail but costs energy, processing and bandwidth.</td>
+</tr>
+<tr class="odd">
+<td>On-sensor vs.&nbsp;on-MCU processing</td>
+<td>Event detection on the sensor lets the MCU sleep; processing on the MCU is more flexible.</td>
+</tr>
+<tr class="even">
+<td>Filtering</td>
+<td>More smoothing means less noise but more delay.</td>
+</tr>
+<tr class="odd">
+<td>Accuracy class</td>
+<td>Better accuracy costs money and often power. Buy only the accuracy the application needs.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-pitfalls" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">6.5</span> Common pitfalls</h2>
+<ul>
+<li><strong>Trusting the first reading.</strong> Many sensors need a short warm-up or settling time after power-up or after waking.</li>
+<li><strong>Forgetting to wake the sensor.</strong> The MPU-6050 starts in sleep mode and returns zeros until it is woken.</li>
+<li><strong>Wrong byte order or sign.</strong> The MPU-6050 sends 16-bit two’s-complement values, high byte first.</li>
+<li><strong>Confusing resolution with accuracy.</strong> Many digits do not mean a correct value.</li>
+<li><strong>Self-heating.</strong> A temperature sensor next to a voltage regulator or a radio measures the board, not the room.</li>
+<li><strong>Integrating gyroscope data without correction.</strong> The angle drifts without bound.</li>
+<li><strong>Unit mistakes.</strong> Pa versus hPa, g versus m/s², degrees versus radians.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Advanced track
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Characterizing noise.</strong> Log 10 000 gyroscope samples with the board still and plot their histogram and the Allan deviation. The Allan deviation separates white noise (which averaging removes) from bias instability (which it does not), and is the standard way to compare inertial sensors.</p>
+<p><strong>Sensor-hub architectures.</strong> Phones and wearables offload continuous sensing to a low-power sensor hub or to the sensor itself, so that the main processor can sleep. Modern IMUs such as the Bosch BMI270 or the ST LSM6DSO include step counters, gesture detectors and even small machine-learning cores. Compare the energy cost of counting steps on the MCU with counting them on the sensor.</p>
+<p><strong>Calibration in the field.</strong> Magnetometers need hard-iron and soft-iron calibration after they are mounted, because nearby metal and currents distort the field they measure. Research how a phone guides you through “figure-eight” calibration and what it is estimating.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">6.6</span> Check your understanding</h2>
+<ol type="1">
+<li>List the five stages of a sensor signal chain.</li>
+<li>What makes a sensor “smart”? Give two advantages.</li>
+<li>Explain the difference between accuracy, precision and resolution, using a dartboard analogy.</li>
+<li>The MPU-6050 accelerometer reads 8 192 counts on its Z axis at the ±2 g range. What acceleration is that?</li>
+<li>Why does a gyroscope-only angle estimate drift, and how does a complementary filter help?</li>
+<li>You want to detect footsteps, which produce accelerations at up to about 5 Hz. What is the minimum sampling rate, and what would you choose in practice?</li>
+<li>Your BMP280 reports an altitude of 140 m, but you know you are at 20 m. Give two likely reasons.</li>
+</ol>
+</section>
+<section id="further-reading" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">6.7</span> Further reading</h2>
+<ul>
+<li>Bosch Sensortec, <em>BMP280 datasheet</em> <span class="citation" data-cites="bosch_bmp280">(<a href="../references.html#ref-bosch_bmp280" role="doc-biblioref"><em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>, n.d.</a>)</span>.</li>
+<li>InvenSense, <em>MPU-6000/MPU-6050 Product Specification</em> and <em>Register Map</em> <span class="citation" data-cites="invensense_mpu6050">(<a href="../references.html#ref-invensense_mpu6050" role="doc-biblioref"><em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>, n.d.</a>)</span>.</li>
+<li>A. Rayes and S. Salam <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>, chapter on sensors and actuators, which this chapter’s classification follows.</li>
+<li>J. Fraden, <em>Handbook of Modern Sensors</em> <span class="citation" data-cites="fraden_sensors">(<a href="../references.html#ref-fraden_sensors" role="doc-biblioref">Fraden 2016</a>)</span>, a comprehensive reference on sensing principles.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-bosch_bmp280" class="csl-entry" role="listitem">
+<em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>. n.d. Bosch Sensortec. <a href="https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/">https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/</a>.
+</div>
+<div id="ref-fraden_sensors" class="csl-entry" role="listitem">
+Fraden, Jacob. 2016. <em>Handbook of Modern Sensors: Physics, Designs, and Applications</em>. 5th ed. Springer.
+</div>
+<div id="ref-invensense_mpu6050" class="csl-entry" role="listitem">
+<em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>. n.d. InvenSense.
+</div>
+<div id="ref-rayes_salam_iot" class="csl-entry" role="listitem">
+Rayes, Ammar, and Samer Salam. 2022. <em>Internet of Things from Hype to Reality: The Road to Digitization</em>. 3rd ed. Springer. <a href="https://doi.org/10.1007/978-3-030-90158-5">https://doi.org/10.1007/978-3-030-90158-5</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../part2-things/05-serial-communication.html" class="pagination-link" aria-label="Serial Communication: UART, SPI and I²C">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../part2-things/07-actuators.html" class="pagination-link" aria-label="Actuators and the Observe–Decide–Act Loop">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part2-things/06-sensors.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>IoT@UCI</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

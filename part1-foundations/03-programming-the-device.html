@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Programming the Device – Introduction to IoT Systems</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../part1-foundations/04-embedded-systems-os.html" rel="next">
+<link href="../part1-foundations/02-boards-and-kit.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7165337bd1de6b8f03f71a37d453c8f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../part1-foundations/03-programming-the-device.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to IoT Systems</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/SergioGagoMasague/intro-to-iot-systems" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Introduction-to-IoT-Systems.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to-use.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using This Book with the IoT@UCI Kit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Part I — Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/01-what-is-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/02-boards-and-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/03-programming-the-device.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/04-embedded-systems-os.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Part II — The Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/05-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/06-sensors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/07-actuators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Part III — Connecting Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/08-communication-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Communication Models: OSI and TCP/IP</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/09-network-requirements-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/10-link-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/11-internet-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/12-application-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Application Protocols: HTTP, CoAP, MQTT and More</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/13-interoperability-standards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Interoperability and Standards</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Part IV — Trustworthy IoT</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/14-security-privacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Security and Privacy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/15-device-identity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Device Identity and Secure Elements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/16-ota-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Over-the-Air Updates and the Device Lifecycle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/17-compliance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Compliance and Regulation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Part V — Intelligence at the Edge</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/18-ai-on-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">AI on IoT and Edge ML</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/19-where-iot-is-heading.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Where IoT Is Heading</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Part VI — Building an IoT System</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/20-idea-to-vertical-slice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From Idea to Vertical Slice</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/21-testing-in-the-field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Testing in the Field</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/22-reviewing-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reviewing Someone Else’s System</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-7-label">Part VII — Lab Companion</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L0-bench-safety-soldering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Bench Safety and Soldering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L1-build-the-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Build the Kit in Stages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L2-traffic-controller.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Traffic Controller</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L3-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Serial Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L4-ble-step-counter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: BLE Step Counter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L5-cloud-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Cloud Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L6-harden-your-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Harden Your Device</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Part VIII — Lecture Activities</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A0-about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About the Activities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A1-blink.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 1: Blink and Basic Circuits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A2-buttons-interrupts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 2: Buttons, Debouncing and Interrupts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A3-i2c-spi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 3: Scan the I²C Bus, Report on SPI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A4-oda-loop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 4: The Observe–Decide–Act Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A5-http-poll.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 5: A Classroom Poll over HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A6-lora-beacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 6: A LoRa Emergency Beacon</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A7-mqtt-qos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 7: MQTT Command Center and Picking the QoS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A8-signed-messages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 8: Signed Messages and STRIDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/A-kit-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Kit Reference</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/B-toolchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Toolchain Setup</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/C-troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Troubleshooting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/D-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/E-teaching-lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Setting Up a Teaching Lab</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#why-it-matters" id="toc-why-it-matters" class="nav-link active" data-scroll-target="#why-it-matters"><span class="header-section-number">3.1</span> Why it matters</a></li>
+  <li><a href="#concepts" id="toc-concepts" class="nav-link" data-scroll-target="#concepts"><span class="header-section-number">3.2</span> Concepts</a>
+  <ul class="collapse">
+  <li><a href="#the-toolchain" id="toc-the-toolchain" class="nav-link" data-scroll-target="#the-toolchain">The toolchain</a></li>
+  <li><a href="#the-arduino-programming-model" id="toc-the-arduino-programming-model" class="nav-link" data-scroll-target="#the-arduino-programming-model">The Arduino programming model</a></li>
+  <li><a href="#digital-input-and-output" id="toc-digital-input-and-output" class="nav-link" data-scroll-target="#digital-input-and-output">Digital input and output</a></li>
+  <li><a href="#pull-up-and-pull-down-resistors" id="toc-pull-up-and-pull-down-resistors" class="nav-link" data-scroll-target="#pull-up-and-pull-down-resistors">Pull-up and pull-down resistors</a></li>
+  <li><a href="#debouncing" id="toc-debouncing" class="nav-link" data-scroll-target="#debouncing">Debouncing</a></li>
+  <li><a href="#polling-and-interrupts" id="toc-polling-and-interrupts" class="nav-link" data-scroll-target="#polling-and-interrupts">Polling and interrupts</a></li>
+  <li><a href="#analog-input" id="toc-analog-input" class="nav-link" data-scroll-target="#analog-input">Analog input</a></li>
+  <li><a href="#analog-output-dac-and-pwm" id="toc-analog-output-dac-and-pwm" class="nav-link" data-scroll-target="#analog-output-dac-and-pwm">Analog output: DAC and PWM</a></li>
+  <li><a href="#time-without-blocking" id="toc-time-without-blocking" class="nav-link" data-scroll-target="#time-without-blocking">Time without blocking</a></li>
+  </ul></li>
+  <li><a href="#sec-ch03-depth" id="toc-sec-ch03-depth" class="nav-link" data-scroll-target="#sec-ch03-depth"><span class="header-section-number">3.3</span> In depth (optional)</a>
+  <ul class="collapse">
+  <li><a href="#bounce-time-and-wrap-around" id="toc-bounce-time-and-wrap-around" class="nav-link" data-scroll-target="#bounce-time-and-wrap-around">Bounce, time and wrap-around</a></li>
+  </ul></li>
+  <li><a href="#design-trade-offs" id="toc-design-trade-offs" class="nav-link" data-scroll-target="#design-trade-offs"><span class="header-section-number">3.4</span> Design trade-offs</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">3.5</span> Common pitfalls</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">3.6</span> Check your understanding</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">3.7</span> Further reading</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part1-foundations/03-programming-the-device.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../part1-foundations/03-programming-the-device.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ch03" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After this chapter you should be able to:</p>
+<ol type="1">
+<li>Set up a PlatformIO project for the ESP32 using the Arduino framework.</li>
+<li>Read and write digital pins, and use pull-up and pull-down resistors correctly.</li>
+<li>Debounce a push button and explain why it is necessary.</li>
+<li>Choose between polling and interrupts, and write a safe interrupt service routine.</li>
+<li>Read analog voltages with the ADC, and produce analog-like outputs with the DAC and PWM.</li>
+<li>Write non-blocking code with <code>millis()</code> so that several things can happen “at once”.</li>
+</ol>
+</div>
+</div>
+<section id="why-it-matters" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="why-it-matters"><span class="header-section-number">3.1</span> Why it matters</h2>
+<p>A push button looks like the simplest input imaginable: pressed or not pressed. Yet a naïve button handler on a microcontroller will often count one press as three, miss presses entirely, or freeze the rest of the program while it waits. Getting the basics of input, output and timing right is what separates a demo that works once from a device that works every time.</p>
+<p>This chapter covers the programming model you will use for the rest of the book, and the handful of techniques that make simple I/O reliable.</p>
+</section>
+<section id="concepts" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="concepts"><span class="header-section-number">3.2</span> Concepts</h2>
+<section id="the-toolchain" class="level3">
+<h3 class="anchored" data-anchor-id="the-toolchain">The toolchain</h3>
+<p>Programming a microcontroller involves a <strong>cross-compiler</strong> (it runs on your laptop but produces code for the ESP32), libraries for the chip’s hardware, and an uploader that writes the compiled program into the board’s flash memory.</p>
+<p>The two most common environments are the <strong>Arduino IDE</strong> and <strong>PlatformIO</strong>. This book uses PlatformIO, an extension for VS Code, because it:</p>
+<ul>
+<li>supports several <em>frameworks</em> for the same chip (Arduino and Espressif’s own ESP-IDF);</li>
+<li>manages library dependencies per project, with version numbers, in a single <code>platformio.ini</code> file;</li>
+<li>integrates building, uploading, the Serial Monitor and debugging into one editor.</li>
+</ul>
+<p>A minimal kit project looks like this:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">; platformio.ini</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[env:esp32dev]</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">platform </span><span class="ot">=</span><span class="st"> espressif32@^6.9.0      ; pins the Arduino-ESP32 core (2.x series)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">board </span><span class="ot">=</span><span class="st"> esp32dev</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">framework </span><span class="ot">=</span><span class="st"> arduino</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">monitor_speed </span><span class="ot">=</span><span class="st"> </span><span class="dv">115200</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">lib_deps </span><span class="ot">=</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">    adafruit/Adafruit SSD1306@^2.5.13</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pinning the platform version matters: different versions of the Arduino-ESP32 core have different APIs for some peripherals, and an unpinned project can stop compiling when a new version is released. Setup instructions are in <a href="../appendices/B-toolchain.html" class="quarto-xref"><span>Appendix B</span></a>.</p>
+</section>
+<section id="the-arduino-programming-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-arduino-programming-model">The Arduino programming model</h3>
+<p>An Arduino program (a <strong>sketch</strong>) defines two functions:</p>
+<ul>
+<li><code>setup()</code> runs once after power-up or reset. Configure pins, start serial ports and initialize devices here.</li>
+<li><code>loop()</code> runs repeatedly, forever, until the board loses power.</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Arduino.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"iot_pins.h"</span><span class="pp">            </span><span class="co">// IoTPins::LED_1 (red), LED_2 (yellow), LED_3 (green), BUTTON_1, ...</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  pinMode<span class="op">(</span>IoTPins<span class="op">::</span>LED_1<span class="op">,</span> OUTPUT<span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  pinMode<span class="op">(</span>IoTPins<span class="op">::</span>BUTTON_1<span class="op">,</span> INPUT_PULLUP<span class="op">);</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> pressed <span class="op">=</span> <span class="op">(</span>digitalRead<span class="op">(</span>IoTPins<span class="op">::</span>BUTTON_1<span class="op">)</span> <span class="op">==</span> LOW<span class="op">);</span>   <span class="co">// active low, see below</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  digitalWrite<span class="op">(</span>IoTPins<span class="op">::</span>LED_1<span class="op">,</span> pressed <span class="op">?</span> HIGH <span class="op">:</span> LOW<span class="op">);</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Behind the scenes the Arduino framework provides <code>main()</code>, calls <code>setup()</code> once, and then calls <code>loop()</code> in an endless loop. On the ESP32, that loop actually runs as a task under a real-time operating system (<a href="04-embedded-systems-os.html" class="quarto-xref"><span>Chapter 4</span></a>), but for now you can think of it as a simple infinite loop.</p>
+<p>Arduino code is C++. Most sketches use a C-like subset, but classes, references and the standard library are all available. Because <code>int</code> is 16 bits on some boards and 32 bits on others, prefer the fixed-width types <code>uint8_t</code>, <code>int16_t</code>, <code>uint32_t</code> and so on whenever size matters.</p>
+</section>
+<section id="digital-input-and-output" class="level3">
+<h3 class="anchored" data-anchor-id="digital-input-and-output">Digital input and output</h3>
+<p>A <strong>digital</strong> signal has two levels. On the ESP32, a pin reads <code>HIGH</code> (1) near 3.3 V and <code>LOW</code> (0) near 0 V.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pinMode(pin, mode)</code></td>
+<td>Configure a pin as <code>OUTPUT</code>, <code>INPUT</code>, <code>INPUT_PULLUP</code> or <code>INPUT_PULLDOWN</code></td>
+</tr>
+<tr class="even">
+<td><code>digitalWrite(pin, value)</code></td>
+<td>Drive an output pin <code>HIGH</code> or <code>LOW</code></td>
+</tr>
+<tr class="odd">
+<td><code>digitalRead(pin)</code></td>
+<td>Read an input pin as <code>HIGH</code> or <code>LOW</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pull-up-and-pull-down-resistors" class="level3">
+<h3 class="anchored" data-anchor-id="pull-up-and-pull-down-resistors">Pull-up and pull-down resistors</h3>
+<p>A button connected between a pin and ground only defines the pin’s level while it is pressed. When it is released, the pin is connected to nothing. It is <strong>floating</strong>, and it will pick up electrical noise and read random values.</p>
+<p>A <strong>pull-up resistor</strong> connects the pin weakly to 3.3 V, so it reads <code>HIGH</code> until the button pulls it firmly to ground. A <strong>pull-down resistor</strong> does the opposite. The ESP32 has internal pull-up and pull-down resistors (roughly 45 kΩ) on most pins, enabled with <code>INPUT_PULLUP</code> or <code>INPUT_PULLDOWN</code>.</p>
+<p>The kit’s buttons are wired from GPIO 32 and 33 to ground and use <code>INPUT_PULLUP</code>. They are therefore <strong>active low</strong>: <code>digitalRead()</code> returns <code>LOW</code> when the button is pressed. Forgetting this inverts every button test.</p>
+<p>Remember that GPIO 34–39 have no internal pull resistors. A button on one of those pins needs an external resistor.</p>
+</section>
+<section id="debouncing" class="level3">
+<h3 class="anchored" data-anchor-id="debouncing">Debouncing</h3>
+<p>Mechanical switch contacts bounce when they close or open. For a few milliseconds the pin rapidly flips between <code>HIGH</code> and <code>LOW</code> before settling. A microcontroller samples fast enough to see every bounce, so a single press can be counted many times.</p>
+<p><strong>Debouncing</strong> filters out the bounces. The simplest software approach accepts a new state only once it has been stable for a short time, such as 20–50 ms:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">uint32_t</span> DEBOUNCE_MS <span class="op">=</span> <span class="dv">30</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> readButtonDebounced<span class="op">(</span><span class="dt">uint8_t</span> pin<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">bool</span> stableState <span class="op">=</span> HIGH<span class="op">;</span>     <span class="co">// last accepted state (released)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">bool</span> lastReading <span class="op">=</span> HIGH<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">uint32_t</span> lastChange <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> reading <span class="op">=</span> digitalRead<span class="op">(</span>pin<span class="op">);</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>reading <span class="op">!=</span> lastReading<span class="op">)</span> <span class="op">{</span>       <span class="co">// something changed: restart the timer</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    lastChange <span class="op">=</span> millis<span class="op">();</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    lastReading <span class="op">=</span> reading<span class="op">;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>millis<span class="op">()</span> <span class="op">-</span> lastChange <span class="op">&gt;=</span> DEBOUNCE_MS<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    stableState <span class="op">=</span> reading<span class="op">;</span>            <span class="co">// stable long enough: accept it</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> stableState<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Detecting double clicks, long presses and so on builds on the same idea. Well-tested libraries such as Button2 handle debouncing and click patterns for you, and are usually the right choice in a project.</p>
+</section>
+<section id="polling-and-interrupts" class="level3">
+<h3 class="anchored" data-anchor-id="polling-and-interrupts">Polling and interrupts</h3>
+<p>The loop above <strong>polls</strong> the button: it checks the pin on every pass, even though the answer is almost always “no change”. Polling is simple and adequate when the loop is fast and the event is slow.</p>
+<p>An <strong>interrupt</strong> lets the hardware notify the processor when a pin changes. The processor pauses whatever it was doing, runs a short function called an <strong>interrupt service routine</strong> (ISR), and then resumes. Every ESP32 GPIO pin can trigger an interrupt.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">volatile</span> <span class="dt">uint32_t</span> pressCount <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>     <span class="co">// shared with the ISR: must be volatile</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> IRAM_ATTR onButton<span class="op">()</span> <span class="op">{</span>           <span class="co">// keep the ISR in fast internal RAM</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  pressCount<span class="op">++;</span>                       <span class="co">// do the minimum, then return</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  pinMode<span class="op">(</span>IoTPins<span class="op">::</span>BUTTON_1<span class="op">,</span> INPUT_PULLUP<span class="op">);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  attachInterrupt<span class="op">(</span>digitalPinToInterrupt<span class="op">(</span>IoTPins<span class="op">::</span>BUTTON_1<span class="op">),</span> onButton<span class="op">,</span> FALLING<span class="op">);</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">uint32_t</span> lastReported <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> count <span class="op">=</span> pressCount<span class="op">;</span>        <span class="co">// copy once, then work with the copy</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>count <span class="op">!=</span> lastReported<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"Presses: </span><span class="sc">%lu\n</span><span class="st">"</span><span class="op">,</span> count<span class="op">);</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    lastReported <span class="op">=</span> count<span class="op">;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The trigger <strong>mode</strong> says which change causes the interrupt: <code>RISING</code>, <code>FALLING</code>, <code>CHANGE</code>, <code>LOW</code> or <code>HIGH</code>. Because the button is active low, a press is a <code>FALLING</code> edge.</p>
+<p>ISRs come with strict rules:</p>
+<ul>
+<li><strong>Keep them short.</strong> Set a flag, increment a counter or record a timestamp, and return. Do the real work in <code>loop()</code>.</li>
+<li><strong>Do not block or print.</strong> No <code>delay()</code>, no <code>Serial.print()</code>, no I²C or SPI transactions.</li>
+<li><strong>Mark shared variables <code>volatile</code></strong>, so the compiler always reads them from memory instead of a stale copy in a register.</li>
+<li><strong>Place the ISR in IRAM</strong> with <code>IRAM_ATTR</code> on the ESP32, so it can run even while the flash memory is busy.</li>
+</ul>
+<p>Interrupts do not remove bouncing. The ISR above will count bounces as presses. A common fix is to record the time in the ISR and ignore edges that arrive within the debounce window of the previous one.</p>
+</section>
+<section id="analog-input" class="level3">
+<h3 class="anchored" data-anchor-id="analog-input">Analog input</h3>
+<p>The physical world is mostly <strong>analog</strong>: temperature, light level and the position of a knob vary continuously. A computer can only store numbers, so an <strong>analog-to-digital converter</strong> (ADC) measures a voltage and <strong>quantizes</strong> it into one of a fixed number of steps.</p>
+<p>The number of steps is set by the converter’s <strong>resolution</strong>. An <span class="math inline">\(n\)</span>-bit ADC divides its input range into <span class="math inline">\(2^n\)</span> levels. The ESP32’s ADCs are 12-bit by default, so <code>analogRead()</code> returns a value from 0 to 4095 over roughly 0 to 3.3 V, and each step is about 0.8 mV.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> raw <span class="op">=</span> analogRead<span class="op">(</span>IoTPins<span class="op">::</span>POT_ADC<span class="op">);</span>                  <span class="co">// 0..4095</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> volts <span class="op">=</span> raw <span class="op">*</span> <span class="fl">3.3</span><span class="bu">f</span> <span class="op">/</span> <span class="fl">4095.0</span><span class="bu">f</span><span class="op">;</span>                       <span class="co">// approximate</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> percent <span class="op">=</span> map<span class="op">(</span>raw<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">4095</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">100</span><span class="op">);</span>                  <span class="co">// rescale</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The ESP32 uses <strong>successive-approximation</strong> ADCs, which find the value bit by bit, like a binary search. Keep three practical limits in mind:</p>
+<ul>
+<li>Only the <strong>ADC1</strong> pins (GPIO 32–39) work while Wi-Fi is on.</li>
+<li>The ESP32’s ADC is <strong>not perfectly linear</strong>, especially near 0 V and near the top of the range. For accurate measurements, use the calibrated <code>analogReadMilliVolts()</code> function, or an external ADC.</li>
+<li>Readings are <strong>noisy</strong>. Averaging several samples is cheap and effective.</li>
+</ul>
+</section>
+<section id="analog-output-dac-and-pwm" class="level3">
+<h3 class="anchored" data-anchor-id="analog-output-dac-and-pwm">Analog output: DAC and PWM</h3>
+<p>There are two ways to produce an output between “fully on” and “fully off”.</p>
+<p>A <strong>digital-to-analog converter</strong> (DAC) produces a real intermediate voltage. The original ESP32 has two 8-bit DAC channels, on GPIO 25 and 26: <code>dacWrite(25, 128)</code> outputs about half of 3.3 V.</p>
+<p><strong>Pulse-width modulation</strong> (PWM) is far more common. The pin switches rapidly between <code>HIGH</code> and <code>LOW</code>, and the fraction of time it spends <code>HIGH</code>, the <strong>duty cycle</strong>, sets the <em>average</em> power. An LED switched fast enough appears dimmer; a motor runs slower. A servo reads the width of each pulse as a position command (<a href="../part2-things/07-actuators.html" class="quarto-xref"><span>Chapter 7</span></a>).</p>
+<p>The ESP32 generates PWM with its <strong>LEDC</strong> peripheral, which has 16 channels with configurable frequency and resolution:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Arduino-ESP32 core 2.x API (the kit's pinned version)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">int</span> LED_CHANNEL <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> PWM_FREQ <span class="op">=</span> <span class="dv">5000</span><span class="op">,</span> PWM_BITS <span class="op">=</span> <span class="dv">8</span><span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  ledcSetup<span class="op">(</span>LED_CHANNEL<span class="op">,</span> PWM_FREQ<span class="op">,</span> PWM_BITS<span class="op">);</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  ledcAttachPin<span class="op">(</span>IoTPins<span class="op">::</span>LED_3<span class="op">,</span> LED_CHANNEL<span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> duty <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> duty <span class="op">&lt;=</span> <span class="dv">255</span><span class="op">;</span> duty <span class="op">+=</span> <span class="dv">5</span><span class="op">)</span> <span class="op">{</span>   <span class="co">// fade in</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    ledcWrite<span class="op">(</span>LED_CHANNEL<span class="op">,</span> duty<span class="op">);</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    delay<span class="op">(</span><span class="dv">20</span><span class="op">);</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Version 3.x of the Arduino-ESP32 core replaced <code>ledcSetup()</code> and <code>ledcAttachPin()</code> with a single <code>ledcAttach(pin, freq, bits)</code> and lets <code>ledcWrite()</code> take the pin directly. This is one reason the kit pins its platform version. Also note that <code>tone()</code> and the servo library both use LEDC channels; the kit’s starter code assigns them separate channels so they do not interfere.</p>
+</section>
+<section id="time-without-blocking" class="level3">
+<h3 class="anchored" data-anchor-id="time-without-blocking">Time without blocking</h3>
+<p><code>delay(ms)</code> stops the program completely. While it waits, the loop cannot read buttons, refresh the display or answer network messages. A better pattern is to check how much time has passed and act only when it is due:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">uint32_t</span> lastRed <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> lastYellow <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> now <span class="op">=</span> millis<span class="op">();</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>now <span class="op">-</span> lastRed <span class="op">&gt;=</span> <span class="dv">1000</span><span class="op">)</span> <span class="op">{</span>           <span class="co">// every 1 s</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    lastRed <span class="op">=</span> now<span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    digitalWrite<span class="op">(</span>IoTPins<span class="op">::</span>LED_1<span class="op">,</span> <span class="op">!</span>digitalRead<span class="op">(</span>IoTPins<span class="op">::</span>LED_1<span class="op">));</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>now <span class="op">-</span> lastYellow <span class="op">&gt;=</span> <span class="dv">1500</span><span class="op">)</span> <span class="op">{</span>        <span class="co">// every 1.5 s</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    lastYellow <span class="op">=</span> now<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    digitalWrite<span class="op">(</span>IoTPins<span class="op">::</span>LED_2<span class="op">,</span> <span class="op">!</span>digitalRead<span class="op">(</span>IoTPins<span class="op">::</span>LED_2<span class="op">));</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... the loop stays free to read inputs here</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>millis()</code> returns the milliseconds since start-up as a 32-bit unsigned number, which wraps around to zero after about 49.7 days. Writing the comparison as <code>now - last &gt;= interval</code>, with unsigned arithmetic, gives the correct answer even across the wraparound. Writing it as <code>now &gt;= last + interval</code> does not.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Try it on your kit: buttons and interrupts
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This exercise corresponds to the second lecture activity and runs in Wokwi or on Stage 1 of the kit.</p>
+<ol type="1">
+<li>Count button presses by polling without any debouncing, and print the count. Press the button 20 times. What count do you get?</li>
+<li>Add the debounce function and repeat. What changed?</li>
+<li>Rewrite the counter with an interrupt. Does it count bounces? Fix it by ignoring edges that arrive within 30 ms of the previous one.</li>
+<li>Make the red LED blink every 500 ms and the green LED every 700 ms using <code>millis()</code>, while the button still toggles the yellow LED instantly.</li>
+<li>Read the potentiometer and use it to set the green LED’s brightness with PWM.</li>
+</ol>
+<p>A guided, step-by-step version for a lecture session is <a href="../part8-activities/A2-buttons-interrupts.html">Activity 2</a>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-ch03-depth" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sec-ch03-depth"><span class="header-section-number">3.3</span> In depth (optional)</h2>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Optional, in-depth explanation.</strong> This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.</p>
+</div>
+</div>
+</div>
+<section id="bounce-time-and-wrap-around" class="level3">
+<h3 class="anchored" data-anchor-id="bounce-time-and-wrap-around">Bounce, time and wrap-around</h3>
+<p><strong>Why buttons bounce.</strong> A pushbutton is two springy metal contacts. When they close, they collide, separate and collide again several times before settling, typically for 1–10 ms. A pin sampled every microsecond sees each collision as a separate edge.</p>
+<p><strong>Hardware debouncing with an RC filter.</strong> A resistor <span class="math inline">\(R\)</span> and capacitor <span class="math inline">\(C\)</span> smooth the signal. When the button opens, the pull-up charges the capacitor:</p>
+<p><span class="math display">\[
+V(t) = V_{DD}\left(1 - e^{-t/RC}\right).
+\]</span></p>
+<p>The pin reads HIGH once <span class="math inline">\(V\)</span> crosses its input threshold <span class="math inline">\(V_{IH}\)</span>, at time <span class="math inline">\(t = -RC \ln\left(1 - V_{IH}/V_{DD}\right)\)</span>. With <span class="math inline">\(R = 10\)</span> kΩ, <span class="math inline">\(C = 1\)</span> µF (<span class="math inline">\(RC = 10\)</span> ms) and <span class="math inline">\(V_{IH} = 0.75\,V_{DD}\)</span>, that is <span class="math inline">\(10 \ln 4 \approx 14\)</span> ms: long enough to ride out the bounce. A slow edge can make an ordinary input chatter as it crosses the threshold, which is why hardware debouncers often add a Schmitt-trigger input with two thresholds.</p>
+<p><strong>Software debouncing</strong> replaces the capacitor with a time window: accept an edge only if more than <span class="math inline">\(t_d\)</span> has passed since the last accepted one. The window must be longer than the worst bounce and shorter than the fastest intentional double press (about 100 ms for a person).</p>
+<p><strong>Timer arithmetic.</strong> <code>millis()</code> counts milliseconds in an unsigned 32-bit integer, so it wraps to zero after <span class="math inline">\(2^{32}\)</span> ms <span class="math inline">\(\approx 49.7\)</span> days. The idiom</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>now <span class="op">-</span> last <span class="op">&gt;=</span> interval<span class="op">)</span> <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>still works across the wrap, because unsigned subtraction is arithmetic modulo <span class="math inline">\(2^{32}\)</span>: if <code>last</code> is just before the wrap and <code>now</code> just after, <code>now - last</code> is still the small, correct difference. The tempting alternative <code>if (now &gt;= last + interval)</code> fails for the interval around the wrap. A device meant to run for months must get this right.</p>
+<p><strong>Hardware timers.</strong> The ESP32’s general-purpose timers count a clock (80 MHz by default) through a prescaler <span class="math inline">\(P\)</span>. One tick lasts <span class="math inline">\(P / 80\ \text{MHz}\)</span>; with <span class="math inline">\(P = 80\)</span>, one tick is 1 µs, and an alarm after <span class="math inline">\(N\)</span> ticks fires every <span class="math inline">\(N\)</span> µs. This is how <code>micros()</code> and periodic timer interrupts are built.</p>
+<p><strong>Exercise.</strong> A wearable samples a button every 5 ms and declares a press when it has seen <em>k</em> consecutive LOW samples. What is the smallest <em>k</em> that rejects bounces of up to 8 ms? What is the longest delay the user can notice?</p>
+<p>Sources for this section: <span class="citation" data-cites="espressif_esp32_trm">(<a href="../references.html#ref-espressif_esp32_trm" role="doc-biblioref"><em><span>ESP32 Technical Reference Manual</span></em>, n.d.</a>)</span>.</p>
+</section>
+</section>
+<section id="design-trade-offs" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="design-trade-offs"><span class="header-section-number">3.4</span> Design trade-offs</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Choice</th>
+<th>Prefer it when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Polling</td>
+<td>The loop is fast, the event is slow, and simplicity matters</td>
+</tr>
+<tr class="even">
+<td>Interrupts</td>
+<td>Events are short or rare, or the processor should sleep while waiting</td>
+</tr>
+<tr class="odd">
+<td>Internal pull-ups</td>
+<td>Short wires and simple buttons</td>
+</tr>
+<tr class="even">
+<td>External pull-ups (e.g.&nbsp;10 kΩ)</td>
+<td>Long wires, noisy environments, or input-only pins</td>
+</tr>
+<tr class="odd">
+<td>DAC</td>
+<td>You need a true analog voltage (audio, a reference level)</td>
+</tr>
+<tr class="even">
+<td>PWM</td>
+<td>Dimming LEDs, controlling motor speed or driving servos</td>
+</tr>
+<tr class="odd">
+<td><code>delay()</code></td>
+<td>Throwaway tests only</td>
+</tr>
+<tr class="even">
+<td><code>millis()</code> scheduling</td>
+<td>Anything that must stay responsive</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-pitfalls" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">3.5</span> Common pitfalls</h2>
+<ul>
+<li><strong>Floating inputs.</strong> An input with no pull resistor reads random values.</li>
+<li><strong>Forgetting active-low logic.</strong> With <code>INPUT_PULLUP</code>, pressed is <code>LOW</code>.</li>
+<li><strong>Long or blocking ISRs.</strong> Printing, delaying or using I²C inside an ISR crashes the ESP32 or causes watchdog resets.</li>
+<li><strong>Missing <code>volatile</code>.</strong> The main loop never notices that the ISR changed a variable.</li>
+<li><strong>Integer overflow and unsigned loops.</strong> <code>for (uint8_t i = 255; i &gt;= 0; i--)</code> never ends, because an unsigned value is always ≥ 0.</li>
+<li><strong>ADC2 with Wi-Fi.</strong> Analog readings fail silently once Wi-Fi starts.</li>
+<li><strong>Unpinned platform versions.</strong> Code that compiled last week fails after a core update.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Advanced track
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Hardware debouncing.</strong> A resistor and capacitor (an RC filter) on the button line, followed by a Schmitt-trigger input, removes bounce in hardware. Calculate an RC time constant that filters bounces of up to 5 ms, and discuss when hardware debouncing is worth the extra parts.</p>
+<p><strong>Atomic access.</strong> Copying a 32-bit counter on the ESP32 is atomic, but a 64-bit value or a structure is not: an interrupt can arrive halfway through the copy. On the ESP32, protect such data with <code>portENTER_CRITICAL_ISR()</code> / <code>portEXIT_CRITICAL_ISR()</code> and a <code>portMUX_TYPE</code> spinlock, or pass events through a FreeRTOS queue (<a href="04-embedded-systems-os.html" class="quarto-xref"><span>Chapter 4</span></a>).</p>
+<p><strong>Hardware timers.</strong> For precise periodic work, the ESP32 has hardware timers whose interrupts fire at exact intervals regardless of what the main loop is doing. The <code>esp_timer</code> API offers microsecond-resolution software timers built on them.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">3.6</span> Check your understanding</h2>
+<ol type="1">
+<li>What does a floating input read, and how do pull-up resistors fix it?</li>
+<li>A button on GPIO 32 uses <code>INPUT_PULLUP</code>. What does <code>digitalRead()</code> return while it is pressed?</li>
+<li>Why must a variable shared with an ISR be declared <code>volatile</code>?</li>
+<li>A 12-bit ADC with a 3.3 V range reads 2048. Approximately what voltage is on the pin?</li>
+<li>Explain how PWM makes an LED look half as bright without producing 1.65 V.</li>
+<li>Why does <code>now - last &gt;= interval</code> keep working after <code>millis()</code> wraps around, while <code>now &gt;= last + interval</code> does not?</li>
+<li>Find the bug: <code>for (uint8_t i = 255; i &gt;= 0; i--) { dacWrite(25, i); }</code>.</li>
+</ol>
+</section>
+<section id="further-reading" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">3.7</span> Further reading</h2>
+<ul>
+<li>Espressif, <em>Arduino-ESP32 documentation</em> <span class="citation" data-cites="espressif_arduino_esp32">(<a href="../references.html#ref-espressif_arduino_esp32" role="doc-biblioref">Espressif Systems, n.d.</a>)</span>, for GPIO, ADC, LEDC and interrupt APIs, including the 2.x-to-3.x migration guide.</li>
+<li>PlatformIO documentation <span class="citation" data-cites="platformio_docs">(<a href="../references.html#ref-platformio_docs" role="doc-biblioref">PlatformIO Labs, n.d.</a>)</span>, for project configuration and library management.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-espressif_esp32_trm" class="csl-entry" role="listitem">
+<em><span>ESP32 Technical Reference Manual</span></em>. n.d. Espressif Systems. <a href="https://www.espressif.com/en/support/documents/technical-documents">https://www.espressif.com/en/support/documents/technical-documents</a>.
+</div>
+<div id="ref-espressif_arduino_esp32" class="csl-entry" role="listitem">
+Espressif Systems. n.d. <span>“<span>Arduino-ESP32 Documentation</span>.”</span> <a href="https://docs.espressif.com/projects/arduino-esp32/">https://docs.espressif.com/projects/arduino-esp32/</a>.
+</div>
+<div id="ref-platformio_docs" class="csl-entry" role="listitem">
+PlatformIO Labs. n.d. <span>“<span>PlatformIO Documentation</span>.”</span> <a href="https://docs.platformio.org/">https://docs.platformio.org/</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../part1-foundations/02-boards-and-kit.html" class="pagination-link" aria-label="Development Boards and the IoT Kit">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../part1-foundations/04-embedded-systems-os.html" class="pagination-link" aria-label="Embedded Systems and Operating Systems">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part1-foundations/03-programming-the-device.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>IoT@UCI</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; What Is the Internet of Things? – Introduction to IoT Systems</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../part1-foundations/02-boards-and-kit.html" rel="next">
+<link href="../how-to-use.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7165337bd1de6b8f03f71a37d453c8f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to IoT Systems</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/SergioGagoMasague/intro-to-iot-systems" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Introduction-to-IoT-Systems.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to-use.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using This Book with the IoT@UCI Kit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Part I — Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/01-what-is-iot.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/02-boards-and-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/03-programming-the-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/04-embedded-systems-os.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Part II — The Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/05-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/06-sensors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/07-actuators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Part III — Connecting Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/08-communication-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Communication Models: OSI and TCP/IP</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/09-network-requirements-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/10-link-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/11-internet-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/12-application-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Application Protocols: HTTP, CoAP, MQTT and More</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/13-interoperability-standards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Interoperability and Standards</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Part IV — Trustworthy IoT</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/14-security-privacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Security and Privacy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/15-device-identity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Device Identity and Secure Elements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/16-ota-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Over-the-Air Updates and the Device Lifecycle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/17-compliance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Compliance and Regulation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Part V — Intelligence at the Edge</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/18-ai-on-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">AI on IoT and Edge ML</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/19-where-iot-is-heading.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Where IoT Is Heading</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Part VI — Building an IoT System</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/20-idea-to-vertical-slice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From Idea to Vertical Slice</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/21-testing-in-the-field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Testing in the Field</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/22-reviewing-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reviewing Someone Else’s System</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-7-label">Part VII — Lab Companion</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L0-bench-safety-soldering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Bench Safety and Soldering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L1-build-the-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Build the Kit in Stages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L2-traffic-controller.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Traffic Controller</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L3-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Serial Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L4-ble-step-counter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: BLE Step Counter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L5-cloud-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Cloud Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L6-harden-your-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Harden Your Device</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Part VIII — Lecture Activities</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A0-about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About the Activities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A1-blink.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 1: Blink and Basic Circuits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A2-buttons-interrupts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 2: Buttons, Debouncing and Interrupts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A3-i2c-spi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 3: Scan the I²C Bus, Report on SPI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A4-oda-loop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 4: The Observe–Decide–Act Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A5-http-poll.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 5: A Classroom Poll over HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A6-lora-beacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 6: A LoRa Emergency Beacon</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A7-mqtt-qos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 7: MQTT Command Center and Picking the QoS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A8-signed-messages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 8: Signed Messages and STRIDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/A-kit-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Kit Reference</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/B-toolchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Toolchain Setup</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/C-troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Troubleshooting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/D-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/E-teaching-lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Setting Up a Teaching Lab</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#why-it-matters" id="toc-why-it-matters" class="nav-link active" data-scroll-target="#why-it-matters"><span class="header-section-number">1.1</span> Why it matters</a></li>
+  <li><a href="#concepts" id="toc-concepts" class="nav-link" data-scroll-target="#concepts"><span class="header-section-number">1.2</span> Concepts</a>
+  <ul class="collapse">
+  <li><a href="#a-working-definition" id="toc-a-working-definition" class="nav-link" data-scroll-target="#a-working-definition">A working definition</a></li>
+  <li><a href="#related-terms" id="toc-related-terms" class="nav-link" data-scroll-target="#related-terms">Related terms</a></li>
+  <li><a href="#from-the-internet-of-people-to-the-internet-of-things" id="toc-from-the-internet-of-people-to-the-internet-of-things" class="nav-link" data-scroll-target="#from-the-internet-of-people-to-the-internet-of-things">From the Internet of People to the Internet of Things</a></li>
+  <li><a href="#three-kinds-of-connection" id="toc-three-kinds-of-connection" class="nav-link" data-scroll-target="#three-kinds-of-connection">Three kinds of connection</a></li>
+  <li><a href="#a-reference-architecture" id="toc-a-reference-architecture" class="nav-link" data-scroll-target="#a-reference-architecture">A reference architecture</a></li>
+  <li><a href="#application-domains" id="toc-application-domains" class="nav-link" data-scroll-target="#application-domains">Application domains</a></li>
+  <li><a href="#the-questions-every-iot-system-must-answer" id="toc-the-questions-every-iot-system-must-answer" class="nav-link" data-scroll-target="#the-questions-every-iot-system-must-answer">The questions every IoT system must answer</a></li>
+  </ul></li>
+  <li><a href="#sec-ch01-depth" id="toc-sec-ch01-depth" class="nav-link" data-scroll-target="#sec-ch01-depth"><span class="header-section-number">1.3</span> In depth (optional)</a>
+  <ul class="collapse">
+  <li><a href="#back-of-the-envelope-engineering" id="toc-back-of-the-envelope-engineering" class="nav-link" data-scroll-target="#back-of-the-envelope-engineering">Back-of-the-envelope engineering</a></li>
+  </ul></li>
+  <li><a href="#design-trade-offs" id="toc-design-trade-offs" class="nav-link" data-scroll-target="#design-trade-offs"><span class="header-section-number">1.4</span> Design trade-offs</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">1.5</span> Common pitfalls</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">1.6</span> Check your understanding</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">1.7</span> Further reading</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part1-foundations/01-what-is-iot.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html">Part I — Foundations</a></li><li class="breadcrumb-item"><a href="../part1-foundations/01-what-is-iot.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ch01" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After this chapter you should be able to:</p>
+<ol type="1">
+<li>Define the Internet of Things and name the four capabilities every IoT system combines.</li>
+<li>Explain how IoT differs from the “Internet of People” that came before it.</li>
+<li>Describe a four-level reference architecture and place real components in it.</li>
+<li>Recognize the major application domains and the engineering questions they raise.</li>
+<li>List the cross-cutting concerns (security, interoperability, reliability, efficiency) that the rest of this book addresses.</li>
+</ol>
+</div>
+</div>
+<section id="why-it-matters" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="why-it-matters"><span class="header-section-number">1.1</span> Why it matters</h2>
+<p>In 2024 there were about 18.5 billion connected IoT devices in the world, more than two for every person. Analysts expected roughly 21 billion in 2025 and close to 40 billion by 2030 <span class="citation" data-cites="iotanalytics_state_2025">(<a href="../references.html#ref-iotanalytics_state_2025" role="doc-biblioref">IoT Analytics 2025</a>)</span>. Most of them are not phones or laptops. They are thermostats, parking sensors, infusion pumps, irrigation valves, shipping-container trackers and factory motors.</p>
+<p>Each of these devices is a small computer that senses something in the physical world, decides what it means, and either acts on it or reports it to someone who will. Building such devices well requires knowledge that usually lives in separate courses: electronics, embedded programming, networking, distributed systems and security. This book brings them together around one question: <strong>how do you build a small device that reliably senses, decides, communicates and acts?</strong></p>
+</section>
+<section id="concepts" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="concepts"><span class="header-section-number">1.2</span> Concepts</h2>
+<section id="a-working-definition" class="level3">
+<h3 class="anchored" data-anchor-id="a-working-definition">A working definition</h3>
+<p>There is no single official definition of the Internet of Things, but most definitions agree on four ingredients. An IoT system is a network of physical things that have:</p>
+<ul>
+<li><strong>Sensors</strong>, to collect information about the world;</li>
+<li><strong>Identifiers</strong>, so that every piece of data can be traced to the device that produced it;</li>
+<li><strong>Software</strong>, to process and interpret the data;</li>
+<li><strong>Connectivity</strong>, so that data and commands can travel between devices, people and services.</li>
+</ul>
+<p>Putting these together, in a formulation close to that of Rayes and Salam <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>:</p>
+<blockquote class="blockquote">
+<p>The <strong>Internet of Things</strong> is the network of physical objects that are embedded with sensors, software and network connectivity, have a unique identity, and can collect and exchange data and act on the physical world.</p>
+</blockquote>
+<p>Notice the last clause. Many IoT devices do not just observe; they also <strong>actuate</strong>: they open valves, lock doors, dim lights and move motors. A device that can change the physical world raises the stakes of every design decision, from how fast it responds to who is allowed to command it.</p>
+</section>
+<section id="related-terms" class="level3">
+<h3 class="anchored" data-anchor-id="related-terms">Related terms</h3>
+<p>You will meet several overlapping terms in the literature:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Emphasis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>M2M</strong> (machine-to-machine)</td>
+<td>Devices talking directly to each other, often over cellular links, without a person in the loop. The older industrial term.</td>
+</tr>
+<tr class="even">
+<td><strong>Wireless sensor networks</strong></td>
+<td>Large numbers of small, battery-powered sensing nodes; mostly research-driven.</td>
+</tr>
+<tr class="odd">
+<td><strong>Industrial IoT</strong> (IIoT)</td>
+<td>Factories, energy and process control, where reliability and safety dominate.</td>
+</tr>
+<tr class="even">
+<td><strong>Web of Things</strong></td>
+<td>Using web standards (HTTP, URLs, JSON) to expose devices as resources.</td>
+</tr>
+<tr class="odd">
+<td><strong>Internet of Everything</strong></td>
+<td>A marketing term that adds people, processes and data to the picture.</td>
+</tr>
+<tr class="even">
+<td><strong>Cyber-physical systems</strong></td>
+<td>The academic term for tightly coupled computation and physical processes.</td>
+</tr>
+</tbody>
+</table>
+<p>These are not competing technologies. They are different lenses on the same idea.</p>
+</section>
+<section id="from-the-internet-of-people-to-the-internet-of-things" class="level3">
+<h3 class="anchored" data-anchor-id="from-the-internet-of-people-to-the-internet-of-things">From the Internet of People to the Internet of Things</h3>
+<p>The internet has gone through several phases, each of which digitized something new <span class="citation" data-cites="evans_ioe_2011 rayes_salam_iot">(<a href="../references.html#ref-evans_ioe_2011" role="doc-biblioref">Evans 2011</a>; <a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>:</p>
+<ol type="1">
+<li><strong>Connectivity</strong> digitized <em>access to information</em>: email, the web, search.</li>
+<li><strong>The networked economy</strong> digitized <em>business</em>: e-commerce, online banking, supply chains.</li>
+<li><strong>Immersive experiences</strong> digitized <em>interaction</em>: social media, video, mobile apps.</li>
+<li><strong>The Internet of Things</strong> digitizes <em>the physical world itself</em>.</li>
+</ol>
+<p>The first three phases mostly connected people to applications. Almost every packet started or ended at a person looking at a screen. In the IoT, most traffic is between machines, and a person may never see the raw data at all. This changes the design priorities. A web page can take a second to load; a braking system cannot. A phone is recharged daily; a soil sensor may need to run for five years on one battery.</p>
+<p>Connecting objects is not a goal in itself. The value comes from turning the data into <strong>better decisions</strong> (for example, scheduling maintenance before a pump fails) and delivering the right information to the right person or machine <strong>at the right time</strong>.</p>
+</section>
+<section id="three-kinds-of-connection" class="level3">
+<h3 class="anchored" data-anchor-id="three-kinds-of-connection">Three kinds of connection</h3>
+<p>It helps to classify IoT interactions by who is talking:</p>
+<ul>
+<li><strong>People to things.</strong> A person monitors or controls a device: checking a home camera, adjusting a thermostat, reading an ECG from a wearable.</li>
+<li><strong>Things to people.</strong> A device notifies a person: a leak alert, a low-battery warning, a door left open.</li>
+<li><strong>Things to things.</strong> Devices coordinate without a person: a motion sensor turns on a light, a traffic signal adapts to a queue of cars, a fleet of warehouse robots avoids collisions.</li>
+</ul>
+<p>The third category grows fastest and is the hardest to get right, because no person is in the loop to notice when something goes wrong.</p>
+</section>
+<section id="a-reference-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="a-reference-architecture">A reference architecture</h3>
+<p>Real IoT systems are built from many products made by different vendors. A <strong>reference architecture</strong> gives you a common vocabulary for where each part belongs. A widely used model, adapted here from Rayes and Salam <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>, has four levels (<a href="#fig-iot-architecture" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>):</p>
+<div id="fig-iot-architecture" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-iot-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/iot-reference-architecture.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-iot-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: A four-level IoT reference architecture. Data generally flows upward; commands flow downward.
+</figcaption>
+</figure>
+</div>
+<ol type="1">
+<li><strong>Device level.</strong> The <em>things</em>: sensors, actuators and the microcontrollers that run them. Your kit lives here.</li>
+<li><strong>Network level.</strong> Everything that moves data: radios, gateways, routers and switches, and the protocols they use. A gateway often translates between a local radio (Bluetooth, LoRa, Zigbee) and the internet.</li>
+<li><strong>Management and services platform level.</strong> Software that manages fleets of devices and their data: device registration and identity, configuration, firmware updates, data storage, rules engines and analytics. Cloud IoT platforms and MQTT brokers live here.</li>
+<li><strong>Application level.</strong> The applications people and businesses actually use: dashboards, mobile apps, alerting, and integration with business systems.</li>
+</ol>
+<p>Two concerns cut across every level: <strong>security</strong> (who may read, send or change what) and <strong>management</strong> (how you find, configure, update and retire devices once they are deployed). Much of this book is organized around this picture. Parts I and II focus on the device level, Part III on the network level, Part IV on the cross-cutting concerns, and Parts V and VI on how the levels come together into a working system.</p>
+</section>
+<section id="application-domains" class="level3">
+<h3 class="anchored" data-anchor-id="application-domains">Application domains</h3>
+<p>IoT appears in almost every industry. A few domains recur throughout the book:</p>
+<ul>
+<li><strong>Smart homes and buildings</strong>: lighting, heating and cooling, locks, appliances and energy metering. Interoperability between brands is the central challenge (<a href="../part3-connecting/13-interoperability-standards.html" class="quarto-xref"><span>Chapter 13</span></a>).</li>
+<li><strong>Smart cities</strong>: parking, street lighting, waste collection, air-quality monitoring and traffic management. Devices are spread over kilometers and must run for years, which favors long-range, low-power radios (<a href="../part3-connecting/10-link-layer.html" class="quarto-xref"><span>Chapter 10</span></a>).</li>
+<li><strong>Healthcare and wellness</strong>: wearables, remote patient monitoring and connected medical devices. Privacy, safety and regulation dominate.</li>
+<li><strong>Transportation and logistics</strong>: vehicle telematics, fleet tracking and cold-chain monitoring of goods in transit.</li>
+<li><strong>Industry and agriculture</strong>: predictive maintenance, process monitoring, irrigation control and livestock tracking.</li>
+</ul>
+<p>Each domain weighs the same trade-offs differently. A smart-home light switch must respond in well under a second but can draw mains power. A soil-moisture sensor can report once an hour but must run on a battery for years.</p>
+</section>
+<section id="the-questions-every-iot-system-must-answer" class="level3">
+<h3 class="anchored" data-anchor-id="the-questions-every-iot-system-must-answer">The questions every IoT system must answer</h3>
+<p>The basic promise of IoT is to <strong>monitor and control things from anywhere</strong>. Delivering that promise raises a set of questions that this book takes up one at a time:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Where it is covered</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>How does a device sense and act on the world?</td>
+<td>Parts I and II</td>
+</tr>
+<tr class="even">
+<td>How does it reach the network, and the network reach it?</td>
+<td>Part III</td>
+</tr>
+<tr class="odd">
+<td>Who is allowed to monitor and control it, and how is that enforced?</td>
+<td>Part IV</td>
+</tr>
+<tr class="even">
+<td>How do devices from different makers work together?</td>
+<td><a href="../part3-connecting/13-interoperability-standards.html" class="quarto-xref"><span>Chapter 13</span></a></td>
+</tr>
+<tr class="odd">
+<td>How do we make it reliable when it is unattended for years?</td>
+<td><a href="../part4-trustworthy/16-ota-lifecycle.html" class="quarto-xref"><span>Chapter 16</span></a>, <a href="../part6-building/21-testing-in-the-field.html" class="quarto-xref"><span>Chapter 21</span></a></td>
+</tr>
+<tr class="even">
+<td>How do we make it efficient in energy, bandwidth and cost?</td>
+<td>Throughout</td>
+</tr>
+<tr class="odd">
+<td>Where should the “thinking” happen: device, edge or cloud?</td>
+<td><a href="../part5-edge-intelligence/18-ai-on-iot.html" class="quarto-xref"><span>Chapter 18</span></a></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Try it on your kit: place the kit in the architecture
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Look at the kit tour in <em>Using This Book with the IoT@UCI Kit</em>.</p>
+<ol type="1">
+<li>For each part in the kit, decide which level of <a href="#fig-iot-architecture" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> it belongs to.</li>
+<li>The kit has no gateway. Which kit component will eventually play that role for the LoRa radio, and what will it connect to?</li>
+<li>Name one application-level product you use daily that sits on top of a device-level thing. What are its sensors, identifiers, software and connectivity?</li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-ch01-depth" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="sec-ch01-depth"><span class="header-section-number">1.3</span> In depth (optional)</h2>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Optional, in-depth explanation.</strong> This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.</p>
+</div>
+</div>
+</div>
+<section id="back-of-the-envelope-engineering" class="level3">
+<h3 class="anchored" data-anchor-id="back-of-the-envelope-engineering">Back-of-the-envelope engineering</h3>
+<p>Most early IoT design questions are answered with two quick estimates: <strong>how long will the battery last</strong>, and <strong>how much data will the fleet produce</strong>. Both are simple averages, and both are worth doing before writing any code.</p>
+<p><strong>Average current.</strong> A device that is active for <span class="math inline">\(t_a\)</span> seconds in every period <span class="math inline">\(T\)</span> has a duty cycle <span class="math inline">\(D = t_a / T\)</span>. Its average current is</p>
+<p><span class="math display">\[
+I_\text{avg} = D \, I_\text{active} + (1 - D)\, I_\text{sleep}.
+\]</span></p>
+<p>For a sensor that wakes for 0.5 s every 10 minutes, draws 80 mA while awake (Wi-Fi on) and 10 µA asleep: <span class="math inline">\(D = 0.5/600 \approx 8.3\times10^{-4}\)</span>, so <span class="math inline">\(I_\text{avg} \approx 67\ \mu\text{A} + 10\ \mu\text{A} \approx 77\ \mu\text{A}\)</span>. Notice that the 10 µA sleep current is already 13% of the total: at low duty cycles, <strong>sleep current dominates</strong>.</p>
+<p><strong>Lifetime.</strong> A battery of capacity <span class="math inline">\(Q\)</span> (in mAh) lasts roughly <span class="math inline">\(Q / I_\text{avg}\)</span> hours. A 225 mAh coin cell would give <span class="math inline">\(225 / 0.077 \approx 2900\)</span> h, about four months, on paper.</p>
+<p><strong>The physics the average hides.</strong> A battery is not an ideal voltage source; it has an internal resistance <span class="math inline">\(R_\text{int}\)</span>. The terminal voltage under load is <span class="math inline">\(V = V_\text{oc} - I R_\text{int}\)</span>. A coin cell’s internal resistance is typically 10–30 Ω and rises as it discharges, so an 80 mA pulse drops <span class="math inline">\(0.08 \times 15 = 1.2\)</span> V: the 3 V cell sags to 1.8 V and the microcontroller resets. The average said four months; the peak says the design does not work at all. This is why Wi-Fi devices use AA or lithium-ion cells, and why coin-cell devices use BLE or LoRa, whose transmit current is far lower, often with a capacitor to supply the pulse.</p>
+<p><strong>Fleet data volume.</strong> If <span class="math inline">\(N\)</span> devices each send <span class="math inline">\(b\)</span> bytes every <span class="math inline">\(T\)</span> seconds, the fleet produces <span class="math inline">\(N b / T\)</span> bytes per second. One million smart meters sending 100 bytes every 15 minutes produce <span class="math inline">\(10^6 \times 100 / 900 \approx 111\)</span> kB/s on average, or about 9.6 GB per day before protocol overhead (<a href="../part3-connecting/08-communication-models.html" class="quarto-xref"><span>Chapter 8</span></a> shows the overhead can be many times the payload). The rate is modest; the challenge is the <em>number of connections</em> and the <em>bursts</em> when every meter reports at the same moment.</p>
+<p><strong>Exercise.</strong> Repeat the lifetime estimate for a device that reports every minute instead of every 10 minutes. Which term now dominates the average?</p>
+<p>Sources for this section: <span class="citation" data-cites="espressif_idf_sleep">(<a href="../references.html#ref-espressif_idf_sleep" role="doc-biblioref">Espressif Systems, n.d.</a>)</span>.</p>
+</section>
+</section>
+<section id="design-trade-offs" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="design-trade-offs"><span class="header-section-number">1.4</span> Design trade-offs</h2>
+<p>Every IoT design balances a small set of competing goals. It is worth naming them now, because they will reappear in every chapter:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Goal</th>
+<th>Typically in tension with</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Long battery life</td>
+<td>Frequent sensing, fast response, high data rates</td>
+</tr>
+<tr class="even">
+<td>Long radio range</td>
+<td>Data rate and energy per bit</td>
+</tr>
+<tr class="odd">
+<td>Low unit cost</td>
+<td>Security hardware, extra sensors, certification</td>
+</tr>
+<tr class="even">
+<td>Rich local processing</td>
+<td>Power, cost and complexity of the device</td>
+</tr>
+<tr class="odd">
+<td>Strong security</td>
+<td>Usability, cost and development time</td>
+</tr>
+<tr class="even">
+<td>Openness and interoperability</td>
+<td>Speed to market and vendor control</td>
+</tr>
+</tbody>
+</table>
+<p>There is no universally right answer. A good IoT engineer can state which goals matter most for a given product and justify the trade-offs that follow.</p>
+</section>
+<section id="common-pitfalls" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">1.5</span> Common pitfalls</h2>
+<ul>
+<li><strong>Connecting things because you can.</strong> A device should be connected because the data or the remote control creates value, not because a radio is cheap.</li>
+<li><strong>Designing for the demo, not the deployment.</strong> A prototype on a desk has unlimited power, perfect Wi-Fi and a developer watching it. A deployed device has none of these.</li>
+<li><strong>Treating security as a feature to add later.</strong> Retrofitting identity, encryption and updates into deployed devices is expensive and sometimes impossible.</li>
+<li><strong>Ignoring the people involved.</strong> Someone installs, maintains and eventually discards every device. Their time and skills are part of the system.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Advanced track
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Reference architectures in standards.</strong> The four-level model above is a simplified version of several formal architectures, including the ITU-T Y.2060 IoT reference model, the IEEE 2413 architectural framework and ISO/IEC 30141. They differ in naming and in how they divide responsibilities, but they all separate devices, networks, services and applications, and they all treat security and management as cross-cutting.</p>
+<p><strong>Exercise.</strong> Choose a commercial IoT product (for example a video doorbell, a connected car or a smart meter). Draw it on the four-level architecture, naming the actual products, protocols and companies at each level. Identify which party controls each level, and what happens to the product if that party goes out of business.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">1.6</span> Check your understanding</h2>
+<ol type="1">
+<li>Name the four ingredients that most definitions of the IoT share, and give an example of each from a smart thermostat.</li>
+<li>Why is “connecting objects together” not, by itself, the goal of an IoT system?</li>
+<li>Explain one way in which IoT traffic differs from traffic in the “Internet of People”.</li>
+<li>At which level of the reference architecture would you place: a LoRa gateway; a firmware-update service; a temperature sensor; a mobile app showing a room’s temperature?</li>
+<li>Give one domain where battery life is the dominant constraint, and one where response time is.</li>
+<li>Why are security and management drawn as cross-cutting concerns rather than as a fifth level?</li>
+</ol>
+</section>
+<section id="further-reading" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">1.7</span> Further reading</h2>
+<ul>
+<li>IoT Analytics, <em>State of IoT 2025</em> <span class="citation" data-cites="iotanalytics_state_2025">(<a href="../references.html#ref-iotanalytics_state_2025" role="doc-biblioref">IoT Analytics 2025</a>)</span>, for current device counts and connectivity trends.</li>
+<li>A. Rayes and S. Salam, <em>Internet of Things from Hype to Reality</em> <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>, whose framing of IoT definitions and reference architecture this chapter follows.</li>
+<li>ITU-T Recommendation Y.2060, <em>Overview of the Internet of Things</em> <span class="citation" data-cites="itu_y2060">(<a href="../references.html#ref-itu_y2060" role="doc-biblioref"><em><span class="nocase">Recommendation Y.2060: Overview of the Internet of Things</span></em> 2012</a>)</span>, the source of many reference-architecture terms.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-espressif_idf_sleep" class="csl-entry" role="listitem">
+Espressif Systems. n.d. <span>“<span>ESP-IDF Programming Guide: Sleep Modes</span>.”</span> <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/sleep_modes.html">https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/sleep_modes.html</a>.
+</div>
+<div id="ref-evans_ioe_2011" class="csl-entry" role="listitem">
+Evans, Dave. 2011. <em>The Internet of Things: How the Next Evolution of the Internet Is Changing Everything</em>. White paper. Cisco Internet Business Solutions Group.
+</div>
+<div id="ref-iotanalytics_state_2025" class="csl-entry" role="listitem">
+IoT Analytics. 2025. <span>“<span class="nocase">State of IoT 2025: Number of connected IoT devices growing 14% to 21.1 billion globally</span>.”</span> <a href="https://iot-analytics.com/number-connected-iot-devices/">https://iot-analytics.com/number-connected-iot-devices/</a>.
+</div>
+<div id="ref-rayes_salam_iot" class="csl-entry" role="listitem">
+Rayes, Ammar, and Samer Salam. 2022. <em>Internet of Things from Hype to Reality: The Road to Digitization</em>. 3rd ed. Springer. <a href="https://doi.org/10.1007/978-3-030-90158-5">https://doi.org/10.1007/978-3-030-90158-5</a>.
+</div>
+<div id="ref-itu_y2060" class="csl-entry" role="listitem">
+<em><span class="nocase">Recommendation Y.2060: Overview of the Internet of Things</span></em>. 2012. International Telecommunication Union (ITU-T).
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../how-to-use.html" class="pagination-link" aria-label="Using This Book with the IoT@UCI Kit">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Using This Book with the IoT@UCI Kit</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../part1-foundations/02-boards-and-kit.html" class="pagination-link" aria-label="Development Boards and the IoT Kit">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part1-foundations/01-what-is-iot.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>IoT@UCI</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

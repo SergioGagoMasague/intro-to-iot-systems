@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; The Link Layer: Short and Long Range – Introduction to IoT Systems</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../part3-connecting/11-internet-layer.html" rel="next">
+<link href="../part3-connecting/09-network-requirements-stack.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7165337bd1de6b8f03f71a37d453c8f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part3-connecting/08-communication-models.html">Part III — Connecting Things</a></li><li class="breadcrumb-item"><a href="../part3-connecting/10-link-layer.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to IoT Systems</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/SergioGagoMasague/intro-to-iot-systems" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Introduction-to-IoT-Systems.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to-use.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using This Book with the IoT@UCI Kit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Part I — Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/01-what-is-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/02-boards-and-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/03-programming-the-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/04-embedded-systems-os.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Part II — The Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/05-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/06-sensors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/07-actuators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Part III — Connecting Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/08-communication-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Communication Models: OSI and TCP/IP</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/09-network-requirements-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/10-link-layer.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/11-internet-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/12-application-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Application Protocols: HTTP, CoAP, MQTT and More</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/13-interoperability-standards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Interoperability and Standards</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Part IV — Trustworthy IoT</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/14-security-privacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Security and Privacy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/15-device-identity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Device Identity and Secure Elements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/16-ota-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Over-the-Air Updates and the Device Lifecycle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/17-compliance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Compliance and Regulation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Part V — Intelligence at the Edge</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/18-ai-on-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">AI on IoT and Edge ML</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/19-where-iot-is-heading.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Where IoT Is Heading</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Part VI — Building an IoT System</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/20-idea-to-vertical-slice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From Idea to Vertical Slice</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/21-testing-in-the-field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Testing in the Field</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/22-reviewing-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reviewing Someone Else’s System</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-7-label">Part VII — Lab Companion</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L0-bench-safety-soldering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Bench Safety and Soldering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L1-build-the-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Build the Kit in Stages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L2-traffic-controller.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Traffic Controller</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L3-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Serial Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L4-ble-step-counter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: BLE Step Counter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L5-cloud-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Cloud Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L6-harden-your-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Harden Your Device</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Part VIII — Lecture Activities</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A0-about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About the Activities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A1-blink.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 1: Blink and Basic Circuits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A2-buttons-interrupts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 2: Buttons, Debouncing and Interrupts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A3-i2c-spi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 3: Scan the I²C Bus, Report on SPI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A4-oda-loop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 4: The Observe–Decide–Act Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A5-http-poll.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 5: A Classroom Poll over HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A6-lora-beacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 6: A LoRa Emergency Beacon</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A7-mqtt-qos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 7: MQTT Command Center and Picking the QoS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A8-signed-messages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 8: Signed Messages and STRIDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/A-kit-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Kit Reference</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/B-toolchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Toolchain Setup</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/C-troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Troubleshooting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/D-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/E-teaching-lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Setting Up a Teaching Lab</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#why-it-matters" id="toc-why-it-matters" class="nav-link active" data-scroll-target="#why-it-matters"><span class="header-section-number">10.1</span> Why it matters</a></li>
+  <li><a href="#concepts" id="toc-concepts" class="nav-link" data-scroll-target="#concepts"><span class="header-section-number">10.2</span> Concepts</a>
+  <ul class="collapse">
+  <li><a href="#what-iot-asks-of-the-link-layer" id="toc-what-iot-asks-of-the-link-layer" class="nav-link" data-scroll-target="#what-iot-asks-of-the-link-layer">What IoT asks of the link layer</a></li>
+  <li><a href="#energy-and-duty-cycling" id="toc-energy-and-duty-cycling" class="nav-link" data-scroll-target="#energy-and-duty-cycling">Energy and duty cycling</a></li>
+  <li><a href="#ieee-802.15.4-low-rate-personal-area-networks" id="toc-ieee-802.15.4-low-rate-personal-area-networks" class="nav-link" data-scroll-target="#ieee-802.15.4-low-rate-personal-area-networks">IEEE 802.15.4: low-rate personal area networks</a></li>
+  <li><a href="#bluetooth" id="toc-bluetooth" class="nav-link" data-scroll-target="#bluetooth">Bluetooth</a></li>
+  <li><a href="#wi-fi" id="toc-wi-fi" class="nav-link" data-scroll-target="#wi-fi">Wi-Fi</a></li>
+  <li><a href="#long-range-lpwans" id="toc-long-range-lpwans" class="nav-link" data-scroll-target="#long-range-lpwans">Long range: LPWANs</a></li>
+  <li><a href="#wired-time-sensitive-networking" id="toc-wired-time-sensitive-networking" class="nav-link" data-scroll-target="#wired-time-sensitive-networking">Wired: time-sensitive networking</a></li>
+  <li><a href="#choosing-a-link-technology" id="toc-choosing-a-link-technology" class="nav-link" data-scroll-target="#choosing-a-link-technology">Choosing a link technology</a></li>
+  </ul></li>
+  <li><a href="#sec-ch10-depth" id="toc-sec-ch10-depth" class="nav-link" data-scroll-target="#sec-ch10-depth"><span class="header-section-number">10.3</span> In depth (optional)</a>
+  <ul class="collapse">
+  <li><a href="#link-budgets-and-time-on-air" id="toc-link-budgets-and-time-on-air" class="nav-link" data-scroll-target="#link-budgets-and-time-on-air">Link budgets and time on air</a></li>
+  </ul></li>
+  <li><a href="#design-trade-offs" id="toc-design-trade-offs" class="nav-link" data-scroll-target="#design-trade-offs"><span class="header-section-number">10.4</span> Design trade-offs</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">10.5</span> Common pitfalls</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">10.6</span> Check your understanding</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">10.7</span> Further reading</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part3-connecting/10-link-layer.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part3-connecting/08-communication-models.html">Part III — Connecting Things</a></li><li class="breadcrumb-item"><a href="../part3-connecting/10-link-layer.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ch10" class="quarto-section-identifier"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After this chapter you should be able to:</p>
+<ol type="1">
+<li>Explain why the link layer dominates an IoT device’s energy budget, and estimate battery life from a duty cycle.</li>
+<li>Use the ESP32’s sleep modes to reduce power consumption.</li>
+<li>Describe IEEE 802.15.4 and the protocols built on it, and compare star, mesh and cluster-tree topologies.</li>
+<li>Describe Bluetooth Classic and Bluetooth Low Energy, including advertising and the GATT data model.</li>
+<li>Describe Wi-Fi’s role in IoT, including ESP-NOW and Wi-Fi HaLow.</li>
+<li>Compare long-range options (LoRa and LoRaWAN, cellular IoT) and wired time-sensitive networking.</li>
+<li>Choose a link technology for a given application from its range, data rate, power and cost.</li>
+</ol>
+</div>
+</div>
+<section id="why-it-matters" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="why-it-matters"><span class="header-section-number">10.1</span> Why it matters</h2>
+<p>The link layer is where an IoT device meets the physical world of radio waves and wires, and it is usually where most of the device’s energy goes. Transmitting a packet over Wi-Fi can take more energy than a full second of computation; repairing lost transmissions with retries can account for most of the energy spent on communication.</p>
+<p>There is no single best link technology. A wireless earbud, a smart lock, a soil sensor on a farm and a robot on a factory floor need very different combinations of range, data rate, latency, power and cost. This chapter surveys the main options and gives you a framework for choosing among them.</p>
+</section>
+<section id="concepts" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="concepts"><span class="header-section-number">10.2</span> Concepts</h2>
+<section id="what-iot-asks-of-the-link-layer" class="level3">
+<h3 class="anchored" data-anchor-id="what-iot-asks-of-the-link-layer">What IoT asks of the link layer</h3>
+<p>Four groups of characteristics shape the choice of link technology <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>:</p>
+<ul>
+<li><strong>Device characteristics.</strong> How much energy the device has, and how much processing and memory it can spend on the radio stack. For many devices, communication costs more energy than everything else combined, so low-power radios are essential.</li>
+<li><strong>Traffic characteristics.</strong> Some devices send short, occasional bursts (a door sensor); others send continuous streams (a camera). Some applications tolerate loss and delay (weather monitoring); others need guaranteed, bounded latency (engine control). The same device can face different requirements in different applications.</li>
+<li><strong>Access characteristics.</strong> Wired or wireless, mobile or stationary, short range or long range.</li>
+<li><strong>Scalability characteristics.</strong> Whether to build your own network (Wi-Fi, Zigbee, LoRa) or rent one (cellular), and whether to use a <strong>star</strong> topology, where every device talks to a central hub, or a <strong>mesh</strong>, where devices relay each other’s traffic. Meshes extend coverage but add forwarding delay, and they converge more slowly as they grow.</li>
+</ul>
+</section>
+<section id="energy-and-duty-cycling" class="level3">
+<h3 class="anchored" data-anchor-id="energy-and-duty-cycling">Energy and duty cycling</h3>
+<p>The ESP32 illustrates how much a radio costs and how sleep modes save it. Approximate figures for the ESP32 chip are <span class="citation" data-cites="espressif_esp32_datasheet">(<a href="../references.html#ref-espressif_esp32_datasheet" role="doc-biblioref"><em><span>ESP32 Series Datasheet</span></em>, n.d.</a>)</span>:</p>
+<div id="tbl-esp32-power" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-esp32-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;10.1: ESP32 power modes. Figures are for the chip; a development board’s USB bridge, regulator and LEDs add several milliamperes.
+</figcaption>
+<div aria-describedby="tbl-esp32-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>What is running</th>
+<th>Approximate current</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Active, Wi-Fi transmitting</td>
+<td>CPU and radio</td>
+<td>160–260 mA</td>
+</tr>
+<tr class="even">
+<td>Active, receiving or listening</td>
+<td>CPU and radio</td>
+<td>80–90 mA</td>
+</tr>
+<tr class="odd">
+<td>Modem sleep</td>
+<td>CPU on, radio off between beacons</td>
+<td>≈ 3–20 mA</td>
+</tr>
+<tr class="even">
+<td>Light sleep</td>
+<td>CPU paused (clock-gated), RAM kept</td>
+<td>≈ 0.8 mA</td>
+</tr>
+<tr class="odd">
+<td>Deep sleep</td>
+<td>Only the RTC domain and its memory</td>
+<td>≈ 10 µA</td>
+</tr>
+<tr class="even">
+<td>Hibernation</td>
+<td>Only an RTC timer</td>
+<td>≈ 2.5 µA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Light sleep</strong> uses <strong>clock gating</strong>: the clock is stopped to most of the chip, so its logic stops switching and stops consuming dynamic power, but its state is preserved. <strong>Deep sleep</strong> powers down the CPU, most of the RAM and the digital peripherals, leaving only the real-time-clock (RTC) controller, its peripherals and a small RTC memory. Waking from deep sleep is like a reset: <code>setup()</code> runs again. Variables marked <code>RTC_DATA_ATTR</code> survive.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>RTC_DATA_ATTR <span class="dt">uint32_t</span> bootCount <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>      <span class="co">// kept in RTC memory across deep sleep</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  bootCount<span class="op">++;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"Boot #</span><span class="sc">%lu</span><span class="st">: measure, transmit, sleep</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> bootCount<span class="op">);</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... read the sensor and send the reading here ...</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  esp_sleep_enable_timer_wakeup<span class="op">(</span><span class="dv">60</span><span class="bu">ULL</span> <span class="op">*</span> <span class="dv">1000000</span><span class="bu">ULL</span><span class="op">);</span>   <span class="co">// wake in 60 s</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  esp_deep_sleep_start<span class="op">();</span>                              <span class="co">// never returns</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{}</span>                                         <span class="co">// never reached</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Battery life follows from the <strong>average</strong> current:</p>
+<p><span class="math display">\[
+\text{battery life} = \frac{\text{capacity}}{I_{avg}},\qquad
+I_{avg} = \sum_i I_i \cdot \frac{t_i}{T}
+\]</span></p>
+<p>For a 1 300 mAh battery:</p>
+<ul>
+<li><strong>Always active</strong> at 250 mA: 1 300 / 250 ≈ <strong>5.2 hours</strong>.</li>
+<li><strong>Modem sleep</strong>, active 50 ms of every second at 250 mA and in modem sleep (10 mA) the rest: <span class="math inline">\(I_{avg} = 250 \times 0.05 + 10 \times 0.95 = 22\)</span> mA, so about <strong>59 hours</strong>.</li>
+<li><strong>Hibernation</strong>, active 4 ms of every second at 250 mA and hibernating at 2.5 µA the rest: <span class="math inline">\(I_{avg} \approx 1.0\)</span> mA, so roughly <strong>54 days</strong>.</li>
+</ul>
+<p>The lesson is that battery life is set almost entirely by how long the radio is on. Sending less often, sending less data, and reconnecting quickly matter far more than optimizing code.</p>
+</section>
+<section id="ieee-802.15.4-low-rate-personal-area-networks" class="level3">
+<h3 class="anchored" data-anchor-id="ieee-802.15.4-low-rate-personal-area-networks">IEEE 802.15.4: low-rate personal area networks</h3>
+<p><strong>IEEE 802.15.4</strong> defines the physical and MAC layers for low-rate wireless personal area networks: low cost, low power and low data rate, with battery lives of months to years. Its main features are:</p>
+<ul>
+<li>operation in unlicensed bands: 868 MHz (Europe, one channel), 902–928 MHz (North America) and 2.4 GHz worldwide (16 channels at 250 kbit/s);</li>
+<li>ranges from tens of meters indoors to around a kilometer outdoors with line of sight;</li>
+<li>acknowledged frames for reliability, with frames of at most 127 bytes.</li>
+</ul>
+<p>802.15.4 is the foundation for several complete stacks: <strong>Zigbee</strong> (widely used in lighting and home automation), <strong>Thread</strong> (an IPv6-based mesh used by Matter, <a href="13-interoperability-standards.html" class="quarto-xref"><span>Chapter 13</span></a>), <strong>WirelessHART</strong> and <strong>ISA100.11a</strong> (industrial), and <strong>6LoWPAN</strong> (<a href="11-internet-layer.html" class="quarto-xref"><span>Chapter 11</span></a>).</p>
+<p>An 802.15.4 network has three kinds of device:</p>
+<ul>
+<li>a <strong>coordinator</strong>, the most capable node and the root of the network, which chooses the channel, assigns the network identifier and allocates addresses;</li>
+<li><strong>routers</strong>, which relay traffic and buffer messages for sleeping devices;</li>
+<li><strong>end devices</strong>, which know only enough to talk to their parent and can sleep most of the time.</li>
+</ul>
+<p>These devices can be arranged in three topologies:</p>
+<div id="tbl-topologies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-topologies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;10.2: 802.15.4 topologies.
+</figcaption>
+<div aria-describedby="tbl-topologies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Topology</th>
+<th>Description</th>
+<th>Strengths</th>
+<th>Weaknesses</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Star</td>
+<td>All devices talk to one coordinator</td>
+<td>Simple and cheap; end devices can sleep</td>
+<td>Single point of failure; range limited to one hop</td>
+<td>Smart home, peripherals, health monitors</td>
+</tr>
+<tr class="even">
+<td>Mesh</td>
+<td>Any device can relay for any other within range</td>
+<td>Self-organizing and self-healing; multipath reliability</td>
+<td>Forwarding delay; routers must stay awake</td>
+<td>Agriculture, environmental monitoring, building automation</td>
+</tr>
+<tr class="odd">
+<td>Cluster-tree</td>
+<td>Hierarchical mesh; routers connect only through parents</td>
+<td>Covers large areas with simple routing</td>
+<td>Longer latency; less redundancy</td>
+<td>Large sensor deployments</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The <strong>TSCH</strong> (time-slotted channel hopping) mode, introduced in IEEE 802.15.4e, synchronizes all nodes to a shared schedule of time slots, and changes radio channel on every slot. Synchronization lets nodes sleep until their slot, which saves energy; channel hopping means interference on one frequency only affects some transmissions, which improves reliability. TSCH is the basis of deterministic low-power industrial networks.</p>
+</section>
+<section id="bluetooth" class="level3">
+<h3 class="anchored" data-anchor-id="bluetooth">Bluetooth</h3>
+<p><strong>Bluetooth</strong> (originally IEEE 802.15.1, now maintained by the Bluetooth SIG) operates in the 2.4 GHz band between 2 402 and 2 480 MHz. It uses <strong>frequency hopping</strong>: devices change channel up to 1 600 times per second, which reduces the impact of interference from Wi-Fi, microwave ovens and other devices sharing the band.</p>
+<p><strong>Bluetooth Classic</strong> (BR/EDR) organizes devices into <strong>piconets</strong>: one central device (historically called the master) and up to seven active peripherals that share its clock and hopping sequence. Piconets can be linked into larger <strong>scatternets</strong>. Classic Bluetooth suits continuous streams such as audio, but discovery and connection maintenance keep the radio busy, which limits battery life.</p>
+<p><strong>Bluetooth Low Energy</strong> (BLE), introduced in Bluetooth 4.0, is a separate, much simpler protocol designed for low power. Its main concepts are:</p>
+<ul>
+<li><strong>Advertising.</strong> A device broadcasts short packets on three dedicated channels to announce itself. Beacons do nothing else; many sensors simply put their readings in their advertisements.</li>
+<li><strong>Connections.</strong> A central device (such as a phone) can connect to a peripheral. Both then wake only at agreed <strong>connection intervals</strong>, typically every 7.5 ms to 4 s, and sleep in between.</li>
+<li><strong>GATT.</strong> Connected devices exchange data through the <strong>Generic Attribute Profile</strong>. A peripheral exposes <strong>services</strong>, each containing <strong>characteristics</strong> (values with properties such as read, write and notify). Services and characteristics are identified by UUIDs; standard ones, such as the Heart Rate service, have short 16-bit UUIDs defined by the Bluetooth SIG.</li>
+</ul>
+<p>Later versions added features important for IoT: Bluetooth 5 introduced a 2 Mbit/s mode and a long-range <strong>coded PHY</strong>; Bluetooth <strong>Mesh</strong> supports many-to-many networks; and Bluetooth 5.1 and later added direction finding and, more recently, channel sounding for distance measurement.</p>
+<p>The original ESP32 supports Bluetooth 4.2, both Classic and BLE. A minimal BLE peripheral that exposes the potentiometer as a readable, notifying characteristic looks like this:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;BLEDevice.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;BLEServer.h&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;BLE2902.h&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"iot_pins.h"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define SERVICE_UUID </span><span class="st">"6e400001-b5a3-f393-e0a9-e50e24dcca9e"</span><span class="pp">   </span><span class="co">// example custom UUIDs</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#define POT_UUID     </span><span class="st">"6e400002-b5a3-f393-e0a9-e50e24dcca9e"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>BLECharacteristic<span class="op">*</span> potChar<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  BLEDevice<span class="op">::</span>init<span class="op">(</span><span class="st">"IoT-Kit"</span><span class="op">);</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  BLEServer<span class="op">*</span> server <span class="op">=</span> BLEDevice<span class="op">::</span>createServer<span class="op">();</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  BLEService<span class="op">*</span> service <span class="op">=</span> server<span class="op">-&gt;</span>createService<span class="op">(</span>SERVICE_UUID<span class="op">);</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  potChar <span class="op">=</span> service<span class="op">-&gt;</span>createCharacteristic<span class="op">(</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      POT_UUID<span class="op">,</span> BLECharacteristic<span class="op">::</span>PROPERTY_READ <span class="op">|</span> BLECharacteristic<span class="op">::</span>PROPERTY_NOTIFY<span class="op">);</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  potChar<span class="op">-&gt;</span>addDescriptor<span class="op">(</span><span class="kw">new</span> BLE2902<span class="op">());</span>          <span class="co">// lets clients enable notifications</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  service<span class="op">-&gt;</span>start<span class="op">();</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  BLEDevice<span class="op">::</span>getAdvertising<span class="op">()-&gt;</span>addServiceUUID<span class="op">(</span>SERVICE_UUID<span class="op">);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  BLEDevice<span class="op">::</span>startAdvertising<span class="op">();</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint16_t</span> value <span class="op">=</span> analogRead<span class="op">(</span>IoTPins<span class="op">::</span>POT_ADC<span class="op">);</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  potChar<span class="op">-&gt;</span>setValue<span class="op">(</span>value<span class="op">);</span>                       <span class="co">// 2 bytes, little-endian</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  potChar<span class="op">-&gt;</span>notify<span class="op">();</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A generic BLE explorer app on a phone (such as nRF Connect) can now discover the kit, connect and subscribe to the value. <a href="../part7-lab-companion/L4-ble-step-counter.html">Lab 4</a> builds a BLE step counter on this foundation.</p>
+</section>
+<section id="wi-fi" class="level3">
+<h3 class="anchored" data-anchor-id="wi-fi">Wi-Fi</h3>
+<p><strong>Wi-Fi</strong> (IEEE 802.11) offers high data rates and uses infrastructure that already exists in most buildings, which makes it the most common link for IoT devices with mains power <span class="citation" data-cites="iotanalytics_state_2025">(<a href="../references.html#ref-iotanalytics_state_2025" role="doc-biblioref">IoT Analytics 2025</a>)</span>. Its drawbacks for battery-powered devices are high transmit power, the time needed to associate and obtain an address, and the need to wake regularly to hear the access point’s beacons.</p>
+<p>Two variants address some of these drawbacks:</p>
+<ul>
+<li><strong>ESP-NOW</strong> is a connectionless protocol from Espressif that sends short packets (up to 250 bytes) directly between ESP devices using the Wi-Fi radio, with no access point. It supports encrypted and unencrypted peers and delivery callbacks. It is ideal for simple device-to-device control, such as a remote button that switches a light, but it is proprietary and limited to a small number of encrypted peers.</li>
+<li><strong>Wi-Fi HaLow</strong> (IEEE 802.11ah) moves Wi-Fi to the sub-GHz bands (902–928 MHz in the US) for longer range (around 1 km outdoors) and better penetration through walls. It supports thousands of stations per access point, longer sleep periods and smaller headers, with data rates from about 150 kbit/s to tens of Mbit/s.</li>
+</ul>
+<p>Newer mainstream Wi-Fi standards also help IoT: Wi-Fi 6 (802.11ax) adds <strong>target wake time</strong>, which lets a device negotiate when it will next wake, so it can sleep through beacons.</p>
+</section>
+<section id="long-range-lpwans" class="level3">
+<h3 class="anchored" data-anchor-id="long-range-lpwans">Long range: LPWANs</h3>
+<p><strong>Low-power wide-area networks</strong> (LPWANs) trade data rate for range and battery life. They can reach several kilometers in cities and further in open country, with batteries lasting years, but they carry only a few bytes per message and a limited number of messages per day.</p>
+<section id="lora-and-lorawan" class="level4">
+<h4 class="anchored" data-anchor-id="lora-and-lorawan">LoRa and LoRaWAN</h4>
+<p><strong>LoRa</strong> is a radio modulation (the physical layer) developed by Semtech. It uses <strong>chirp spread spectrum</strong>: each symbol is a frequency sweep, which can be decoded even below the noise floor. Its key parameter is the <strong>spreading factor</strong> (SF7 to SF12). Each step up roughly doubles the time on air and adds range; SF7 at 125 kHz bandwidth carries about 5.5 kbit/s, while SF12 carries under 300 bit/s. In North America LoRa uses the 902–928 MHz band (US915), and in Europe the 863–870 MHz band (EU868), where regulations limit each device to a small duty cycle.</p>
+<p><strong>LoRaWAN</strong> is the MAC and network protocol built on LoRa, maintained by the LoRa Alliance <span class="citation" data-cites="lorawan_spec">(<a href="../references.html#ref-lorawan_spec" role="doc-biblioref"><em><span>LoRaWAN Specification</span></em>, n.d.</a>)</span>. Its main features are:</p>
+<ul>
+<li>a <strong>star-of-stars topology</strong>: end devices transmit to any gateways in range; <strong>gateways</strong> are simple bridges that forward everything to a <strong>network server</strong>, which removes duplicates, manages devices and routes data to application servers. The intelligence is in the server, so devices stay simple;</li>
+<li><strong>device classes</strong> that trade latency for energy: <strong>Class A</strong> devices listen only briefly after each uplink (lowest power); <strong>Class B</strong> devices also open scheduled receive windows; <strong>Class C</strong> devices listen continuously (mains-powered actuators);</li>
+<li><strong>adaptive data rate</strong>, which picks the fastest spreading factor that reliably reaches a gateway;</li>
+<li>built-in <strong>security</strong>, with separate network and application session keys derived when a device joins (typically over the air, with OTAA).</li>
+</ul>
+<p>The kit’s RFM95W module (Semtech SX1276) speaks raw LoRa. Without a LoRaWAN network, two kits can talk directly, point to point:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;SPI.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;LoRa.h&gt;</span><span class="pp">          </span><span class="co">// arduino-LoRa library</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"iot_pins.h"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>setPins<span class="op">(</span>IoTPins<span class="op">::</span>LORA_CS<span class="op">,</span> IoTPins<span class="op">::</span>LORA_RST<span class="op">,</span> IoTPins<span class="op">::</span>LORA_G0<span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>LoRa<span class="op">.</span>begin<span class="op">(</span><span class="fl">915E6</span><span class="op">))</span> <span class="op">{</span>                <span class="co">// US915 band</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>println<span class="op">(</span><span class="st">"LoRa init failed: check wiring"</span><span class="op">);</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span><span class="kw">true</span><span class="op">)</span> delay<span class="op">(</span><span class="dv">1000</span><span class="op">);</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>setSpreadingFactor<span class="op">(</span><span class="dv">7</span><span class="op">);</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>setSyncWord<span class="op">(</span><span class="bn">0x34</span><span class="op">);</span>                  <span class="co">// pick a team-specific value to avoid crosstalk</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>beginPacket<span class="op">();</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>print<span class="op">(</span><span class="st">"beacon team-07 "</span><span class="op">);</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>print<span class="op">(</span>millis<span class="op">()</span> <span class="op">/</span> <span class="dv">1000</span><span class="op">);</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  LoRa<span class="op">.</span>endPacket<span class="op">();</span>                        <span class="co">// blocks until sent</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> size <span class="op">=</span> LoRa<span class="op">.</span>parsePacket<span class="op">();</span>           <span class="co">// anything received?</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>size<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    String msg<span class="op">;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">(</span>LoRa<span class="op">.</span>available<span class="op">())</span> msg <span class="op">+=</span> <span class="op">(</span><span class="dt">char</span><span class="op">)</span>LoRa<span class="op">.</span>read<span class="op">();</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"RX '</span><span class="sc">%s</span><span class="st">' RSSI </span><span class="sc">%d</span><span class="st"> dBm SNR </span><span class="sc">%.1f</span><span class="st"> dB</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                  msg<span class="op">.</span>c_str<span class="op">(),</span> LoRa<span class="op">.</span>packetRssi<span class="op">(),</span> LoRa<span class="op">.</span>packetSnr<span class="op">());</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  delay<span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="cellular-iot" class="level4">
+<h4 class="anchored" data-anchor-id="cellular-iot">Cellular IoT</h4>
+<p>Cellular networks offer wide coverage without building infrastructure, at the cost of a subscription and higher module prices. Two standards are designed for IoT:</p>
+<ul>
+<li><strong>LTE-M</strong> (LTE Cat-M1): up to about 1 Mbit/s, supports mobility and voice, suited to trackers and wearables.</li>
+<li><strong>NB-IoT</strong> (narrowband IoT): tens of kbit/s, excellent building penetration, very low power, suited to static meters and sensors.</li>
+</ul>
+<p>Both support <strong>power saving mode</strong> (PSM) and <strong>extended discontinuous reception</strong> (eDRX), which let a device sleep for hours while remaining registered. Many older devices rely on 2G and 3G networks, which carriers are shutting down; new designs should use LTE-M, NB-IoT or 5G variants such as RedCap.</p>
+</section>
+<section id="other-lpwans" class="level4">
+<h4 class="anchored" data-anchor-id="other-lpwans">Other LPWANs</h4>
+<p><strong>Sigfox</strong> offered an ultra-narrowband network with a very small daily message allowance, and is now operated by UnaBiz. Other options include <strong>Wi-SUN</strong> (used by utilities for smart meters), <strong>Wireless M-Bus</strong> (metering in Europe) and <strong>mioty</strong>.</p>
+</section>
+</section>
+<section id="wired-time-sensitive-networking" class="level3">
+<h3 class="anchored" data-anchor-id="wired-time-sensitive-networking">Wired: time-sensitive networking</h3>
+<p>Not every IoT link is wireless. Factories and vehicles use Ethernet extended with IEEE <strong>Time-Sensitive Networking</strong> (TSN) standards. TSN combines:</p>
+<ul>
+<li><strong>precise time synchronization</strong> (IEEE 802.1AS, a profile of the Precision Time Protocol) to better than a microsecond;</li>
+<li><strong>scheduled and shaped forwarding</strong> (for example IEEE 802.1Qbv and 802.1Qav), so that time-critical traffic gets guaranteed, bounded latency even on links shared with video or file transfers;</li>
+<li><strong>stream reservation</strong> and <strong>redundant paths</strong> (IEEE 802.1CB) for reliability.</li>
+</ul>
+<p>Targets in industrial automation reported in the literature <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span> are on the order of microseconds of latency within a machine cell and around 100 µs across a factory.</p>
+</section>
+<section id="choosing-a-link-technology" class="level3">
+<h3 class="anchored" data-anchor-id="choosing-a-link-technology">Choosing a link technology</h3>
+<p><a href="#fig-range-rate" class="quarto-xref">Figure&nbsp;<span>10.1</span></a> places the main options by range and data rate.</p>
+<div id="fig-range-rate" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-range-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/range-vs-datarate.svg" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-range-rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.1: Approximate range and data rate of common IoT link technologies. Both axes are logarithmic; real values depend heavily on environment, antennas and configuration.
+</figcaption>
+</figure>
+</div>
+<div id="tbl-link-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-link-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;10.3: Comparing IoT link technologies. Values are typical, not limits.
+</figcaption>
+<div aria-describedby="tbl-link-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technology</th>
+<th>Typical range</th>
+<th>Data rate</th>
+<th>Power</th>
+<th>Topology</th>
+<th>Infrastructure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BLE</td>
+<td>10–50 m</td>
+<td>0.125–2 Mbit/s</td>
+<td>Very low</td>
+<td>Star, mesh</td>
+<td>Phone or gateway</td>
+</tr>
+<tr class="even">
+<td>Zigbee / Thread (802.15.4)</td>
+<td>10–100 m per hop</td>
+<td>250 kbit/s</td>
+<td>Very low</td>
+<td>Mesh</td>
+<td>Hub or border router</td>
+</tr>
+<tr class="odd">
+<td>Wi-Fi</td>
+<td>30–50 m indoors</td>
+<td>10–1000+ Mbit/s</td>
+<td>High</td>
+<td>Star</td>
+<td>Access point</td>
+</tr>
+<tr class="even">
+<td>Wi-Fi HaLow</td>
+<td>up to ≈ 1 km</td>
+<td>0.15–80 Mbit/s</td>
+<td>Low–medium</td>
+<td>Star</td>
+<td>HaLow access point</td>
+</tr>
+<tr class="odd">
+<td>LoRaWAN</td>
+<td>2–15 km</td>
+<td>0.3–22 kbit/s</td>
+<td>Very low</td>
+<td>Star of stars</td>
+<td>Gateways (own or community)</td>
+</tr>
+<tr class="even">
+<td>NB-IoT / LTE-M</td>
+<td>Cellular coverage</td>
+<td>20 kbit/s–1 Mbit/s</td>
+<td>Low</td>
+<td>Star</td>
+<td>Carrier, subscription</td>
+</tr>
+<tr class="odd">
+<td>Ethernet + TSN</td>
+<td>100 m per segment</td>
+<td>100 Mbit/s–10 Gbit/s</td>
+<td>Mains</td>
+<td>Switched</td>
+<td>Wired network</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Try it on your kit: a LoRa emergency beacon
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This exercise corresponds to the LoRa lecture activity and uses Stage 4 of the kit build.</p>
+<ol type="1">
+<li>Agree on a sync word with a partner team and run the beacon sketch on both kits. Print each received message with its RSSI and SNR.</li>
+<li>Walk one kit away from the other, down a corridor and through a door. At what RSSI and SNR do packets start to be lost?</li>
+<li>Change the spreading factor from 7 to 10 on both kits. How do range and time on air change? Measure time on air with <code>micros()</code> around <code>endPacket()</code>.</li>
+<li>Turn the beacon into an emergency beacon: pressing a button sends an alert that the other kit shows on its OLED and announces with the buzzer.</li>
+<li>Estimate battery life for a beacon that wakes from deep sleep once per minute, sends one SF7 packet and goes back to sleep.</li>
+</ol>
+<p>A guided, step-by-step version for a lecture session is <a href="../part8-activities/A6-lora-beacon.html">Activity 6</a>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-ch10-depth" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="sec-ch10-depth"><span class="header-section-number">10.3</span> In depth (optional)</h2>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Optional, in-depth explanation.</strong> This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.</p>
+</div>
+</div>
+</div>
+<section id="link-budgets-and-time-on-air" class="level3">
+<h3 class="anchored" data-anchor-id="link-budgets-and-time-on-air">Link budgets and time on air</h3>
+<p><strong>Free-space path loss.</strong> In free space, received power falls with the square of distance and with the square of frequency (for fixed-gain antennas). In decibels, with <span class="math inline">\(d\)</span> in metres and <span class="math inline">\(f\)</span> in hertz,</p>
+<p><span class="math display">\[
+\text{FSPL} = 20\log_{10} d + 20\log_{10} f - 147.55\ \text{dB}.
+\]</span></p>
+<p>At 915 MHz the loss over 1 km is <span class="math inline">\(60 + 179.2 - 147.6 \approx 91.7\)</span> dB; at 2.4 GHz it is about 8.4 dB more. Real environments lose more, and a <strong>log-distance model</strong> captures it with an exponent <span class="math inline">\(n\)</span> (2 in free space, roughly 2.7–3.5 in towns, 4–6 indoors through walls):</p>
+<p><span class="math display">\[
+PL(d) = PL(d_0) + 10\,n \log_{10}\frac{d}{d_0}.
+\]</span></p>
+<p><strong>The link budget.</strong> A link works if</p>
+<p><span class="math display">\[
+P_\text{tx} + G_\text{tx} + G_\text{rx} - PL - L_\text{misc} \ge S_\text{rx},
+\]</span></p>
+<p>where <span class="math inline">\(S_\text{rx}\)</span> is the receiver sensitivity. For an SX1276 at 14 dBm with unity-gain antennas, sensitivity is roughly −123 dBm at SF7 and −137 dBm at SF12 (125 kHz). The difference between transmit power and sensitivity, the <strong>maximum coupling loss</strong>, is 137 dB at SF7 and 151 dB at SF12. Every 6 dB of extra budget doubles the free-space range; with <span class="math inline">\(n = 3\)</span>, it multiplies range by <span class="math inline">\(10^{6/30} \approx 1.6\)</span>.</p>
+<p><strong>LoRa time on air.</strong> A chirp spread-spectrum symbol at spreading factor SF and bandwidth BW lasts <span class="math inline">\(T_s = 2^{SF}/BW\)</span>. Semtech’s formula for the number of payload symbols, for a payload of PL bytes, coding rate <span class="math inline">\(4/(4+CR)\)</span>, CRC on (<span class="math inline">\(\text{CRC} = 1\)</span>), explicit header (<span class="math inline">\(IH = 0\)</span>) and low-data-rate optimization off (<span class="math inline">\(DE = 0\)</span>), is</p>
+<p><span class="math display">\[
+n_\text{payload} = 8 + \max\left(\left\lceil \frac{8PL - 4SF + 28 + 16\,\text{CRC} - 20\,IH}{4\,(SF - 2DE)} \right\rceil (CR + 4),\ 0\right),
+\]</span></p>
+<p>and the preamble of <span class="math inline">\(n_p\)</span> symbols adds <span class="math inline">\((n_p + 4.25)\,T_s\)</span>.</p>
+<p>For Activity 6’s 23-byte beacon at SF7, BW 125 kHz, CR = 1 (4/5) and an 8-symbol preamble: <span class="math inline">\(T_s = 1.024\)</span> ms; the fraction is <span class="math inline">\(200/28 = 7.14\)</span>, rounded up to 8, times 5 gives 40, so <span class="math inline">\(n_\text{payload} = 48\)</span>. Time on air is <span class="math inline">\((12.25 + 48) \times 1.024 \approx 62\)</span> ms. At SF12, <span class="math inline">\(T_s = 32.8\)</span> ms, low-data-rate optimization becomes mandatory (<span class="math inline">\(DE = 1\)</span>), and the same packet takes about 1.5 s: the range costs airtime, and airtime costs energy and channel capacity.</p>
+<p><strong>Duty-cycle arithmetic.</strong> In Europe’s 868 MHz bands many sub-bands limit each device to 1% of the time: 36 s per hour, or about 580 of these SF7 packets but only about 24 at SF12. North American rules for 902–928 MHz instead limit the <em>dwell time</em> on a channel (400 ms for many configurations), which an SF12 packet of this size already exceeds.</p>
+<p><strong>Exercise.</strong> Two kits are 300 m apart in a town (<span class="math inline">\(n = 3\)</span>, <span class="math inline">\(PL(1\,\text{m}) = 31.7\)</span> dB at 915 MHz). Is SF7 enough? What margin do you have?</p>
+<p>Sources for this section: <span class="citation" data-cites="friis_1946 semtech_sx1276 semtech_an1200_13">(<a href="../references.html#ref-friis_1946" role="doc-biblioref">Friis 1946</a>; <a href="../references.html#ref-semtech_sx1276" role="doc-biblioref"><em><span class="nocase">SX1276/77/78/79 Datasheet: 137 MHz to 1020 MHz Low Power Long Range Transceiver</span></em>, n.d.</a>; <a href="../references.html#ref-semtech_an1200_13" role="doc-biblioref"><em><span>LoRa</span> Modem Designer’s Guide (<span>AN1200.13</span>)</em> 2013</a>)</span>.</p>
+</section>
+</section>
+<section id="design-trade-offs" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="design-trade-offs"><span class="header-section-number">10.4</span> Design trade-offs</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Decision</th>
+<th>Considerations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Range vs.&nbsp;data rate vs.&nbsp;power</td>
+<td>You can usually have two of the three</td>
+</tr>
+<tr class="even">
+<td>Own network vs.&nbsp;carrier network</td>
+<td>Building your own avoids subscription fees but requires deploying and maintaining gateways</td>
+</tr>
+<tr class="odd">
+<td>Star vs.&nbsp;mesh</td>
+<td>Stars are simple and let end devices sleep; meshes extend coverage but need always-on routers</td>
+</tr>
+<tr class="even">
+<td>Licensed vs.&nbsp;unlicensed spectrum</td>
+<td>Licensed (cellular) bands are managed and predictable; unlicensed bands are free but shared</td>
+</tr>
+<tr class="odd">
+<td>Standard vs.&nbsp;proprietary</td>
+<td>Standards (BLE, Thread, LoRaWAN) bring interoperability; proprietary protocols (ESP-NOW) can be simpler but lock you in</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-pitfalls" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">10.5</span> Common pitfalls</h2>
+<ul>
+<li><strong>Estimating battery life from the chip’s datasheet only.</strong> Regulators, USB bridges, LEDs and sensors on the board often draw more than the chip in deep sleep.</li>
+<li><strong>Ignoring retransmissions.</strong> Lost packets cost energy twice.</li>
+<li><strong>Using a European LoRa frequency in the US</strong>, or vice versa. Hardware and frequency plans are regional.</li>
+<li><strong>Exceeding duty-cycle or dwell-time limits</strong> in unlicensed bands, which can make a device illegal to operate.</li>
+<li><strong>Operating a LoRa module without an antenna.</strong> It can damage the transmitter.</li>
+<li><strong>Relying on 2G/3G modules</strong> in new designs.</li>
+<li><strong>Testing radios only on a desk.</strong> Walls, people, metal and other radios change everything.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Advanced track
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Link budget.</strong> A link works if transmit power plus antenna gains, minus path loss, exceeds the receiver’s sensitivity by a margin. With free-space path loss <span class="math inline">\(\text{FSPL(dB)} = 20\log_{10}(d) + 20\log_{10}(f) - 147.55\)</span> (meters and hertz), compute the free-space range of a 915 MHz LoRa link with +14 dBm transmit power, 0 dBi antennas and −130 dBm sensitivity. Then explain why real-world range is far shorter.</p>
+<p><strong>LoRaWAN on campus.</strong> Community networks such as The Things Network provide free LoRaWAN gateways in many cities. Register a device, join it over the air with OTAA, and compare the effort and the result with the point-to-point exercise above. What do you gain from the network server?</p>
+<p><strong>Coexistence.</strong> Wi-Fi channel 1, BLE advertising channels and Thread channel 11 all overlap near 2.4 GHz. Design a test that measures BLE packet loss while a nearby laptop streams video over Wi-Fi, and propose mitigations.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">10.6</span> Check your understanding</h2>
+<ol type="1">
+<li>Why is the link layer often responsible for most of an IoT device’s energy use?</li>
+<li>A device draws 200 mA for 100 ms every 10 s and 20 µA the rest of the time. What is its average current, and how long will a 2 000 mAh battery last?</li>
+<li>What is preserved in ESP32 deep sleep, and how does the program resume?</li>
+<li>Name the three device roles in an 802.15.4 network and what each does.</li>
+<li>What advantages does TSCH bring to 802.15.4?</li>
+<li>What are BLE services and characteristics? How does a phone receive updates from a characteristic without polling it?</li>
+<li>Why is LoRaWAN called a “star of stars”? Where is the intelligence?</li>
+<li>Choose a link technology for: (a) a water meter in a basement; (b) a wireless light switch in an apartment; (c) a livestock tracker on a ranch; (d) a security camera. Justify each.</li>
+</ol>
+</section>
+<section id="further-reading" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">10.7</span> Further reading</h2>
+<ul>
+<li>A. Rayes and S. Salam <span class="citation" data-cites="rayes_salam_iot">(<a href="../references.html#ref-rayes_salam_iot" role="doc-biblioref">Rayes and Salam 2022</a>)</span>, on link-layer requirements and technologies.</li>
+<li>Espressif, <em>ESP-IDF Sleep Modes</em> documentation <span class="citation" data-cites="espressif_idf_sleep">(<a href="../references.html#ref-espressif_idf_sleep" role="doc-biblioref">Espressif Systems, n.d.</a>)</span>.</li>
+<li>K. Townsend et al., <em>Getting Started with Bluetooth Low Energy</em> <span class="citation" data-cites="townsend_ble">(<a href="../references.html#ref-townsend_ble" role="doc-biblioref">Townsend et al. 2014</a>)</span>.</li>
+<li>LoRa Alliance, <em>LoRaWAN Specification</em> <span class="citation" data-cites="lorawan_spec">(<a href="../references.html#ref-lorawan_spec" role="doc-biblioref"><em><span>LoRaWAN Specification</span></em>, n.d.</a>)</span>.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-espressif_esp32_datasheet" class="csl-entry" role="listitem">
+<em><span>ESP32 Series Datasheet</span></em>. n.d. Espressif Systems. <a href="https://www.espressif.com/en/support/documents/technical-documents">https://www.espressif.com/en/support/documents/technical-documents</a>.
+</div>
+<div id="ref-espressif_idf_sleep" class="csl-entry" role="listitem">
+Espressif Systems. n.d. <span>“<span>ESP-IDF Programming Guide: Sleep Modes</span>.”</span> <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/sleep_modes.html">https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/sleep_modes.html</a>.
+</div>
+<div id="ref-friis_1946" class="csl-entry" role="listitem">
+Friis, Harald T. 1946. <span>“A Note on a Simple Transmission Formula.”</span> <em>Proceedings of the IRE</em> 34 (5): 254–56. <a href="https://doi.org/10.1109/JRPROC.1946.234568">https://doi.org/10.1109/JRPROC.1946.234568</a>.
+</div>
+<div id="ref-iotanalytics_state_2025" class="csl-entry" role="listitem">
+IoT Analytics. 2025. <span>“<span class="nocase">State of IoT 2025: Number of connected IoT devices growing 14% to 21.1 billion globally</span>.”</span> <a href="https://iot-analytics.com/number-connected-iot-devices/">https://iot-analytics.com/number-connected-iot-devices/</a>.
+</div>
+<div id="ref-semtech_an1200_13" class="csl-entry" role="listitem">
+<em><span>LoRa</span> Modem Designer’s Guide (<span>AN1200.13</span>)</em>. 2013. Semtech Corporation.
+</div>
+<div id="ref-lorawan_spec" class="csl-entry" role="listitem">
+<em><span>LoRaWAN Specification</span></em>. n.d. LoRa Alliance. <a href="https://lora-alliance.org/resource_hub/">https://lora-alliance.org/resource_hub/</a>.
+</div>
+<div id="ref-rayes_salam_iot" class="csl-entry" role="listitem">
+Rayes, Ammar, and Samer Salam. 2022. <em>Internet of Things from Hype to Reality: The Road to Digitization</em>. 3rd ed. Springer. <a href="https://doi.org/10.1007/978-3-030-90158-5">https://doi.org/10.1007/978-3-030-90158-5</a>.
+</div>
+<div id="ref-semtech_sx1276" class="csl-entry" role="listitem">
+<em><span class="nocase">SX1276/77/78/79 Datasheet: 137 MHz to 1020 MHz Low Power Long Range Transceiver</span></em>. n.d. Semtech. <a href="https://www.semtech.com/products/wireless-rf/lora-connect/sx1276">https://www.semtech.com/products/wireless-rf/lora-connect/sx1276</a>.
+</div>
+<div id="ref-townsend_ble" class="csl-entry" role="listitem">
+Townsend, Kevin, Carles Cufı́, Akiba, and Robert Davidson. 2014. <em>Getting Started with Bluetooth Low Energy</em>. O’Reilly Media.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../part3-connecting/09-network-requirements-stack.html" class="pagination-link" aria-label="IoT Network Requirements and the Protocol Stack">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../part3-connecting/11-internet-layer.html" class="pagination-link" aria-label="The Internet Layer: 6LoWPAN and RPL">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part3-connecting/10-link-layer.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>IoT@UCI</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Serial Communication: UART, SPI and I²C – Introduction to IoT Systems</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../part2-things/06-sensors.html" rel="next">
+<link href="../part1-foundations/04-embedded-systems-os.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-7165337bd1de6b8f03f71a37d453c8f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c215e2b45d1d87a345ee9edfdd7ec7c9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html">Part II — The Things</a></li><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to IoT Systems</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/SergioGagoMasague/intro-to-iot-systems" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="../Introduction-to-IoT-Systems.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../how-to-use.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using This Book with the IoT@UCI Kit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Part I — Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/01-what-is-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">What Is the Internet of Things?</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/02-boards-and-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Development Boards and the IoT Kit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/03-programming-the-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Programming the Device</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part1-foundations/04-embedded-systems-os.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Part II — The Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/05-serial-communication.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/06-sensors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part2-things/07-actuators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Actuators and the Observe–Decide–Act Loop</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">Part III — Connecting Things</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/08-communication-models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Communication Models: OSI and TCP/IP</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/09-network-requirements-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">IoT Network Requirements and the Protocol Stack</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/10-link-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Link Layer: Short and Long Range</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/11-internet-layer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Internet Layer: 6LoWPAN and RPL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/12-application-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Application Protocols: HTTP, CoAP, MQTT and More</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part3-connecting/13-interoperability-standards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Interoperability and Standards</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Part IV — Trustworthy IoT</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/14-security-privacy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Security and Privacy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/15-device-identity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Device Identity and Secure Elements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/16-ota-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Over-the-Air Updates and the Device Lifecycle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part4-trustworthy/17-compliance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Compliance and Regulation</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Part V — Intelligence at the Edge</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/18-ai-on-iot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">AI on IoT and Edge ML</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part5-edge-intelligence/19-where-iot-is-heading.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Where IoT Is Heading</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-controls="quarto-sidebar-section-6" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-6-label">Part VI — Building an IoT System</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-6" aria-labelledby="quarto-sidebar-section-6-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/20-idea-to-vertical-slice.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">From Idea to Vertical Slice</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/21-testing-in-the-field.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Testing in the Field</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part6-building/22-reviewing-systems.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reviewing Someone Else’s System</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-controls="quarto-sidebar-section-7" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-7-label">Part VII — Lab Companion</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-7" aria-labelledby="quarto-sidebar-section-7-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L0-bench-safety-soldering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Bench Safety and Soldering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L1-build-the-kit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Build the Kit in Stages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L2-traffic-controller.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Traffic Controller</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L3-serial-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Serial Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L4-ble-step-counter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: BLE Step Counter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L5-cloud-communication.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Cloud Communication</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part7-lab-companion/L6-harden-your-device.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Harden Your Device</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-controls="quarto-sidebar-section-8" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-8-label">Part VIII — Lecture Activities</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-8" aria-labelledby="quarto-sidebar-section-8-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A0-about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About the Activities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A1-blink.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 1: Blink and Basic Circuits</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A2-buttons-interrupts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 2: Buttons, Debouncing and Interrupts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A3-i2c-spi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 3: Scan the I²C Bus, Report on SPI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A4-oda-loop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 4: The Observe–Decide–Act Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A5-http-poll.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 5: A Classroom Poll over HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A6-lora-beacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 6: A LoRa Emergency Beacon</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A7-mqtt-qos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 7: MQTT Command Center and Picking the QoS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../part8-activities/A8-signed-messages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Activity 8: Signed Messages and STRIDE</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-controls="quarto-sidebar-section-9" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-9-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-9" aria-labelledby="quarto-sidebar-section-9-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/A-kit-reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Kit Reference</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/B-toolchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Toolchain Setup</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/C-troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Troubleshooting</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/D-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/E-teaching-lab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Setting Up a Teaching Lab</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#why-it-matters" id="toc-why-it-matters" class="nav-link active" data-scroll-target="#why-it-matters"><span class="header-section-number">5.1</span> Why it matters</a></li>
+  <li><a href="#concepts" id="toc-concepts" class="nav-link" data-scroll-target="#concepts"><span class="header-section-number">5.2</span> Concepts</a>
+  <ul class="collapse">
+  <li><a href="#protocols-parallel-and-serial" id="toc-protocols-parallel-and-serial" class="nav-link" data-scroll-target="#protocols-parallel-and-serial">Protocols, parallel and serial</a></li>
+  <li><a href="#uart-asynchronous-serial" id="toc-uart-asynchronous-serial" class="nav-link" data-scroll-target="#uart-asynchronous-serial">UART: asynchronous serial</a></li>
+  <li><a href="#spi-the-fast-synchronous-bus" id="toc-spi-the-fast-synchronous-bus" class="nav-link" data-scroll-target="#spi-the-fast-synchronous-bus">SPI: the fast synchronous bus</a></li>
+  <li><a href="#i²c-two-wires-many-devices" id="toc-i²c-two-wires-many-devices" class="nav-link" data-scroll-target="#i²c-two-wires-many-devices">I²C: two wires, many devices</a></li>
+  </ul></li>
+  <li><a href="#sec-ch05-depth" id="toc-sec-ch05-depth" class="nav-link" data-scroll-target="#sec-ch05-depth"><span class="header-section-number">5.3</span> In depth (optional)</a>
+  <ul class="collapse">
+  <li><a href="#bit-budgets-and-bus-electrics" id="toc-bit-budgets-and-bus-electrics" class="nav-link" data-scroll-target="#bit-budgets-and-bus-electrics">Bit budgets and bus electrics</a></li>
+  </ul></li>
+  <li><a href="#design-trade-offs" id="toc-design-trade-offs" class="nav-link" data-scroll-target="#design-trade-offs"><span class="header-section-number">5.4</span> Design trade-offs</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">5.5</span> Common pitfalls</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">5.6</span> Check your understanding</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">5.7</span> Further reading</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part2-things/05-serial-communication.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html">Part II — The Things</a></li><li class="breadcrumb-item"><a href="../part2-things/05-serial-communication.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-ch05" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Serial Communication: UART, SPI and I²C</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After this chapter you should be able to:</p>
+<ol type="1">
+<li>Explain why embedded devices move data serially, and distinguish synchronous from asynchronous links.</li>
+<li>Describe how UART, SPI and I²C frame, clock and address their data.</li>
+<li>Choose the right bus for a given peripheral, and justify the choice in terms of wires, speed, distance and number of devices.</li>
+<li>Connect, scan and read devices on the kit’s I²C and SPI buses from ESP32 code.</li>
+<li>Diagnose the most common wiring and configuration faults on each bus.</li>
+</ol>
+</div>
+</div>
+<section id="why-it-matters" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="why-it-matters"><span class="header-section-number">5.1</span> Why it matters</h2>
+<p>Open almost any IoT device and you will find a microcontroller surrounded by smaller chips: a temperature sensor, a motion sensor, a display, a radio, a secure element. The microcontroller is the only part that runs your code. Everything the device <em>senses</em>, <em>shows</em> or <em>transmits</em> reaches it over a handful of wires.</p>
+<p>Your kit is a good example. Its ESP32 talks to a computer, two sensors, a security chip, a display and a LoRa radio over about a dozen signal wires, most of them shared. It manages this because it uses three different serial protocols, each designed for a different job (<a href="#fig-kit-buses" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>).</p>
+<div id="fig-kit-buses" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kit-buses-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/kit-serial-buses.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kit-buses-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: The kit uses all three buses covered in this chapter. UART connects the ESP32 to your laptop. SPI connects fast devices that each get their own chip-select wire. I²C connects slower devices that share two wires and are told apart by address.
+</figcaption>
+</figure>
+</div>
+<p>Choosing the wrong bus, or wiring the right one carelessly, is one of the most common reasons an IoT prototype does not work. This chapter gives you the vocabulary and the mental model to get it right.</p>
+</section>
+<section id="concepts" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="concepts"><span class="header-section-number">5.2</span> Concepts</h2>
+<section id="protocols-parallel-and-serial" class="level3">
+<h3 class="anchored" data-anchor-id="protocols-parallel-and-serial">Protocols, parallel and serial</h3>
+<p>A <strong>communication protocol</strong> is an agreement between two or more parties about how information is exchanged: the <em>syntax</em> (how bits are grouped), the <em>semantics</em> (what they mean), and the <em>synchronization</em> (when each bit is valid). Protocols also say what happens when something goes wrong.</p>
+<p>Suppose you want to move one byte from one ESP32 to another. The simplest approach is <strong>parallel</strong> communication: use eight wires, one per bit, and set them all at once. Parallel buses are fast and are still used inside computers, for example between a processor and its memory.</p>
+<p>Parallel links do not scale well for small devices, though. Each extra bit costs a pin, a trace and a wire, and microcontrollers have few pins to spare. Over longer wires, the bits also stop arriving at exactly the same moment. <strong>Serial</strong> communication solves both problems by sending the bits one after another over a single data line, and adding just enough control information for the receiver to reassemble them.</p>
+<p>Two properties describe any serial link:</p>
+<ul>
+<li><strong>Synchronization.</strong> In a <strong>synchronous</strong> link, one side drives a separate <em>clock</em> wire that tells the receiver exactly when to read each bit. In an <strong>asynchronous</strong> link there is no clock wire, so both sides must agree on the bit rate in advance and resynchronize on every frame.</li>
+<li><strong>Direction.</strong> A <strong>simplex</strong> link carries data one way only. A <strong>half-duplex</strong> link carries data both ways, but only one way at a time. A <strong>full-duplex</strong> link carries data both ways simultaneously.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A note on terminology
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Older documents describe bus roles as <em>master</em> and <em>slave</em>, and name SPI pins MOSI and MISO. Current specifications use <strong>controller</strong> and <strong>target</strong> for I²C <span class="citation" data-cites="nxp_i2c_um10204">(<a href="../references.html#ref-nxp_i2c_um10204" role="doc-biblioref"><em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em> 2021</a>)</span>, and many vendors now use <strong>controller</strong> and <strong>peripheral</strong> for SPI, with pins named COPI (controller out, peripheral in) and CIPO. This book uses the modern terms. You will still see the older labels printed on modules and in the Arduino API, and they mean the same thing.</p>
+</div>
+</div>
+</section>
+<section id="uart-asynchronous-serial" class="level3">
+<h3 class="anchored" data-anchor-id="uart-asynchronous-serial">UART: asynchronous serial</h3>
+<p>A <strong>UART</strong> (Universal Asynchronous Receiver/Transmitter) is a hardware block, not a protocol in itself. It turns bytes into a timed stream of bits on a transmit (TX) wire, and turns the bit stream arriving on a receive (RX) wire back into bytes.</p>
+<section id="the-frame" class="level4">
+<h4 class="anchored" data-anchor-id="the-frame">The frame</h4>
+<p>Because there is no clock wire, every byte is wrapped in a <strong>frame</strong> that the receiver can recognize on its own (<a href="#fig-uart-frame" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>):</p>
+<ol type="1">
+<li>The line <strong>idles high</strong>.</li>
+<li>A <strong>start bit</strong> pulls the line low for one bit time. This falling edge tells the receiver a byte is coming and where its bits begin.</li>
+<li>Five to nine <strong>data bits</strong> follow, <em>least-significant bit first</em>. Eight is almost universal.</li>
+<li>An optional <strong>parity bit</strong> allows simple error detection.</li>
+<li>One or two <strong>stop bits</strong> return the line high, so the next start bit always produces a fresh falling edge.</li>
+</ol>
+<div id="fig-uart-frame" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-uart-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/uart-frame-8n1.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-uart-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: One UART frame carrying the ASCII character ‘A’ (0x41) in the common 8N1 format.
+</figcaption>
+</figure>
+</div>
+<p>A configuration is usually written in shorthand such as <strong>8N1</strong>: 8 data bits, no parity, 1 stop bit. The receiver samples each bit near the middle of its time slot, which gives it some tolerance for timing error.</p>
+</section>
+<section id="baud-rate-and-throughput" class="level4">
+<h4 class="anchored" data-anchor-id="baud-rate-and-throughput">Baud rate and throughput</h4>
+<p>The <strong>baud rate</strong> is the number of bit times per second. Both sides must be set to the same value. Common rates are 9600 and 115200 baud.</p>
+<p>The framing bits are overhead. In 8N1, each byte costs 10 bit times, so a link at 115200 baud moves at most</p>
+<p><span class="math display">\[
+\frac{115\,200 \text{ bits/s}}{10 \text{ bits/byte}} = 11\,520 \text{ bytes/s}.
+\]</span></p>
+<p>If the two sides disagree on the baud rate, the receiver samples at the wrong moments and the error accumulates across the frame. A mismatch of a few percent is enough to corrupt data. A large mismatch produces the familiar screen full of random characters in the Serial Monitor.</p>
+</section>
+<section id="wiring" class="level4">
+<h4 class="anchored" data-anchor-id="wiring">Wiring</h4>
+<p>A UART link is <strong>point-to-point</strong> between two devices:</p>
+<ul>
+<li>Connect each device’s <strong>TX to the other’s RX</strong>, not TX to TX.</li>
+<li><strong>Connect the grounds.</strong> The receiver measures voltage relative to its own ground, so without a common reference the levels are meaningless.</li>
+<li>Check the <strong>logic levels</strong>. The ESP32 uses 3.3 V signals. Connecting a 5 V device’s TX directly to an ESP32 input can damage it.</li>
+</ul>
+</section>
+<section id="uart-on-the-esp32" class="level4">
+<h4 class="anchored" data-anchor-id="uart-on-the-esp32">UART on the ESP32</h4>
+<p>The ESP32 has three UART controllers. On the DevKit V1, <strong>UART0</strong> is wired to a USB-to-UART bridge chip on the board. That is the link you use every time you upload code or open the Serial Monitor, so avoid using its pins for anything else. The other two UARTs can be routed to almost any free GPIO pins through the ESP32’s pin multiplexer <span class="citation" data-cites="espressif_esp32_trm">(<a href="../references.html#ref-espressif_esp32_trm" role="doc-biblioref"><em><span>ESP32 Technical Reference Manual</span></em>, n.d.</a>)</span>.</p>
+<p>In the Arduino framework, each UART is a <code>HardwareSerial</code> object:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-lst-cap="Echoing bytes on UART0 and opening a second UART on chosen pins."><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Arduino.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">int</span> UART2_RX <span class="op">=</span> <span class="dv">16</span><span class="op">;</span>   <span class="co">// example pins; check your pin map first</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">int</span> UART2_TX <span class="op">=</span> <span class="dv">17</span><span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span>                                  <span class="co">// UART0 → USB → laptop</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  Serial2<span class="op">.</span>begin<span class="op">(</span><span class="dv">9600</span><span class="op">,</span> SERIAL_8N1<span class="op">,</span> UART2_RX<span class="op">,</span> UART2_TX<span class="op">);</span>   <span class="co">// e.g., a GPS module</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>Serial<span class="op">.</span>available<span class="op">()</span> <span class="op">&gt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>        <span class="co">// bytes waiting in the receive buffer?</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> b <span class="op">=</span> Serial<span class="op">.</span>read<span class="op">();</span>             <span class="co">// take one byte</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"Received 0x</span><span class="sc">%02X</span><span class="st"> ('</span><span class="sc">%c</span><span class="st">')</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> b<span class="op">,</span> b<span class="op">);</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The course helper <code>iotStartSerial()</code> wraps <code>Serial.begin(115200)</code> and prints a banner, which is why the Serial Monitor in every activity is set to 115200 baud.</p>
+</section>
+<section id="strengths-and-limits" class="level4">
+<h4 class="anchored" data-anchor-id="strengths-and-limits">Strengths and limits</h4>
+<p>UART is simple, needs only two wires, and every microcontroller has one. That is why it remains the standard way to talk to a development board, and why modules such as GPS receivers and cellular modems still use it.</p>
+<p>Its limits follow from its design. It connects only two devices. It spends 20% of the line on framing. Both sides must agree on the speed in advance. Inside devices, most chip-to-chip links have moved to SPI and I²C.</p>
+</section>
+</section>
+<section id="spi-the-fast-synchronous-bus" class="level3">
+<h3 class="anchored" data-anchor-id="spi-the-fast-synchronous-bus">SPI: the fast synchronous bus</h3>
+<p>The <strong>Serial Peripheral Interface</strong> (SPI) is a synchronous bus introduced by Motorola in the 1980s <span class="citation" data-cites="freescale_spi_block_guide">(<a href="../references.html#ref-freescale_spi_block_guide" role="doc-biblioref"><em><span>SPI Block Guide</span></em> 2003</a>)</span>. It has no formal standard, but it is supported by almost every microcontroller and by thousands of peripherals.</p>
+<section id="signals-and-topology" class="level4">
+<h4 class="anchored" data-anchor-id="signals-and-topology">Signals and topology</h4>
+<p>One <strong>controller</strong> (the ESP32) drives the bus. Three wires are shared by every device:</p>
+<ul>
+<li><strong>SCK</strong>, the clock, always driven by the controller.</li>
+<li><strong>COPI</strong> (MOSI), data from controller to peripheral.</li>
+<li><strong>CIPO</strong> (MISO), data from peripheral to controller.</li>
+</ul>
+<p>Each peripheral also gets its own <strong>chip select</strong> (CS) wire. CS is <em>active low</em>: the controller pulls one device’s CS low to talk to it, and keeps every other CS high. A deselected peripheral must ignore the clock and release CIPO, so devices do not fight over the shared line.</p>
+<p>On every clock pulse, the controller shifts one bit out on COPI while the selected peripheral shifts one bit back on CIPO. SPI is therefore <strong>full duplex</strong>, and the hardware inside a simple peripheral can be little more than a shift register. Because the controller generates every clock edge, a peripheral can only send data while the controller is clocking. If the controller wants to read a reply, it must keep clocking (usually by sending dummy bytes) for as many bytes as it expects.</p>
+</section>
+<section id="clock-modes" class="level4">
+<h4 class="anchored" data-anchor-id="clock-modes">Clock modes</h4>
+<p>Devices disagree about which clock edge marks a valid bit. Two settings describe the convention:</p>
+<ul>
+<li><strong>CPOL</strong> (clock polarity): whether the clock idles low (0) or high (1).</li>
+<li><strong>CPHA</strong> (clock phase): whether data is sampled on the first (0) or second (1) clock edge of each bit.</li>
+</ul>
+<div id="tbl-spi-modes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-spi-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5.1: The four SPI modes. Mode 0 is the most common.
+</figcaption>
+<div aria-describedby="tbl-spi-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>CPOL</th>
+<th>CPHA</th>
+<th>Clock idles</th>
+<th>Data sampled on</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>Low</td>
+<td>Rising edge</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>Low</td>
+<td>Falling edge</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>High</td>
+<td>Falling edge</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>High</td>
+<td>Rising edge</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The controller must use the mode the peripheral expects, which is given in the peripheral’s datasheet. Most devices also send the <strong>most significant bit first</strong>.</p>
+</section>
+<section id="speed" class="level4">
+<h4 class="anchored" data-anchor-id="speed">Speed</h4>
+<p>SPI has no addressing overhead and no framing bits, and its push-pull outputs switch quickly. Clock rates of 10 MHz or more are routine, which makes SPI the usual choice for displays, radios, SD cards and flash memory. The practical limit is set by the slowest device on the bus and by the length of the wires.</p>
+</section>
+<section id="spi-on-the-esp32" class="level4">
+<h4 class="anchored" data-anchor-id="spi-on-the-esp32">SPI on the ESP32</h4>
+<p>The ESP32 has four SPI controllers. Two of them (SPI0 and SPI1) are reserved for the external flash chip that holds your program. The other two, <strong>HSPI</strong> and <strong>VSPI</strong>, are free for peripherals <span class="citation" data-cites="espressif_esp32_trm">(<a href="../references.html#ref-espressif_esp32_trm" role="doc-biblioref"><em><span>ESP32 Technical Reference Manual</span></em>, n.d.</a>)</span>. The kit uses VSPI on its default pins: SCK on GPIO 18, COPI on GPIO 23 and CIPO on GPIO 19. Using a controller’s default pins gives the highest clock rates; routing SPI signals to other pins through the GPIO matrix works, but lowers the maximum speed.</p>
+<p>The kit puts two devices on this bus (<a href="#fig-kit-buses" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>):</p>
+<ul>
+<li>The <strong>OLED display</strong> (CS on GPIO 5) only receives data, so it never uses CIPO. It has an extra <strong>D/C</strong> pin that tells it whether each byte is a command or pixel data.</li>
+<li>The <strong>LoRa radio</strong> (CS on GPIO 14), added in <a href="../part3-connecting/10-link-layer.html" class="quarto-xref"><span>Chapter 10</span></a>, both receives commands and returns data, so it uses CIPO.</li>
+</ul>
+<p>Because different devices may need different speeds and modes, the Arduino SPI library groups those settings into a <em>transaction</em>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-lst-cap="One SPI transaction: select the device, exchange bytes, release it."><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;SPI.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">int</span> LORA_CS <span class="op">=</span> <span class="dv">14</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">uint8_t</span> readRadioRegister<span class="op">(</span><span class="dt">uint8_t</span> reg<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  SPI<span class="op">.</span>beginTransaction<span class="op">(</span>SPISettings<span class="op">(</span><span class="dv">8000000</span><span class="op">,</span> MSBFIRST<span class="op">,</span> SPI_MODE0<span class="op">));</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  digitalWrite<span class="op">(</span>LORA_CS<span class="op">,</span> LOW<span class="op">);</span>          <span class="co">// select the radio</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  SPI<span class="op">.</span>transfer<span class="op">(</span>reg <span class="op">&amp;</span> <span class="bn">0x7F</span><span class="op">);</span>            <span class="co">// send the register address (top bit 0 = read)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint8_t</span> value <span class="op">=</span> SPI<span class="op">.</span>transfer<span class="op">(</span><span class="bn">0x00</span><span class="op">);</span>  <span class="co">// clock out a dummy byte, clock in the reply</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  digitalWrite<span class="op">(</span>LORA_CS<span class="op">,</span> HIGH<span class="op">);</span>         <span class="co">// release the bus</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  SPI<span class="op">.</span>endTransaction<span class="op">();</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> value<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  pinMode<span class="op">(</span>LORA_CS<span class="op">,</span> OUTPUT<span class="op">);</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  digitalWrite<span class="op">(</span>LORA_CS<span class="op">,</span> HIGH<span class="op">);</span>         <span class="co">// every CS starts deselected</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  SPI<span class="op">.</span>begin<span class="op">(</span><span class="dv">18</span><span class="op">,</span> <span class="dv">19</span><span class="op">,</span> <span class="dv">23</span><span class="op">);</span>               <span class="co">// SCK, CIPO (MISO), COPI (MOSI)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Notice that reading one byte takes two transfers: the first sends the register address, and the second exists only to generate eight clock pulses so the radio can answer.</p>
+</section>
+<section id="strengths-and-limits-1" class="level4">
+<h4 class="anchored" data-anchor-id="strengths-and-limits-1">Strengths and limits</h4>
+<p>SPI is fast, full duplex and simple to implement in hardware. Its costs are wiring and coordination. Every additional device needs another CS wire. There is no acknowledgment, so the controller cannot tell whether anyone is listening. Peripherals cannot start a conversation on their own, and they cannot talk to each other.</p>
+<p>When there are more peripherals than spare pins, designers either add a decoder chip that turns a few pins into many chip selects, or <strong>daisy-chain</strong> devices so that data shifts through one into the next. Daisy-chaining suits output-only devices such as LED drivers.</p>
+</section>
+</section>
+<section id="i²c-two-wires-many-devices" class="level3">
+<h3 class="anchored" data-anchor-id="i²c-two-wires-many-devices">I²C: two wires, many devices</h3>
+<p><strong>I²C</strong> (Inter-Integrated Circuit, pronounced “I-squared-C”) was created by Philips in 1982 to connect many chips inside a television using as few wires as possible. Today it is the default bus for low-speed sensors and is defined by a published specification <span class="citation" data-cites="nxp_i2c_um10204">(<a href="../references.html#ref-nxp_i2c_um10204" role="doc-biblioref"><em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em> 2021</a>)</span>.</p>
+<section id="two-wires-and-an-address" class="level4">
+<h4 class="anchored" data-anchor-id="two-wires-and-an-address">Two wires and an address</h4>
+<p>Every device on an I²C bus shares just two lines:</p>
+<ul>
+<li><strong>SCL</strong>, the serial clock, driven by the controller.</li>
+<li><strong>SDA</strong>, serial data, driven by whichever side is sending.</li>
+</ul>
+<p>Instead of chip-select wires, each target has a <strong>7-bit address</strong>. The controller begins every transaction by sending an address, and only the target with that address responds. The kit’s three I²C devices sit on the same two wires at addresses 0x76 (BMP280), 0x68 (MPU-6050) and 0x60 (ATECC608A). A few addresses are reserved by the specification, so the usable range is 0x08 to 0x77.</p>
+<p>Many breakout boards let you choose between two addresses with a pin or a jumper. The BMP280 answers at 0x76 or 0x77 depending on its SDO pin, and the MPU-6050 at 0x68 or 0x69 depending on its AD0 pin <span class="citation" data-cites="bosch_bmp280 invensense_mpu6050">(<a href="../references.html#ref-bosch_bmp280" role="doc-biblioref"><em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>, n.d.</a>; <a href="../references.html#ref-invensense_mpu6050" role="doc-biblioref"><em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>, n.d.</a>)</span>. That is how two identical sensors can share a bus.</p>
+</section>
+<section id="open-drain-and-pull-up-resistors" class="level4">
+<h4 class="anchored" data-anchor-id="open-drain-and-pull-up-resistors">Open drain and pull-up resistors</h4>
+<p>I²C outputs are <strong>open drain</strong>: a device can pull a line <em>low</em>, but it can never drive it <em>high</em>. Instead, a <strong>pull-up resistor</strong> on each line returns it to the supply voltage whenever nobody is pulling down.</p>
+<p>This design has two important consequences:</p>
+<ul>
+<li><strong>No device can short the bus.</strong> If one device holds the line low while another releases it, the line is simply low. This is what makes acknowledgments, arbitration and clock stretching (below) safe.</li>
+<li><strong>The pull-ups set the speed.</strong> The rising edge is only as fast as the resistor can charge the capacitance of the wires and inputs. Larger resistors save power but slow the edges; smaller ones allow faster edges but force each device to sink more current when it pulls low. Values between about 2.2 kΩ and 10 kΩ are typical.</li>
+</ul>
+<p>Most sensor breakout boards include their own pull-up resistors. When several boards share a bus, their pull-ups act in parallel, so the effective resistance drops as you add boards. That is usually harmless with two or three boards, but worth checking as a bus grows.</p>
+</section>
+<section id="transactions-ack-and-nack" class="level4">
+<h4 class="anchored" data-anchor-id="transactions-ack-and-nack">Transactions, ACK and NACK</h4>
+<p>An I²C transaction is built from 9-bit units: eight data bits, most significant first, followed by one <strong>acknowledge</strong> bit (<a href="#fig-i2c-read" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>).</p>
+<ol type="1">
+<li>The controller sends a <strong>START</strong> condition: SDA falls while SCL is high. Data never changes while SCL is high, so this pattern is unmistakable.</li>
+<li>The controller sends the 7-bit address and a <strong>read/write</strong> bit (0 = write, 1 = read).</li>
+<li>The addressed target pulls SDA low during the ninth clock to <strong>acknowledge</strong> (ACK). If no device has that address, SDA stays high: a <strong>NACK</strong>.</li>
+<li>Data bytes follow, each acknowledged by the receiver.</li>
+<li>The controller ends with a <strong>STOP</strong> condition: SDA rises while SCL is high.</li>
+</ol>
+<p>Most sensors expose their data as numbered <strong>registers</strong>. To read a register, the controller first <em>writes</em> the register number, then uses a <strong>repeated START</strong> (a START without a STOP in between) to switch to <em>reading</em> without giving up the bus.</p>
+<div id="fig-i2c-read" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i2c-read-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/i2c-register-read.svg" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i2c-read-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Reading the MPU-6050’s WHO_AM_I register (0x75). The chip answers 0x68, which identifies it as an MPU-6050.
+</figcaption>
+</figure>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-lst-cap="Reading one register over I²C with a repeated START."><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Wire.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">uint8_t</span> MPU6050_ADDR <span class="op">=</span> <span class="bn">0x68</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">constexpr</span> <span class="dt">uint8_t</span> WHO_AM_I     <span class="op">=</span> <span class="bn">0x75</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> readRegister<span class="op">(</span><span class="dt">uint8_t</span> addr<span class="op">,</span> <span class="dt">uint8_t</span> reg<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>beginTransmission<span class="op">(</span>addr<span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>write<span class="op">(</span>reg<span class="op">);</span>                          <span class="co">// which register we want</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>Wire<span class="op">.</span>endTransmission<span class="op">(</span><span class="kw">false</span><span class="op">)</span> <span class="op">!=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>   <span class="co">// false = repeated START, keep the bus</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span>                              <span class="co">// NACK: nobody at this address</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>requestFrom<span class="op">(</span>addr<span class="op">,</span> <span class="op">(</span><span class="dt">uint8_t</span><span class="op">)</span><span class="dv">1</span><span class="op">);</span>       <span class="co">// read one byte, then STOP</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Wire<span class="op">.</span>available<span class="op">()</span> <span class="op">?</span> Wire<span class="op">.</span>read<span class="op">()</span> <span class="op">:</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>begin<span class="op">(</span><span class="dv">21</span><span class="op">,</span> <span class="dv">22</span><span class="op">);</span>                       <span class="co">// SDA, SCL</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"WHO_AM_I = 0x</span><span class="sc">%02X\n</span><span class="st">"</span><span class="op">,</span> readRegister<span class="op">(</span>MPU6050_ADDR<span class="op">,</span> WHO_AM_I<span class="op">));</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="scanning-a-bus" class="level4">
+<h4 class="anchored" data-anchor-id="scanning-a-bus">Scanning a bus</h4>
+<p>Because a missing device answers with a NACK, the controller can discover what is connected simply by addressing every possible target and noting which ones acknowledge. This <strong>bus scan</strong> is the first thing to run on any new I²C wiring.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-lst-cap="An I²C bus scanner."><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Wire.h&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> setup<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>begin<span class="op">(</span><span class="dv">115200</span><span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  Wire<span class="op">.</span>begin<span class="op">(</span><span class="dv">21</span><span class="op">,</span> <span class="dv">22</span><span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> found <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">uint8_t</span> addr <span class="op">=</span> <span class="bn">0x08</span><span class="op">;</span> addr <span class="op">&lt;=</span> <span class="bn">0x77</span><span class="op">;</span> addr<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    Wire<span class="op">.</span>beginTransmission<span class="op">(</span>addr<span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>Wire<span class="op">.</span>endTransmission<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span>     <span class="co">// 0 = the address was acknowledged</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"Found device at 0x</span><span class="sc">%02X\n</span><span class="st">"</span><span class="op">,</span> addr<span class="op">);</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      found<span class="op">++;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  Serial<span class="op">.</span>printf<span class="op">(</span><span class="st">"</span><span class="sc">%d</span><span class="st"> device(s) found</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> found<span class="op">);</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="speed-clock-stretching-and-multiple-controllers" class="level4">
+<h4 class="anchored" data-anchor-id="speed-clock-stretching-and-multiple-controllers">Speed, clock stretching and multiple controllers</h4>
+<p>I²C runs at defined speeds: <strong>100 kHz</strong> (Standard-mode), <strong>400 kHz</strong> (Fast-mode) and <strong>1 MHz</strong> (Fast-mode Plus), with faster modes defined for special hardware <span class="citation" data-cites="nxp_i2c_um10204">(<a href="../references.html#ref-nxp_i2c_um10204" role="doc-biblioref"><em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em> 2021</a>)</span>. Address bytes, acknowledgments and the slow rising edges make it much slower than SPI in practice, which is acceptable for sensors that produce a few readings per second. On the ESP32, <code>Wire.setClock(400000)</code> selects Fast-mode.</p>
+<p>Open-drain outputs also make two advanced features possible:</p>
+<ul>
+<li><strong>Clock stretching.</strong> A target that needs more time can hold SCL low after a byte. The controller waits until SCL is released.</li>
+<li><strong>Multiple controllers.</strong> Two controllers can share a bus. If both start at once, each watches SDA while sending; the first one to send a 1 while the line reads 0 knows it has lost <strong>arbitration</strong> and backs off.</li>
+</ul>
+</section>
+<section id="strengths-and-limits-2" class="level4">
+<h4 class="anchored" data-anchor-id="strengths-and-limits-2">Strengths and limits</h4>
+<p>I²C needs only two wires for up to dozens of devices, confirms that each byte was received, and lets software find devices by scanning. Its costs are speed and fragility: it is half duplex, slower than SPI, sensitive to pull-up values and wire length, and a single misbehaving device can hold the whole bus low.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Try it on your kit: map your buses
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This exercise uses the kit wiring from Stage 2 of <a href="../part7-lab-companion/L1-build-the-kit.html">Lab 1</a>, and corresponds to the I²C and SPI lecture activity.</p>
+<ol type="1">
+<li>Run the bus scanner above. You should find exactly three devices: 0x60, 0x68 and 0x76. Write down what you see before going on.</li>
+<li>Unplug the USB cable, remove the MPU-6050’s SDA wire, and scan again. Which addresses remain? Why does removing one device not break the others?</li>
+<li>Restore the wire and run the WHO_AM_I example. Confirm that it prints 0x68.</li>
+<li>Set the Serial Monitor to 9600 baud while the code still uses 115200. Describe what you see, and explain it using <a href="#fig-uart-frame" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>.</li>
+<li>Write a line of your choice to the OLED. Which bus carried it, and which chip-select pin went low?</li>
+</ol>
+<p>A guided, step-by-step version for a lecture session is <a href="../part8-activities/A3-i2c-spi.html">Activity 3</a>.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="sec-ch05-depth" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sec-ch05-depth"><span class="header-section-number">5.3</span> In depth (optional)</h2>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Optional, in-depth explanation.</strong> This section goes beyond the rest of the chapter into the math and physics behind it. Nothing later in the book depends on it; skip it on a first reading.</p>
+</div>
+</div>
+</div>
+<section id="bit-budgets-and-bus-electrics" class="level3">
+<h3 class="anchored" data-anchor-id="bit-budgets-and-bus-electrics">Bit budgets and bus electrics</h3>
+<p><strong>UART efficiency.</strong> An 8N1 frame sends 10 bits (start, 8 data, stop) for every byte, so the useful byte rate is <span class="math inline">\(\text{baud}/10\)</span>: 11 520 bytes per second at 115 200 baud.</p>
+<p><strong>How much baud-rate error is tolerable?</strong> The receiver synchronizes on the start bit’s falling edge and samples each bit in its middle. If the two clocks differ by a fraction <span class="math inline">\(\varepsilon\)</span>, the sampling point drifts by <span class="math inline">\(\varepsilon\)</span> bit-times per bit. By the stop bit, about 9.5 bit-times after the edge, the drift must stay under half a bit:</p>
+<p><span class="math display">\[
+9.5\,\varepsilon &lt; 0.5 \quad\Rightarrow\quad \varepsilon &lt; 5.3\%.
+\]</span></p>
+<p>That is the <em>combined</em> error of both ends, before any allowance for slow edges or noise, so designers aim for about 2% on each side. It explains why a 9600-baud monitor on a 115 200-baud stream produces garbage rather than a slowed-down message.</p>
+<p><strong>I²C pull-up resistors.</strong> I²C lines are open-drain: devices only pull them low, and a pull-up resistor <span class="math inline">\(R_p\)</span> pulls them high through the bus capacitance <span class="math inline">\(C_b\)</span> (wires plus pins). The rise is an RC charge, and the standard measures it from 30% to 70% of <span class="math inline">\(V_{DD}\)</span>:</p>
+<p><span class="math display">\[
+t_r = t_{70\%} - t_{30\%} = R_pC_b\left(\ln\frac{1}{0.3} - \ln\frac{1}{0.7}\right) = R_pC_b \ln\frac{7}{3} \approx 0.847\,R_p C_b .
+\]</span></p>
+<p>Fast mode (400 kHz) allows <span class="math inline">\(t_r \le 300\)</span> ns, so <span class="math inline">\(R_p \le 300\ \text{ns} / (0.847\, C_b)\)</span>; for <span class="math inline">\(C_b = 100\)</span> pF, <span class="math inline">\(R_p \le 3.5\)</span> kΩ. The resistor also cannot be too small, or a device cannot pull the line low enough: with a 3 mA sink and a 0.4 V low level, <span class="math inline">\(R_p \ge (3.3 - 0.4)/0.003 \approx 970\)</span> Ω. Breakout boards each add their own pull-ups (often 4.7 kΩ or 10 kΩ), and they combine in parallel, so three modules on one bus already give 1.6–3.3 kΩ.</p>
+<p><strong>Transfer time on each bus.</strong> An I²C byte takes 9 clock cycles (8 data bits plus acknowledge), so a 1024-byte display frame at 400 kHz takes at least</p>
+<p><span class="math display">\[
+\frac{1024 \times 9}{400\,000} \approx 23\ \text{ms},
+\]</span></p>
+<p>capping the refresh rate near 40 frames per second before any other work. On SPI at 8 MHz, with no acknowledge bit, the same frame takes <span class="math inline">\(1024 \times 8 / 8\,000\,000 \approx 1\)</span> ms. That factor of twenty is why the kit’s display uses SPI.</p>
+<p><strong>Exercise.</strong> The MPU-6050 delivers 14 bytes per sample (accelerometer, temperature, gyroscope). At 400 kHz, counting the address and register bytes, what is the highest sample rate the bus could sustain? What does that leave for the BMP280?</p>
+<p>Sources for this section: <span class="citation" data-cites="nxp_i2c_um10204 espressif_esp32_trm">(<a href="../references.html#ref-nxp_i2c_um10204" role="doc-biblioref"><em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em> 2021</a>; <a href="../references.html#ref-espressif_esp32_trm" role="doc-biblioref"><em><span>ESP32 Technical Reference Manual</span></em>, n.d.</a>)</span>.</p>
+</section>
+</section>
+<section id="design-trade-offs" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="design-trade-offs"><span class="header-section-number">5.4</span> Design trade-offs</h2>
+<div id="tbl-bus-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bus-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5.2: Comparing the three buses.
+</figcaption>
+<div aria-describedby="tbl-bus-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>UART</th>
+<th>SPI</th>
+<th>I²C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Signal wires</td>
+<td>2 (TX, RX)</td>
+<td>3 shared + 1 CS per device</td>
+<td>2 shared</td>
+</tr>
+<tr class="even">
+<td>Devices</td>
+<td>2 (point-to-point)</td>
+<td>1 controller, several peripherals</td>
+<td>Many controllers and targets</td>
+</tr>
+<tr class="odd">
+<td>Clock</td>
+<td>None (asynchronous)</td>
+<td>Controller’s SCK</td>
+<td>Controller’s SCL</td>
+</tr>
+<tr class="even">
+<td>Duplex</td>
+<td>Full</td>
+<td>Full</td>
+<td>Half</td>
+</tr>
+<tr class="odd">
+<td>How a device is chosen</td>
+<td>Not needed</td>
+<td>Chip-select wire</td>
+<td>7-bit address</td>
+</tr>
+<tr class="even">
+<td>Delivery confirmed?</td>
+<td>No</td>
+<td>No</td>
+<td>Yes (ACK/NACK)</td>
+</tr>
+<tr class="odd">
+<td>Typical speed</td>
+<td>9.6–115.2 kbit/s (up to a few Mbit/s)</td>
+<td>1–80 MHz clock</td>
+<td>100 kHz–1 MHz clock</td>
+</tr>
+<tr class="even">
+<td>On the kit</td>
+<td>Laptop console</td>
+<td>OLED, LoRa radio</td>
+<td>BMP280, MPU-6050, ATECC608A</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A few rules of thumb follow from the table:</p>
+<ul>
+<li><strong>Talking to another computer or a module with its own processor</strong> (a laptop, GPS receiver or cellular modem): UART.</li>
+<li><strong>Moving a lot of data quickly</strong> (displays, radios, memory cards, cameras): SPI.</li>
+<li><strong>Reading many slow sensors with few pins</strong>: I²C.</li>
+<li><strong>Running out of pins</strong>: I²C for anything slow enough; a CS decoder or daisy-chain for SPI.</li>
+<li><strong>Long cables</strong>: none of these three. Use a differential standard such as RS-485 or CAN, or move to a network link (<a href="../part3-connecting/10-link-layer.html" class="quarto-xref"><span>Chapter 10</span></a>).</li>
+</ul>
+</section>
+<section id="common-pitfalls" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">5.5</span> Common pitfalls</h2>
+<ul>
+<li><strong>TX connected to TX.</strong> UART lines cross over: TX goes to RX.</li>
+<li><strong>No common ground.</strong> Two boards powered separately must share GND for any of these buses to work.</li>
+<li><strong>Baud-rate mismatch.</strong> Garbled characters almost always mean the two sides disagree on speed.</li>
+<li><strong>7-bit versus 8-bit addresses.</strong> Some datasheets give the address already shifted left with the read/write bit included. The ATECC608A, for example, is often listed as 0xC0, which is 0x60 in the 7-bit form the Arduino <code>Wire</code> library expects <span class="citation" data-cites="microchip_atecc608a">(<a href="../references.html#ref-microchip_atecc608a" role="doc-biblioref"><em><span>ATECC608A CryptoAuthentication Device Summary Datasheet</span></em>, n.d.</a>)</span>.</li>
+<li><strong>Two devices with the same address.</strong> The scan shows one address, but the readings are nonsense. Move one device to its alternate address.</li>
+<li><strong>More than one CS low at once.</strong> Two SPI peripherals drive CIPO together and both replies are corrupted. Set every CS pin high in <code>setup()</code> before using the bus.</li>
+<li><strong>The wrong SPI mode.</strong> The device answers, but with shifted or meaningless bits. Check CPOL and CPHA in its datasheet.</li>
+<li><strong>Trusting the silkscreen.</strong> Many SPI display modules label their data input “SDA” even though it is SPI data, not I²C. The kit’s OLED is one of them: its “SDA” pin goes to the SPI COPI line (GPIO 23), not the I²C bus.</li>
+<li><strong>Using reserved pins.</strong> On the ESP32, GPIO 6 to 11 connect to the flash chip and must never be used.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Advanced track
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Seeing the bits.</strong> A logic analyzer captures the actual voltages on each wire and decodes them as UART, SPI or I²C frames. Inexpensive USB analyzers, used with open-source software such as PulseView/sigrok, are the fastest way to answer “is the problem in my code or my wiring?” Capture a bus scan and identify every START, address, ACK and STOP.</p>
+<p><strong>Logic levels.</strong> The ESP32 uses 3.3 V logic. Many older sensors and Arduino shields use 5 V. Connecting them needs a level shifter. For I²C, a bidirectional MOSFET shifter works because the bus is open drain; for SPI, use a dedicated buffer.</p>
+<p><strong>Bus recovery.</strong> If a controller resets in the middle of a read, a target may still be holding SDA low, waiting for clock pulses that never come. The standard fix is to toggle SCL manually up to nine times until SDA is released, then send a STOP.</p>
+<p><strong>Beyond these three.</strong> RS-485 carries UART-style data over a differential pair for hundreds of meters. CAN, used in vehicles and factories, adds arbitration and error handling on a differential bus. I3C is a newer successor to I²C with higher speeds, in-band interrupts and dynamic addressing.</p>
+<p><strong>Design review question.</strong> Your product needs a display updated 30 times per second, four environmental sensors and a radio, and the microcontroller has 10 free GPIO pins. Assign each device to a bus, count the pins, and justify any choice a reviewer might challenge.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">5.6</span> Check your understanding</h2>
+<ol type="1">
+<li>Why might a UART link fail if the two devices use different baud rates, even when the wiring is correct?</li>
+<li>How many bytes per second can an 8N1 UART carry at 9600 baud?</li>
+<li>Which of the three buses uses the fewest wires for five devices? How many signal wires would SPI need for the same five devices?</li>
+<li>Which bus would you choose for high-speed communication with several peripherals, and what does it cost you in wiring?</li>
+<li>Why must I²C outputs be open drain? Name two features of I²C that would be impossible otherwise.</li>
+<li>A bus scan finds only one device at 0x68, but you connected an MPU-6050 and a real-time-clock chip that also uses 0x68. What happened, and how do you fix it?</li>
+<li>In the SPI read listing, why does reading one register take two calls to <code>SPI.transfer()</code>?</li>
+<li>Your OLED and your LoRa radio share an SPI bus. The radio works on its own, but stops working once the display code is added. Give two likely causes.</li>
+</ol>
+</section>
+<section id="further-reading" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">5.7</span> Further reading</h2>
+<ul>
+<li>NXP Semiconductors, <em>I²C-bus Specification and User Manual</em> <span class="citation" data-cites="nxp_i2c_um10204">(<a href="../references.html#ref-nxp_i2c_um10204" role="doc-biblioref"><em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em> 2021</a>)</span>. The authoritative reference, including timing, pull-up sizing and arbitration.</li>
+<li>Espressif, <em>ESP32 Technical Reference Manual</em> <span class="citation" data-cites="espressif_esp32_trm">(<a href="../references.html#ref-espressif_esp32_trm" role="doc-biblioref"><em><span>ESP32 Technical Reference Manual</span></em>, n.d.</a>)</span>, chapters on UART, SPI and I²C controllers.</li>
+<li>SparkFun, <em>Serial Communication</em> <span class="citation" data-cites="sparkfun_serial">(<a href="../references.html#ref-sparkfun_serial" role="doc-biblioref">SparkFun Electronics, n.d.</a>)</span>. A readable introduction to UART framing and wiring.</li>
+<li>The datasheets for the kit’s devices: BMP280 <span class="citation" data-cites="bosch_bmp280">(<a href="../references.html#ref-bosch_bmp280" role="doc-biblioref"><em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>, n.d.</a>)</span>, MPU-6050 <span class="citation" data-cites="invensense_mpu6050">(<a href="../references.html#ref-invensense_mpu6050" role="doc-biblioref"><em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>, n.d.</a>)</span>, ATECC608A <span class="citation" data-cites="microchip_atecc608a">(<a href="../references.html#ref-microchip_atecc608a" role="doc-biblioref"><em><span>ATECC608A CryptoAuthentication Device Summary Datasheet</span></em>, n.d.</a>)</span> and SX1276 <span class="citation" data-cites="semtech_sx1276">(<a href="../references.html#ref-semtech_sx1276" role="doc-biblioref"><em><span class="nocase">SX1276/77/78/79 Datasheet: 137 MHz to 1020 MHz Low Power Long Range Transceiver</span></em>, n.d.</a>)</span>.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-microchip_atecc608a" class="csl-entry" role="listitem">
+<em><span>ATECC608A CryptoAuthentication Device Summary Datasheet</span></em>. n.d. Microchip Technology. <a href="https://www.microchip.com/">https://www.microchip.com/</a>.
+</div>
+<div id="ref-bosch_bmp280" class="csl-entry" role="listitem">
+<em><span>BMP280 Digital Pressure Sensor Datasheet</span></em>. n.d. Bosch Sensortec. <a href="https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/">https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/</a>.
+</div>
+<div id="ref-espressif_esp32_trm" class="csl-entry" role="listitem">
+<em><span>ESP32 Technical Reference Manual</span></em>. n.d. Espressif Systems. <a href="https://www.espressif.com/en/support/documents/technical-documents">https://www.espressif.com/en/support/documents/technical-documents</a>.
+</div>
+<div id="ref-invensense_mpu6050" class="csl-entry" role="listitem">
+<em><span class="nocase">MPU-6000 and MPU-6050 Product Specification</span></em>. n.d. InvenSense.
+</div>
+<div id="ref-sparkfun_serial" class="csl-entry" role="listitem">
+SparkFun Electronics. n.d. <span>“<span>Serial Communication</span>.”</span> <a href="https://learn.sparkfun.com/tutorials/serial-communication/all">https://learn.sparkfun.com/tutorials/serial-communication/all</a>.
+</div>
+<div id="ref-freescale_spi_block_guide" class="csl-entry" role="listitem">
+<em><span>SPI Block Guide</span></em>. 2003. Motorola / Freescale Semiconductor.
+</div>
+<div id="ref-semtech_sx1276" class="csl-entry" role="listitem">
+<em><span class="nocase">SX1276/77/78/79 Datasheet: 137 MHz to 1020 MHz Low Power Long Range Transceiver</span></em>. n.d. Semtech. <a href="https://www.semtech.com/products/wireless-rf/lora-connect/sx1276">https://www.semtech.com/products/wireless-rf/lora-connect/sx1276</a>.
+</div>
+<div id="ref-nxp_i2c_um10204" class="csl-entry" role="listitem">
+<em><span class="nocase">UM10204: I2C-bus Specification and User Manual</span></em>. 2021. NXP Semiconductors. <a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">https://www.nxp.com/docs/en/user-guide/UM10204.pdf</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="../part1-foundations/04-embedded-systems-os.html" class="pagination-link" aria-label="Embedded Systems and Operating Systems">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Embedded Systems and Operating Systems</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../part2-things/06-sensors.html" class="pagination-link" aria-label="Sensors">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sensors</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© Sergio Gago-Masagué · Text CC BY 4.0 · Code MIT</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/edit/main/part2-things/05-serial-communication.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/SergioGagoMasague/intro-to-iot-systems/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>IoT@UCI</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

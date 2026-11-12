@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="450" y="30" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">The three serial buses on the IoT@UCI kit</text>
+<rect x="350" y="190" width="200" height="90" rx="8" fill="#1A2420" fill-opacity="0.10" stroke="#1A2420" stroke-width="2"/>
+<text x="450.0" y="232.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">ESP32</text>
+<text x="450.0" y="251.0" text-anchor="middle" font-size="12" fill="#1A2420">DevKit V1</text>
+<rect x="40" y="200" width="170" height="70" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="125.0" y="232.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">USB-to-UART bridge</text>
+<text x="125.0" y="251.0" text-anchor="middle" font-size="12" fill="#1A2420">→ laptop Serial Monitor</text>
+<line x1="210" y1="235" x2="350" y2="235" stroke="#6b7280" stroke-width="3"/>
+<text x="280" y="225" text-anchor="middle" font-size="12" fill="#6b7280">UART0 · TX/RX</text>
+<line x1="450" y1="190" x2="450" y2="120" stroke="#8F5119" stroke-width="4"/>
+<line x1="250" y1="120" x2="790" y2="120" stroke="#8F5119" stroke-width="4"/>
+<text x="460" y="160" font-size="12" fill="#8F5119">SPI (VSPI): SCK 18 · MOSI 23 · MISO 19</text>
+<rect x="170" y="45" width="170" height="62" rx="8" fill="#8F5119" fill-opacity="0.10" stroke="#8F5119" stroke-width="2"/>
+<text x="255.0" y="73.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">OLED (SSD1306)</text>
+<text x="255.0" y="92.0" text-anchor="middle" font-size="12" fill="#1A2420">CS 5 · DC 16 · RES 17</text>
+<line x1="255" y1="107" x2="255" y2="120" stroke="#8F5119" stroke-width="3"/>
+<rect x="620" y="45" width="170" height="62" rx="8" fill="#8F5119" fill-opacity="0.10" stroke="#8F5119" stroke-width="2"/>
+<text x="705.0" y="73.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">LoRa RFM95W</text>
+<text x="705.0" y="92.0" text-anchor="middle" font-size="12" fill="#1A2420">CS 14 · RST 26 · G0 25</text>
+<line x1="705" y1="107" x2="705" y2="120" stroke="#8F5119" stroke-width="3"/>
+<line x1="450" y1="280" x2="450" y2="340" stroke="#1C6B49" stroke-width="4"/>
+<line x1="150" y1="340" x2="760" y2="340" stroke="#1C6B49" stroke-width="4"/>
+<text x="460" y="315" font-size="12" fill="#1C6B49">I²C: SDA 21 · SCL 22</text>
+<rect x="80" y="370" width="170" height="62" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="165.0" y="398.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">BMP280</text>
+<text x="165.0" y="417.0" text-anchor="middle" font-size="12" fill="#1A2420">address 0x76</text>
+<line x1="165" y1="340" x2="165" y2="370" stroke="#1C6B49" stroke-width="3"/>
+<rect x="365" y="370" width="170" height="62" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="450.0" y="398.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">MPU-6050</text>
+<text x="450.0" y="417.0" text-anchor="middle" font-size="12" fill="#1A2420">address 0x68</text>
+<line x1="450" y1="340" x2="450" y2="370" stroke="#1C6B49" stroke-width="3"/>
+<rect x="650" y="370" width="170" height="62" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="735.0" y="398.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">ATECC608A</text>
+<text x="735.0" y="417.0" text-anchor="middle" font-size="12" fill="#1A2420">address 0x60</text>
+<line x1="735" y1="340" x2="735" y2="370" stroke="#1C6B49" stroke-width="3"/>
+<text x="450" y="458" text-anchor="middle" font-size="12" fill="#6b7280">SPI: one chip-select wire per device · I²C: one address per device on two shared wires</text>
+</svg>

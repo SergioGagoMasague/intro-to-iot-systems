@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 410" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="440.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">A four-level IoT reference architecture</text>
+<rect x="40" y="50" width="620" height="70" rx="8" fill="#2f5d8a" fill-opacity="0.10" stroke="#2f5d8a" stroke-width="2"/>
+<text x="350.0" y="81.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Application level</text>
+<text x="350.0" y="100.0" text-anchor="middle" font-size="12" fill="#1A2420">Dashboards, mobile apps, alerts, business systems</text>
+<rect x="40" y="140" width="620" height="70" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="350.0" y="171.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Management &amp; services platform</text>
+<text x="350.0" y="190.0" text-anchor="middle" font-size="12" fill="#1A2420">Device registry, identity, configuration, updates, storage, analytics</text>
+<rect x="40" y="230" width="620" height="70" rx="8" fill="#8F5119" fill-opacity="0.10" stroke="#8F5119" stroke-width="2"/>
+<text x="350.0" y="261.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Network level</text>
+<text x="350.0" y="280.0" text-anchor="middle" font-size="12" fill="#1A2420">Radios, gateways, routers, switches and their protocols</text>
+<rect x="40" y="320" width="620" height="70" rx="8" fill="#9E3629" fill-opacity="0.10" stroke="#9E3629" stroke-width="2"/>
+<text x="350.0" y="351.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Device level</text>
+<text x="350.0" y="370.0" text-anchor="middle" font-size="12" fill="#1A2420">Sensors, actuators and the microcontrollers that run them</text>
+<rect x="690" y="50" width="160" height="340" rx="8" fill="#1A2420" fill-opacity="0.10" stroke="#1A2420" stroke-width="2"/>
+<text x="770.0" y="225.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">Security</text>
+<text x="770" y="250" text-anchor="middle" font-size="13" fill="#1A2420" font-weight="bold">and management</text>
+<text x="770" y="280" text-anchor="middle" font-size="12" fill="#6b7280">(cross-cutting)</text>
+<line x1="14" y1="380" x2="14" y2="60" stroke="#1C6B49" stroke-width="2" marker-end="url(#ar)"/>
+<text x="14" y="220" text-anchor="middle" font-size="11" fill="#1A2420"></text>
+<text x="30" y="220" font-size="12" fill="#6b7280" transform="rotate(-90 30 220)" text-anchor="middle">data flows up · commands flow down</text>
+</svg>

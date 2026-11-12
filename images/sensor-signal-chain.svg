@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1130 200" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="565.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">The sensor signal chain</text>
+<rect x="20" y="70" width="135" height="70" rx="8" fill="#6b7280" fill-opacity="0.10" stroke="#6b7280" stroke-width="2"/>
+<text x="87.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Physical</text>
+<text x="87.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">quantity</text>
+<line x1="155" y1="105" x2="180" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="180" y="70" width="135" height="70" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="247.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Transducer</text>
+<text x="247.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">→ electrical</text>
+<line x1="315" y1="105" x2="340" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="340" y="70" width="135" height="70" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="407.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Conditioning</text>
+<text x="407.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">amplify, filter</text>
+<line x1="475" y1="105" x2="500" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="500" y="70" width="135" height="70" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="567.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">ADC</text>
+<text x="567.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">→ number</text>
+<line x1="635" y1="105" x2="660" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="660" y="70" width="135" height="70" rx="8" fill="#1C6B49" fill-opacity="0.10" stroke="#1C6B49" stroke-width="2"/>
+<text x="727.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Processing</text>
+<text x="727.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">calibrate, filter</text>
+<line x1="795" y1="105" x2="820" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+<rect x="820" y="70" width="135" height="70" rx="8" fill="#8F5119" fill-opacity="0.10" stroke="#8F5119" stroke-width="2"/>
+<text x="887.5" y="101.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#1A2420">Interface</text>
+<text x="887.5" y="120.0" text-anchor="middle" font-size="12" fill="#1A2420">I²C · SPI · UART</text>
+<rect x="172" y="55" width="796" height="100" rx="12" fill="none" stroke="#1A2420" stroke-dasharray="6,5" stroke-width="1.5"/>
+<text x="570" y="180" text-anchor="middle" font-size="13" fill="#6b7280">Smart sensor: everything inside the dashed box on one chip</text>
+<rect x="990" y="70" width="120" height="70" rx="8" fill="#1A2420" fill-opacity="0.10" stroke="#1A2420" stroke-width="2"/>
+<text x="1050.0" y="110.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#1A2420">MCU</text>
+<line x1="955" y1="105" x2="988" y2="105" stroke="#1A2420" stroke-width="2" marker-end="url(#ar)"/>
+</svg>

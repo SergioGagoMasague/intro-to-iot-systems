@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 890 350" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2420"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="445.0" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1A2420">Encapsulation in the TCP/IP stack</text>
+<text x="110" y="90" text-anchor="end" font-size="14" fill="#1A2420" font-weight="bold">Application</text>
+<rect x="510" y="68" width="300" height="40" fill="#1A2420" fill-opacity="0.12" stroke="#1A2420" stroke-width="2"/>
+<text x="660.0" y="93" text-anchor="middle" font-size="13" fill="#1A2420">Data</text>
+<text x="110" y="160" text-anchor="end" font-size="14" fill="#1A2420" font-weight="bold">Transport</text>
+<text x="110" y="178" text-anchor="end" font-size="12" fill="#6b7280">Segment</text>
+<rect x="400" y="138" width="110" height="40" fill="#8F5119" fill-opacity="0.12" stroke="#8F5119" stroke-width="2"/>
+<text x="455.0" y="163" text-anchor="middle" font-size="13" fill="#1A2420">TCP/UDP hdr</text>
+<rect x="510" y="138" width="300" height="40" fill="#1A2420" fill-opacity="0.12" stroke="#1A2420" stroke-width="2"/>
+<text x="660.0" y="163" text-anchor="middle" font-size="13" fill="#1A2420">Data</text>
+<text x="110" y="230" text-anchor="end" font-size="14" fill="#1A2420" font-weight="bold">Internet</text>
+<text x="110" y="248" text-anchor="end" font-size="12" fill="#6b7280">Packet</text>
+<rect x="310" y="208" width="90" height="40" fill="#1C6B49" fill-opacity="0.12" stroke="#1C6B49" stroke-width="2"/>
+<text x="355.0" y="233" text-anchor="middle" font-size="13" fill="#1A2420">IP hdr</text>
+<rect x="400" y="208" width="110" height="40" fill="#8F5119" fill-opacity="0.12" stroke="#8F5119" stroke-width="2"/>
+<text x="455.0" y="233" text-anchor="middle" font-size="13" fill="#1A2420">TCP/UDP hdr</text>
+<rect x="510" y="208" width="300" height="40" fill="#1A2420" fill-opacity="0.12" stroke="#1A2420" stroke-width="2"/>
+<text x="660.0" y="233" text-anchor="middle" font-size="13" fill="#1A2420">Data</text>
+<text x="110" y="300" text-anchor="end" font-size="14" fill="#1A2420" font-weight="bold">Link</text>
+<text x="110" y="318" text-anchor="end" font-size="12" fill="#6b7280">Frame</text>
+<rect x="130" y="278" width="100" height="40" fill="#2f5d8a" fill-opacity="0.12" stroke="#2f5d8a" stroke-width="2"/>
+<text x="180.0" y="303" text-anchor="middle" font-size="13" fill="#1A2420">Link hdr</text>
+<rect x="230" y="278" width="90" height="40" fill="#1C6B49" fill-opacity="0.12" stroke="#1C6B49" stroke-width="2"/>
+<text x="275.0" y="303" text-anchor="middle" font-size="13" fill="#1A2420">IP hdr</text>
+<rect x="320" y="278" width="110" height="40" fill="#8F5119" fill-opacity="0.12" stroke="#8F5119" stroke-width="2"/>
+<text x="375.0" y="303" text-anchor="middle" font-size="13" fill="#1A2420">TCP/UDP hdr</text>
+<rect x="430" y="278" width="300" height="40" fill="#1A2420" fill-opacity="0.12" stroke="#1A2420" stroke-width="2"/>
+<text x="580.0" y="303" text-anchor="middle" font-size="13" fill="#1A2420">Data</text>
+<rect x="730" y="278" width="80" height="40" fill="#2f5d8a" fill-opacity="0.12" stroke="#2f5d8a" stroke-width="2"/>
+<text x="770.0" y="303" text-anchor="middle" font-size="13" fill="#1A2420">Trailer</text>
+<line x1="840" y1="70" x2="840" y2="320" stroke="#6b7280" stroke-width="2" marker-end="url(#ar)"/>
+<text x="850" y="200" text-anchor="middle" font-size="12" fill="#1A2420"></text>
+<text x="862" y="195" font-size="12" fill="#6b7280" transform="rotate(90 862 195)" text-anchor="middle">sender: encapsulate ↓ · receiver: decapsulate ↑</text>
+</svg>

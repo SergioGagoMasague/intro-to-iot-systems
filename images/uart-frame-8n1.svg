@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 250" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="160" y="45" width="600" height="110" fill="#1C6B49" opacity="0.07"/>
+<polyline points="40,70 40,70 100,70 100,70 100,70 160,70 160,70 160,130 220,130 220,130 220,70 280,70 280,70 280,130 340,130 340,130 340,130 400,130 400,130 400,130 460,130 460,130 460,130 520,130 520,130 520,130 580,130 580,130 580,70 640,70 640,70 640,130 700,130 700,130 700,70 760,70 760,70 760,70 820,70 820,70 820,70 880,70" fill="none" stroke="#1A2420" stroke-width="3"/>
+<text x="70.0" y="180" text-anchor="middle" font-size="13" fill="#6b7280">idle</text>
+<text x="130.0" y="180" text-anchor="middle" font-size="13" fill="#6b7280">idle</text>
+<line x1="160" y1="45" x2="160" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="190.0" y="180" text-anchor="middle" font-size="15" fill="#9E3629" font-weight="bold">Start</text>
+<text x="190.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="220" y1="45" x2="220" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="250.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D0</text>
+<text x="250.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">1</text>
+<line x1="280" y1="45" x2="280" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="310.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D1</text>
+<text x="310.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="340" y1="45" x2="340" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="370.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D2</text>
+<text x="370.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="400" y1="45" x2="400" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="430.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D3</text>
+<text x="430.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="460" y1="45" x2="460" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="490.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D4</text>
+<text x="490.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="520" y1="45" x2="520" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="550.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D5</text>
+<text x="550.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="580" y1="45" x2="580" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="610.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D6</text>
+<text x="610.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">1</text>
+<line x1="640" y1="45" x2="640" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="670.0" y="180" text-anchor="middle" font-size="15" fill="#1C6B49" font-weight="bold">D7</text>
+<text x="670.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">0</text>
+<line x1="700" y1="45" x2="700" y2="155" stroke="#6b7280" stroke-dasharray="3,4" stroke-width="1"/>
+<text x="730.0" y="180" text-anchor="middle" font-size="15" fill="#8F5119" font-weight="bold">Stop</text>
+<text x="730.0" y="62" text-anchor="middle" font-size="15" fill="#1A2420">1</text>
+<text x="790.0" y="180" text-anchor="middle" font-size="13" fill="#6b7280">idle</text>
+<text x="850.0" y="180" text-anchor="middle" font-size="13" fill="#6b7280">idle</text>
+<line x1="760" y1="45" x2="760" y2="155" stroke="#6b7280" stroke-dasharray="3,4"/>
+<text x="32" y="75" text-anchor="end" font-size="13" fill="#6b7280">1</text><text x="32" y="135" text-anchor="end" font-size="13" fill="#6b7280">0</text>
+<text x="460.0" y="215" text-anchor="middle" font-size="15" fill="#1A2420">One 8N1 frame = 10 bit times · data sent least-significant bit first</text>
+<text x="460.0" y="240" text-anchor="middle" font-size="14" fill="#1C6B49">Data bits D0–D7 = 0x41 (ASCII ‘A’)</text>
+<text x="460.0" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#1A2420">UART frame for the character ‘A’ (8 data bits, no parity, 1 stop bit)</text>
+</svg>
