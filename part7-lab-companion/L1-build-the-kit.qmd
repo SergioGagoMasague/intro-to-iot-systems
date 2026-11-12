@@ -18,7 +18,7 @@ The kit uses **two 830-point breadboards** side by side along their long edges, 
 
 - **Left board**: LEDs, buttons, potentiometer and buzzer; at the top, the servo and its 470 µF capacitor on a short, separate **5 V rail**.
 - **Right board**: from top to bottom, the ATECC608A, the OLED, the MPU-6050 and the BMP280.
-- A holder at the top carries the servo and, in some kits, the LoRa radio and its antenna; otherwise the radio sits on the right board.
+- A printed holder at the top (download link in @sec-app-a) carries the servo and, in some kits, the LoRa radio and its antenna; otherwise the radio sits on the right board.
 
 @fig-kit-layout in Appendix A shows the finished layout, and @fig-stage1 to @fig-stage4 show the wiring for each stage.
 

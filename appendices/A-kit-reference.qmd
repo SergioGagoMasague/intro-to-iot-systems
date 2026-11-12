@@ -40,7 +40,7 @@ Each kit is shared by a team of two or three students. Part numbers are the ones
 | 1 | LoRa radio, 915 MHz (North America) | SX1276-based; small 16 × 16 mm module fits the holder | Adafruit RFM95W #3072, or bare RFM95W-915S2 |
 | 1 | 915 MHz spring antenna (or 78 mm of 22 AWG wire) | Quarter-wave at 915 MHz | Adafruit #4269 |
 | — | Header pins (male), 40-pin strips | Cut to length | Amazon B0774VBJ3J |
-| 1 | Printed holder (tray) | See below | Printed in PLA or PETG |
+| 1 | Printed holder (tray) | See below | [Breadboard Snap-On Component Tray (830-point)](https://cults3d.com/en/3d-model/gadget/breadboard-snap-on-component-tray-830-point), designed by Alvin; free download, printed in PLA or PETG |
 
 : Kit bill of materials. {#tbl-bom}
 
@@ -54,9 +54,13 @@ A simple wire antenna works best at a quarter of the wavelength. At 915 MHz the 
 
 The holder is a single printed part that clips over the outer edges of the two breadboards and carries the servo and the radio, so that they do not pull on their wires.
 
-![Functional dimensions of the holder used in Fall 2026, measured from the printed part. They are given so that other courses can design a compatible holder.](../images/tray-dimensions.svg){#fig-tray width="95%"}
+::: {.callout-note title="Get the holder file from its designer"}
+The holder is the **Breadboard Snap-On Component Tray (830-point)**, designed by **Alvin** and shared as a free download on Cults3D: <https://cults3d.com/en/3d-model/gadget/breadboard-snap-on-component-tray-830-point>. Download the STL there rather than from a copy: the designer keeps it up to date based on feedback from users, and instructors who need a variation for their own kits can find his other designs on the same page. This book does not redistribute the file.
+:::
 
-Design notes for a compatible holder:
+![Functional dimensions of the holder used in Fall 2026, measured from the printed part. Download the part itself from its designer (link above); the dimensions are given to check a print and to plan compatible parts.](../images/tray-dimensions.svg){#fig-tray width="95%"}
+
+Key dimensions (useful to check a print against the kit):
 
 | Feature | Value | Why |
 |---|---|---|
@@ -69,7 +73,7 @@ Design notes for a compatible holder:
 
 Larger breakout-style radios (such as the 29 × 25 mm RadioFruit board) do **not** fit the radio pocket; they sit on the right breadboard instead.
 
-Printing tips: PLA or PETG, 0.2 mm layers, 15–20% infill, no supports if printed pocket-side up. Print one, test-fit a servo, a radio and both breadboards, then print the rest. Allow 0.2–0.3 mm clearance per side on pockets, since printers vary.
+Printing tips: PLA or PETG, 0.2 mm layers, 15–20% infill, no supports if printed pocket-side up. Print one, test-fit a servo, a radio and both breadboards, then print the rest.
 
 ## Wiring by stage
 
